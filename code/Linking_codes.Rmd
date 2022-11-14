@@ -1,0 +1,49 @@
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+load("R:/Science ERD/HEDMG/MPA_Group/Projects/St Anns Bank/Monitoring/Diets/ISDB/ISDB.ISTRIPS.RData")
+load("R:/Science ERD/HEDMG/MPA_Group/Projects/St Anns Bank/Monitoring/Diets/ISDB/ISDB.ISFISHSETS.RData")
+load("R:/Science ERD/HEDMG/MPA_Group/Projects/St Anns Bank/Monitoring/Diets/ISDB/ISDB.ISSETPROFILE_WIDE.RData")
+load("R:/Science ERD/HEDMG/MPA_Group/Projects/St Anns Bank/Monitoring/Diets/ISDB/ISDB.ISCATCHES.RData")
+load("R:/Science ERD/HEDMG/MPA_Group/Projects/St Anns Bank/Monitoring/Diets/ISDB/ISDB.ISFISH.RData")
+```
+
+
+```{r}
+tt <- merge(ISTRIPS[, c("TRIP_ID", "TRIP", "TRIPCD_ID")], ISFISHSETS[, c("FISHSET_ID", "TRIP_ID", "SET_NO", "SETCD_ID", "SPECSCD_ID")], by = "TRIP_ID")
+```
+
+
+```{r}
+tt2 <- merge(tt, ISSETPROFILE_WIDE[, c("FISHSET_ID", "SET_NO", "DATE_TIME1", "LAT1", "LONG1", "LAT2", "LONG2", "LAT3", "LONG3", "LAT4", "LONG4", "DEP1", "DEP2", "DEP3", "DEP4", "YEAR")])
+```
+
+
+```{r}
+stomach_dat <- read.csv("R:/Science ERD/HEDMG/MPA_Group/Projects/St Anns Bank/Monitoring/Diets/STOMACH_DATA.csv", header = TRUE, stringsAsFactors = FALSE)
+```
+
+```{r}
+dim(stomach_dat)
+```
+
+```{r}
+length(unique(stomach_dat$MISSION))
+```
+
+```{r}
+which(tt2$TRIP %in% stomach_dat$MISSION)
+```
+
+```{r}
+stomach_dat2 <- merge(stomach_dat, tt2, by.x = c("MISSION", "SETNO"), by.y = c("TRIP", "SET_NO"), all.x = FALSE)
+```
+
+```{r}
+dim(stomach_dat)
+```
+
