@@ -11,6 +11,7 @@ library(data.table)
 library(scales)
 library(ggridges)
 library(tidyr)
+library(ggridges)
 
 #Temperature data ------
 tempdat <- read.csv("c:/Users/stanleyr/Desktop/SAB AC/SABTempData.csv",stringsAsFactors = F)%>%
