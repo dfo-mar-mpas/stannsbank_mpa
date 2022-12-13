@@ -19,6 +19,9 @@ latlong <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
 utm_mar <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84=0,0,0"
 CanProj <- "+proj=lcc +lat_1=49 +lat_2=77 +lat_0=63.390675 +lon_0=-91.86666666666666 +x_0=6200000 +y_0=3000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
 
+#load bathymetry 
+ras <- raster("data/Bathymetry/sab_dem.tif")
+
 #load the St. Anns Bank MPA Polygon
 sab <- read_sf("data/Shapefiles/StAnnsBank/SAB_boundary_zones_2017.shp")%>%
   st_transform(latlong)
@@ -71,14 +74,18 @@ sab_benthoscape <- read_sf("data/Shapefiles/StAnns_Benthoscape/benthoscape/benth
 sample_coords <- read.csv("data/sampling_2022_coords.csv")%>%
                  filter(grepl("SAB",station))%>%
                  dplyr::select(station,lon,lat)%>%
-                 st_as_sf(coords=c("lon","lat"),crs=latlong)%>%
+                 st_as_sf(coords=c("lon","lat"),crs=latlong,remove=FALSE)%>%
                  mutate(type="eDNA")
+
+sample_coords$depth <- raster::extract(ras,sample_coords%>%st_transform(st_crs(ras))%>%as_Spatial())*-1
 
 #load reciever locations
 reciever_coords <- read.csv("data/OTN_redesign_coords.csv")%>%
                    rename(lon=long)%>%
-                   st_as_sf(coords=c("lon","lat"),crs=latlong)%>%
+                   st_as_sf(coords=c("lon","lat"),crs=latlong,remove=FALSE)%>%
                    mutate(type="Acoustic recievers")
+
+reciever_coords$depth <- raster::extract(ras,reciever_coords%>%st_transform(st_crs(ras))%>%as_Spatial())*-1
 
 
 #make the map
@@ -95,3 +102,12 @@ p1 <- ggplot()+
       annotation_scale()
 
 ggsave("output/sab_readme_plot.png",p1,width=6,height=6,dpi=300,units="in")      
+
+#get the coordinates together for output
+out <- sample_coords%>%
+       data.frame()%>%
+       mutate(station == ifelse(station=="SAB_trans_1","Scattarie Bank",station))%>%
+       dplyr::select(type,station,depth,lon,lat)%>%
+       rbind(.,reciever_coords%>%data.frame()%>%mutate(station = paste0("AR_",Id))%>%dplyr::select(type,station,depth,lon,lat))
+
+write.csv(out,"output/sab_coordinates.csv",row.names = FALSE)
