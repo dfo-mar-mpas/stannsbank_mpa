@@ -30,7 +30,7 @@ utm_mar <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +tow
 CanProj <- "+proj=lcc +lat_1=49 +lat_2=77 +lat_0=63.390675 +lon_0=-91.86666666666666 +x_0=6200000 +y_0=3000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
 
 #load the St. Anns Bank MPA Polygon
-sab <- read_sf("data/Shapefiles/StAnnsBank/SAB_boundary_zones_2017.shp")%>%
+sab <- read_sf("data/Shapefiles/SAB_boundary_zones_2017.shp")%>%
   st_transform(latlong)
 
 sab_nozones <- sab%>%
@@ -89,7 +89,7 @@ basemap_atlantic <- rbind(ne_states(country = "Canada",returnclass = "sf")%>%
 sab_bathy <- raster("data/Bathymetry/bathy50/w001001.adf", RAT=FALSE)%>%
   projectRaster(.,crs=latlong)
 
-sab_benthoscape <- read_sf("data/Shapfiles/benthoscape.shp")%>%
+sab_benthoscape <- read_sf("data/Shapefiles/benthoscape.shp")%>%
   st_transform(latlong)%>%
   mutate(class = Assigned_c,
          class = gsub("A - ","",class), #clean up the classification labels
