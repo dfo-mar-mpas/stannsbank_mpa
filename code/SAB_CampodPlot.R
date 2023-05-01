@@ -90,9 +90,9 @@ ras <- raster("data/Bathymetry/sab_dem.tif")
 rasproj <- proj4string(ras)
 
 #load coordinates - downloaded form https://data.mendeley.com/datasets/vhj7cg9y68/2
-photo_coords <- read.xlsx("r:/Science/CESD/HES_MPAGroup/Data/Imagery/2009 St. Anns Bank/St Anns Bank MPA Photo Archive Metadata.xlsx",sheetIndex = 1)%>%
-                st_as_sf(coords=c("Longitude","Latitude"),crs=latlong,remove=FALSE)%>%
-                mutate(type="photo")
+photo_coords <- read_sf("data/shapefiles/Kenchington2023_SAB_MPA_Photo_Archive_Metadata.shp")%>%
+                   st_transform(latlong)%>%
+                   mutate(type="photo")
 
 photo_centroid <- photo_coords%>%
                   group_by(Station)%>%
@@ -100,9 +100,9 @@ photo_centroid <- photo_coords%>%
                   st_centroid()%>%
                   st_as_sf() # get the centroid of point clusters
 
-video_coords <- read.xlsx("r:/Science/CESD/HES_MPAGroup/Data/Imagery/2009 St. Anns Bank/St Anns Bank MPA Video Transects.xlsx",sheetIndex = 1)%>%
-                st_as_sf(coords=c("Longitude","Latitude"),crs=latlong,remove=FALSE)%>%
-                mutate(type="video")
+video_coords <- read_sf("data/shapefiles/Kenchington2023_SAB_MPA_Video_Transect_Metadata.shp")%>%
+                 st_transform(latlong)%>%
+                 mutate(type="video")
 
 imagery_coords <- rbind(photo_coords%>%dplyr::select(Station,type,geometry),video_coords%>%dplyr::select(Station,type,geometry))
 
