@@ -1,6 +1,6 @@
 # stannsbank
 St. Anns Bank Marine Protected Area Science Program
 
-![](output/sab_readme_plot.png)
+![](output/2023_mission/sab_survey_design_2024-26.png)
 
-__Fig 1.__ St. Anns Bank Marine Protected Area. Fill colours correspond to benthoscape classes [(Lacharite and Brown 2018)](https://onlinelibrary.wiley.com/doi/full/10.1002/aqc.3074). Cirlces correspond to the proposed environmental DNA sampling program (eDNA) and small crosses correspond to the array of acoustic receivers deployed for tracking fish movement [Ocean Tracking Network - SABMPA](https://members.oceantrack.org/project?ccode=SABMPA). White dot denotes Scatterie Bank. 
+__Fig 1.__ St. Anns Bank Marine Protected Area. Fill colours correspond to benthoscape classes [(Lacharite and Brown 2018)](https://onlinelibrary.wiley.com/doi/full/10.1002/aqc.3074). Points correspond to the proposed environmental DNA sampling program (eDNA) and locations for potential deployment of a mid-water camera system in summer 2023. 
