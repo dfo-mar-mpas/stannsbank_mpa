@@ -377,7 +377,7 @@ sab  <- sab_zones%>%
                     scale_shape_manual(values=c(21,25,19))+
                     theme_bw()+
                     #scale_fill_viridis(discrete = T,option="C")+
-                    labs(fill="",shape="",title="Proposed Sample locations")
+                    labs(fill="",shape="",title="Proposed sample locations")
     
     outplot <- ggplot()+
                 geom_sf(data=basemap)+
