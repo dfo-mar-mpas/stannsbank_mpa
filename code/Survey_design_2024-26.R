@@ -28,6 +28,7 @@ utm <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84
 #load bathymetry ------
 dem_sab <- raster("data/Bathymetry/sab_dem.tif") # SAB based on the 'predSpace' data
 dem_esi <- raster("data/Bathymetry/esi_dem.tif") # ESI based on the Greenlaw 35 dem
+load("data/Bathymetry/250m_stars_object.RData") # STARS object based on the 250m depth contour extracted (converted) from GEBCO
 
 #simplify the names for COIP application
 benthoscape_classes <- data.frame(Assigned_c=c("A - Mud",
@@ -363,8 +364,6 @@ sab  <- sab_zones%>%
                        st_bbox()%>% #make it square
                        st_as_sfc()%>%
                        st_as_sf()
-                                       
-    
     
     sample_plot <- ggplot()+
                     geom_sf(data=basemap)+
@@ -402,16 +401,29 @@ sab  <- sab_zones%>%
 ## now format the final station list ---------
     
     station_output <- rbind(strat_samples_format%>%
-                              data.frame()%>%
                               mutate(type=ifelse(grepl("Campod",type),"St Anns Bank Stratified eDNA",type))%>%
-                              dplyr::select(latitude,longitude,name,type),
+                              dplyr::select(latitude,longitude,name,type,geometry),
                             camera_locations%>%
-                              data.frame()%>%
                               rename(name=station,latitude=lat,longitude=lon)%>%
                               mutate(type="Camera drop")%>%
-                              dplyr::select(latitude,longitude,name,type))
+                              dplyr::select(latitude,longitude,name,type,geometry))%>%
+                       st_transform(proj4string(dem_sab))%>%
+                       mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))%>%
+                       arrange(type,name)%>%
+                       st_transform(latlong)
     
-    write.csv(x=station_output,file="output/2023_mission/2024-26_StationList.csv",row.names = FALSE)
+    #for COIP
+    write.csv(x=station_output%>%data.frame()%>%dplyr::select(-c(geometry,depth)),file="output/2023_mission/2024-26_StationList.csv",row.names = FALSE)
+    
+    #for activity approval
+    write.csv(x=station_output%>%
+                st_intersection(.,sab_zones%>%dplyr::select(Zone,geometry))%>%
+                data.frame()%>%
+                rename(station=name)%>%
+                mutate(latitude = round(latitude,2),
+                       longitude = round(longitude,2))%>%
+                arrange(type,Zone,station)%>%
+                dplyr::select(Zone,type,station,depth,longitude,latitude),file="output/2023_mission/2023_StationList_activityapproval.csv",row.names = FALSE)
     
     
     edna_stations_ESI <- read.csv("data/sampling_2022_coords.csv")%>%
@@ -422,6 +434,24 @@ sab  <- sab_zones%>%
                         dplyr::select(latitude,longitude,name,type)
     
     write.csv(x=rbind(station_output,edna_stations_ESI),file="output/2023_mission/COIP_2024-26_StationList.csv")
+    
+    
+#make a map of the proposed survey locations for the 2023 Activity approval  ----------
+    
+    sample_plot_AA <- ggplot()+
+                      geom_sf(data=shelfbreak,col="grey20",lty=2,fill=NA)+
+                      geom_sf(data=basemap)+
+                      geom_sf(data=buffered_benthoscape,aes(fill=classn))+
+                      geom_sf(data=sab_zones,fill=NA)+
+                      geom_sf(data=strat_samples_format,aes(shape=type),fill="white",col="grey20",size=1.5)+
+                      geom_sf(data=strat_samples_format%>%filter(type=="Campod"),aes(shape=type),fill="white",col="grey20",size=3)+
+                      coord_sf(xlim=st_bbox(edna_boundaries)[c(1,3)],ylim=st_bbox(edna_boundaries)[c(2,4)],expand=0)+
+                      scale_shape_manual(values=c(21,25,19))+
+                      theme_bw()+
+                      #scale_fill_viridis(discrete = T,option="C")+
+                      labs(fill="",shape="",title="Proposed sample locations")
+    
+    ggsave("output/2023_mission/proposed_sample_locations.png",sample_plot_AA,width=7,height=5,units="in",dpi=300)
 
 ##extra code  -------------
 
