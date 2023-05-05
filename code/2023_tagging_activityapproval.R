@@ -38,6 +38,15 @@ sab  <- sab_zones%>%
   st_transform(latlong)%>%
   st_as_sf()
 
+#load the reciever locations
+reciever_locs <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
+                 st_as_sf(coords=c("long","lat"),crs=latlong)%>%
+                  st_intersection(.,sab_zones%>%dplyr::select(Zone,geometry))%>%
+                  mutate(lon=round(st_coordinates(.)[,1],3),
+                         lat=round(st_coordinates(.)[,2],3),
+                         type="Acoustic Reciever Locations")%>%
+                  dplyr::select(type,Zone,lon,lat,geometry)
+
 #load coastline and make basemap ------
 coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
 
@@ -132,3 +141,21 @@ p1 <- ggplot()+
         legend.position="bottom")
 
 ggsave("output/Acoustic/2023_ActivityApproval_taglocations.png",p1,height=5,width=8,units="in",dpi=300)
+
+#map with reciever locations too 
+
+p2 <- ggplot()+
+  geom_sf(data=shelfbreak,fill=NA,lwd=0.2)+
+  geom_sf(data=basemap)+
+  geom_sf(data=sab_zones,fill="cornflowerblue",alpha=0.30,col="grey10")+
+  #geom_sf(data=rbind(surveysets%>%filter(type=="2022 tag locations"),reciever_locs),aes(fill=type),col="black",pch=21,size=2)+
+    geom_sf(data=reciever_locs,aes(fill=type),col="black",pch=21,size=1.2)+
+  geom_sf(data=surveysets%>%filter(type=="2022 tag locations"),aes(fill=type),col="black",pch=21,size=2)+
+  scale_fill_manual(values=c("grey80","red"))+
+  coord_sf(xlim=plot_boundaries[c(1,2)],ylim=plot_boundaries[c(3,4)],expand=0)+
+  labs(fill="")+
+  theme_bw()+
+  theme(panel.grid = element_blank(),
+        legend.position="bottom")
+
+ggsave("output/Acoustic/reciever_tag_locations.png",p2,height=5,width=8,units="in",dpi=300)
