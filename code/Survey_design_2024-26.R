@@ -401,10 +401,27 @@ sab  <- sab_zones%>%
     
 ## now format the final station list ---------
     
-    station_output <- rbind(strat_samples_format%>%data.frame()%>%dplyr::select(latitude,longitude,name,type),
-                            camera_locations%>%data.frame()%>%rename(name=station,latitude=lat,longitude=lon)%>%dplyr::select(latitude,longitude,name,type))
+    station_output <- rbind(strat_samples_format%>%
+                              data.frame()%>%
+                              mutate(type=ifelse(grepl("Campod",type),"St Anns Bank Stratified eDNA",type))%>%
+                              dplyr::select(latitude,longitude,name,type),
+                            camera_locations%>%
+                              data.frame()%>%
+                              rename(name=station,latitude=lat,longitude=lon)%>%
+                              mutate(type="Camera drop")%>%
+                              dplyr::select(latitude,longitude,name,type))
     
     write.csv(x=station_output,file="output/2023_mission/2024-26_StationList.csv",row.names = FALSE)
+    
+    
+    edna_stations_ESI <- read.csv("data/sampling_2022_coords.csv")%>%
+                        filter(grepl("ESI",station))%>% 
+                        mutate(type="ESI eDNA",
+                               name=paste(type,1:n(),sep="-"))%>%
+                        rename(latitude=lat,longitude=lon)%>%
+                        dplyr::select(latitude,longitude,name,type)
+    
+    write.csv(x=rbind(station_output,edna_stations_ESI),file="output/2023_mission/COIP_2024-26_StationList.csv")
 
 ##extra code  -------------
 
