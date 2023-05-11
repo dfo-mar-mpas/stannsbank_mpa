@@ -1,18 +1,26 @@
 "Zone","type","station","depth","longitude","latitude"
-"1","Camera drop","SAB 1",90.8,-59.2,46.23
-"1","Camera drop","SAB 2",109.9,-59.03,46.15
-"1","Camera drop","SB09_01a",124,-59.04,45.98
-"1","Camera drop","SB09_02",43.1,-59.25,45.97
-"2a","Camera drop","NSB09_03_a",51,-59.48,46.04
-"2a","Camera drop","SB09_03_a",52.3,-59.47,46.03
+"1","Camera drop - Campod","SAB 1",90.8,-59.2,46.23
+"1","Camera drop - Campod","SAB 2",109.9,-59.03,46.15
+"1","Camera drop - Campod","SB09_01a",124,-59.04,45.98
+"1","Camera drop - Campod","SB09_02",43.1,-59.25,45.97
+"2a","Camera drop - Campod","NSB09_03_a",51,-59.48,46.04
+"2a","Camera drop - Campod","SB09_03_a",52.3,-59.47,46.03
+"1","Camera drop - rv","NED2017020-154",68,-59.31,46.06
+"1","Camera drop - rv","NED2019030-215",123.7,-59.05,45.91
+"1","Camera drop - rv","NED2019030-216",117.7,-59.02,46.03
+"1","Camera drop - rv","NED2019030-217",101.5,-59.07,46.15
+"2a","Camera drop - rv","NED2019030-203",57.4,-59.53,45.9
+"1","RV sets","Gravel-mud_3",123.7,-59.05,45.91
+"1","RV sets","Mud_3",117.7,-59.02,46.03
+"1","RV sets","Till-coraline algae_7",68,-59.31,46.06
+"1","RV sets","Till-gravel_8",101.5,-59.07,46.15
+"2a","RV sets","Sand-SandDollars_3",57.4,-59.53,45.9
 "1","St Anns Bank Stratified eDNA","Gravel-crinoids_1",129.7,-58.91,46.03
 "1","St Anns Bank Stratified eDNA","Gravel-crinoids_2",134.7,-58.92,46.03
 "1","St Anns Bank Stratified eDNA","Gravel-crinoids_3",99.5,-59.31,45.95
-"1","St Anns Bank Stratified eDNA","Gravel-mud_1",87.6,-59.44,45.85
-"1","St Anns Bank Stratified eDNA","Gravel-mud_2",90.5,-59.39,45.85
-"1","St Anns Bank Stratified eDNA","Gravel-mud_3 - CP",124,-59.04,45.98
-"1","St Anns Bank Stratified eDNA","Mud_1",128.1,-59.02,46.19
-"1","St Anns Bank Stratified eDNA","Mud_2",76.1,-59.46,45.95
+"1","St Anns Bank Stratified eDNA","Gravel-mud_1",93,-59.42,45.85
+"1","St Anns Bank Stratified eDNA","Gravel-mud_2 - CP",124,-59.04,45.98
+"1","St Anns Bank Stratified eDNA","Mud_1",98,-59.16,45.9
 "1","St Anns Bank Stratified eDNA","Sand-SandDollars_1",48.4,-59.47,45.94
 "1","St Anns Bank Stratified eDNA","Sand-SandDollars_2",96.3,-59.47,45.83
 "1","St Anns Bank Stratified eDNA","Sand-SandDollars_3",83.4,-59.49,45.85
@@ -25,16 +33,15 @@
 "2a","St Anns Bank Stratified eDNA","Mud_1",77.8,-59.34,46.04
 "2a","St Anns Bank Stratified eDNA","Mud_2",76.8,-59.35,46.04
 "2a","St Anns Bank Stratified eDNA","Mud_3",53,-59.54,45.88
-"2a","St Anns Bank Stratified eDNA","Sand-SandDollars_1",89.4,-59.55,45.83
-"2a","St Anns Bank Stratified eDNA","Sand-SandDollars_2",85.7,-59.6,45.83
-"2a","St Anns Bank Stratified eDNA","Sand-SandDollars_3",86.7,-59.53,45.83
+"2a","St Anns Bank Stratified eDNA","Sand-SandDollars_1",87.4,-59.58,45.83
+"2a","St Anns Bank Stratified eDNA","Sand-SandDollars_2",89.4,-59.56,45.83
 "2a","St Anns Bank Stratified eDNA","Till-coraline algae_1",53,-59.54,45.88
-"2a","St Anns Bank Stratified eDNA","Till-coraline algae_2",54.9,-59.58,46.04
+"2a","St Anns Bank Stratified eDNA","Till-coraline algae_2",61.9,-59.53,46.04
 "2a","St Anns Bank Stratified eDNA","Till-coraline algae_3 - CP",51,-59.48,46.04
 "2a","St Anns Bank Stratified eDNA","Till-coraline algae_4 - CP",52.3,-59.47,46.03
-"2a","St Anns Bank Stratified eDNA","Till-gravel_1",62.9,-59.38,46.06
-"2a","St Anns Bank Stratified eDNA","Till-gravel_2",65.4,-59.61,45.99
-"2a","St Anns Bank Stratified eDNA","Till-gravel_3",72.2,-59.51,45.87
+"2a","St Anns Bank Stratified eDNA","Till-gravel_1",77.6,-59.37,46.01
+"2a","St Anns Bank Stratified eDNA","Till-gravel_2",65.7,-59.34,46.03
+"2a","St Anns Bank Stratified eDNA","Till-gravel_3",68.1,-59.53,45.86
 "2b","St Anns Bank Stratified eDNA","Gravel-mud_1",119.2,-59.01,46
 "2b","St Anns Bank Stratified eDNA","Gravel-mud_2",132.2,-58.99,45.98
 "2b","St Anns Bank Stratified eDNA","Gravel-mud_3",141.6,-58.98,45.97
@@ -44,7 +51,7 @@
 "2b","St Anns Bank Stratified eDNA","Till-gravel_1",98,-59.02,45.97
 "2b","St Anns Bank Stratified eDNA","Till-gravel_2",128.7,-58.94,45.93
 "2b","St Anns Bank Stratified eDNA","Till-gravel_3",117.6,-58.92,45.96
-"1","eDNA depth transect","Mud_3 - DT",128.9,-59.06,46.21
+"1","eDNA depth transect","Mud_2 - DT",128.9,-59.06,46.21
 "1","eDNA depth transect","Till-coraline algae_1 - DT",33.6,-59.21,45.99
 "1","eDNA depth transect","Till-coraline algae_2 - DT",50.6,-59.21,46
 "1","eDNA depth transect","Till-coraline algae_3 - DT",59.4,-59.2,46.01

@@ -194,12 +194,20 @@ sab  <- sab_zones%>%
                       dplyr::select(station,type,lon,lat,geometry)%>%
                       suppressWarnings() #taking centriod of non-planar coordinates is ok since these are just approximate
       
+      rv_locations <- read_sf("data/Shapefiles/RV_sets_2017_2019_inside_SAB.shp")%>%
+                      st_transform(latlong)%>%
+                      rename(lat=LATITUDE,lon=LONGITUDE)%>%
+                      mutate(station=paste(MISSION,SETNO,sep="-"),
+                             type="RV sets")%>%
+                      dplyr::select(station,type,lon,lat,geometry)
+      
       camera_locations <- rbind(photo_coords%>%
                                   filter(!station %in% unique(video_coords$station)), #take the centriod from the videos and not the photos 
-                                video_coords)%>%
+                                video_coords,rv_locations)%>%
                           st_intersection(.,sab_benthoscape%>%dplyr::select(classn,geometry))%>%
                           st_intersection(.,perley_net_buffer)%>% #cut out the ones not in the operational window of the Perley
-                          st_intersection(.,sab_zones%>%dplyr::select(Zone,geometry))
+                          st_intersection(.,sab_zones%>%dplyr::select(Zone,geometry))%>%
+                          suppressWarnings()#non-planar intersection warning. Not an issue here.
       
       camera_locations_df <- data.frame(camera_locations)%>%dplyr::select(-geometry)%>%
                               rename(latitude=lat,longitude=lon,name=station)%>%
@@ -312,7 +320,7 @@ sab  <- sab_zones%>%
         mutate(classn=factor(classn,levels=unique(buffered_benthoscape$classn)))%>%
         arrange(classn)}
       
-      set.seed(23) #this will ensure that the analysis is repeatable. COmment out this code to resample the MPA
+      set.seed(23) #this will ensure that the analysis is repeatable. Comment out this code to re-sample the MPA
       
       strat_out <- buffered_benthoscape%>%
         filter(Zone==i)%>%
@@ -373,7 +381,7 @@ sab  <- sab_zones%>%
                     geom_sf(data=strat_samples_format,aes(shape=type),fill="white",col="grey20",size=1.5)+
                     geom_sf(data=strat_samples_format%>%filter(type=="Campod"),aes(shape=type),fill="white",col="grey20",size=3)+
                     coord_sf(xlim=st_bbox(edna_boundaries)[c(1,3)],ylim=st_bbox(edna_boundaries)[c(2,4)],expand=0)+
-                    scale_shape_manual(values=c(21,25,19))+
+                    scale_shape_manual(values=c(21,22,25,19))+
                     theme_bw()+
                     #scale_fill_viridis(discrete = T,option="C")+
                     labs(fill="",shape="",title="Proposed sample locations")
@@ -397,7 +405,6 @@ sab  <- sab_zones%>%
     
     ggsave("output/2023_mission/sab_survey_design_2024-26.png",study_plot,width=10,height=4,units="in",dpi=300)
     
-    
 ## now format the final station list ---------
     
     station_output <- rbind(strat_samples_format%>%
@@ -405,14 +412,15 @@ sab  <- sab_zones%>%
                               dplyr::select(latitude,longitude,name,type,geometry),
                             camera_locations%>%
                               rename(name=station,latitude=lat,longitude=lon)%>%
-                              mutate(type="Camera drop")%>%
+                              mutate(type=case_when(grepl("RV",type) ~ "Camera drop - rv",
+                                                    TRUE ~ "Camera drop - Campod"))%>%
                               dplyr::select(latitude,longitude,name,type,geometry))%>%
                        st_transform(proj4string(dem_sab))%>%
                        mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))%>%
                        arrange(type,name)%>%
                        st_transform(latlong)
     
-    #for COIP
+    #for COIP - note that this was updated from the one uploaded to the submitted COIP - incporated the RV prospective locations later
     write.csv(x=station_output%>%data.frame()%>%dplyr::select(-c(geometry,depth)),file="output/2023_mission/2024-26_StationList.csv",row.names = FALSE)
     
     #for activity approval
@@ -423,7 +431,8 @@ sab  <- sab_zones%>%
                 mutate(latitude = round(latitude,2),
                        longitude = round(longitude,2))%>%
                 arrange(type,Zone,station)%>%
-                dplyr::select(Zone,type,station,depth,longitude,latitude),file="output/2023_mission/2023_StationList_activityapproval.csv",row.names = FALSE)
+                dplyr::select(Zone,type,station,depth,longitude,latitude)%>%
+                suppressWarnings(),file="output/2023_mission/2023_StationList_activityapproval.csv",row.names = FALSE)
     
     
     edna_stations_ESI <- read.csv("data/sampling_2022_coords.csv")%>%
@@ -434,8 +443,7 @@ sab  <- sab_zones%>%
                         dplyr::select(latitude,longitude,name,type)
     
     write.csv(x=rbind(station_output,edna_stations_ESI),file="output/2023_mission/COIP_2024-26_StationList.csv")
-    
-    
+
 #make a map of the proposed survey locations for the 2023 Activity approval  ----------
     
     sample_plot_AA <- ggplot()+
@@ -446,7 +454,7 @@ sab  <- sab_zones%>%
                       geom_sf(data=strat_samples_format,aes(shape=type),fill="white",col="grey20",size=1.5)+
                       geom_sf(data=strat_samples_format%>%filter(type=="Campod"),aes(shape=type),fill="white",col="grey20",size=3)+
                       coord_sf(xlim=st_bbox(edna_boundaries)[c(1,3)],ylim=st_bbox(edna_boundaries)[c(2,4)],expand=0)+
-                      scale_shape_manual(values=c(21,25,19))+
+                      scale_shape_manual(values=c(21,22,25,19))+
                       theme_bw()+
                       #scale_fill_viridis(discrete = T,option="C")+
                       labs(fill="",shape="",title="Proposed sample locations")
