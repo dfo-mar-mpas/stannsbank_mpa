@@ -1,0 +1,37 @@
+* Sea-Bird SBE 19plus V2 Data File:
+* FileName = C:\Eastern_Shore_Islands_cruises\Ryan_Perley2023757\757A001.afm
+* Software Version SeatermAF 2.1.4
+* Temperature SN = 
+* Conductivity SN = 
+* System UpLoad Time = Apr 21 2023 08:50:34 (localtime) = Apr 21 2023 11:50:34 (UTC)
+** Platform: M. Perley 
+** Cruise: PER2023757 
+** Station:  ESI_08
+** Cast: 01 01
+** Latitude: N  44 40.0813
+** Longitude: W  -62 20.8761
+** Sounding:  114
+** Chief Scientist: Ryan Stanley 
+** Comment: 
+** First cast,Bottle 3 snagged, so we used water from bottle 5 twice. First test of the new sysetm. Also the Salinity guard wasn't taken off
+* ds
+* SBE 55 V 1.4.1  SERIAL NO. 188  21 Apr 2023 11:47:51
+* main battery = 12.98 volts
+* lithium battery =  3.04 volts
+* SBE 55 is NOT ARMED
+* A>
+*END*
+
+1  1   21 Apr 2023 11:40:04  confirmed   12.4  1961
+    00CA0007AA
+    00CA0007AB
+    00CA0007AC
+    00CA0007AD
+    00CA0007AE
+2  6   21 Apr 2023 11:44:48  confirmed   12.8  3098
+    0066000C1C
+    0066000C1D
+    0066000C1E
+    0065000C1F
+    0065000C20
+A>
