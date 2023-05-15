@@ -1,0 +1,205 @@
+* Sea-Bird SBE19plus  Data File:
+* FileName = C:\Eastern_Shore_Islands_cruises\Ryan_Perley2023757\757A004.hex
+* Software version 2.3.0 SB_Terminal.dll
+* Temperature SN = 7141
+* Conductivity SN = 7141
+* System UpLoad Time = Apr 21 2023 12:47:56
+* <ApplicationData>
+* <SeatermAF>
+* <SoftwareVersion>2.1.4</SoftwareVersion>
+* <BuildDate>11-Sep-2013 15:42:25 GMT</BuildDate>
+* </SeatermAF>
+* </ApplicationData>
+* cast   4 21 Apr 2023 15:27:58 samples 10929 to 14510, avg = 1, stop = mag switch
+** Platform: M. Perley
+** Cruise: PER2023757
+** Station:  ESI_05
+** Cast: 01 04
+** Latitude: N  44 49.3125
+** Longitude: W  -62 28.7752
+** Sounding:  11.7
+** Chief Scientist: Ryan Stanley
+** Comment: 141019-141024
+** Samples 141019 - 141024. Coming back early into Sheet Harbour because of an engine issue with the CCGS Perley.
+** CastID 757A004
+# nquan = 9
+# nvalues = 18                                    
+# units = specified
+# name 0 = depSM: Depth [salt water, m], lat = 44.00
+# name 1 = tv290C: Temperature [ITS-90, deg C]
+# name 2 = sal00: Salinity, Practical [PSU]
+# name 3 = opoxMg/L: Oxygen Optode, Aanderaa [mg/l]
+# name 4 = sbeox0Mg/L: Oxygen, SBE 43 [mg/l]
+# name 5 = wetStar: Fluorescence, WET Labs WETstar [mg/m^3]
+# name 6 = nbf: Bottles Fired
+# name 7 = scan: Scan Count
+# name 8 = flag:  0.000e+00
+# interval = seconds: 0.25
+# start_time = Apr 21 2023 15:27:58 [Instrument's time stamp, header]
+# bad_flag = -9.990e-29
+# <Sensors count="8" >
+#   <sensor Channel="1" >
+#     <!-- Count, Temperature -->
+#     <TemperatureSensor SensorID="58" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>21-Jan-21</CalibrationDate>
+#       <A0>1.24919288e-003</A0>
+#       <A1>2.79747385e-004</A1>
+#       <A2>-1.98507588e-006</A2>
+#       <A3>2.16007031e-007</A3>
+#       <Slope>1.00000000</Slope>
+#       <Offset>0.0000</Offset>
+#     </TemperatureSensor>
+#   </sensor>
+#   <sensor Channel="2" >
+#     <!-- Frequency 0, Conductivity -->
+#     <ConductivitySensor SensorID="3" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>21-Jan-21</CalibrationDate>
+#       <UseG_J>1</UseG_J>
+#       <!-- Cell const and series R are applicable only for wide range sensors. -->
+#       <SeriesR>0.0000</SeriesR>
+#       <CellConst>2000.0000</CellConst>
+#       <ConductivityType>0</ConductivityType>
+#       <Coefficients equation="0" >
+#         <A>0.00000000e+000</A>
+#         <B>0.00000000e+000</B>
+#         <C>0.00000000e+000</C>
+#         <D>0.00000000e+000</D>
+#         <M>0.0</M>
+#         <CPcor>-9.57000000e-008</CPcor>
+#       </Coefficients>
+#       <Coefficients equation="1" >
+#         <G>-9.92225195e-001</G>
+#         <H>1.38449995e-001</H>
+#         <I>-2.39825598e-004</I>
+#         <J>3.77199441e-005</J>
+#         <CPcor>-9.57000000e-008</CPcor>
+#         <CTcor>3.2500e-006</CTcor>
+#         <!-- WBOTC not applicable unless ConductivityType = 1. -->
+#         <WBOTC>0.00000000e+000</WBOTC>
+#       </Coefficients>
+#       <Slope>1.00000000</Slope>
+#       <Offset>0.00000</Offset>
+#     </ConductivitySensor>
+#   </sensor>
+#   <sensor Channel="3" >
+#     <!-- Count, Pressure, Strain Gauge -->
+#     <PressureSensor SensorID="46" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>11-Jan-21</CalibrationDate>
+#       <PA0>4.83652284e-002</PA0>
+#       <PA1>1.55001426e-003</PA1>
+#       <PA2>6.74523834e-012</PA2>
+#       <PTEMPA0>-6.83459498e+001</PTEMPA0>
+#       <PTEMPA1>5.34490621e+001</PTEMPA1>
+#       <PTEMPA2>-6.08517786e-001</PTEMPA2>
+#       <PTCA0>5.24947930e+005</PTCA0>
+#       <PTCA1>3.44175870e+000</PTCA1>
+#       <PTCA2>-9.03093657e-002</PTCA2>
+#       <PTCB0>2.49792500e+001</PTCB0>
+#       <PTCB1>2.50000000e-004</PTCB1>
+#       <PTCB2>0.00000000e+000</PTCB2>
+#       <Offset>0.000000</Offset>
+#     </PressureSensor>
+#   </sensor>
+#   <sensor Channel="4" >
+#     <!-- A/D voltage 0, Oxygen, SBE 43 -->
+#     <OxygenSensor SensorID="38" >
+#       <SerialNumber>3758</SerialNumber>
+#       <CalibrationDate>17-Mar-21</CalibrationDate>
+#       <Use2007Equation>1</Use2007Equation>
+#       <CalibrationCoefficients equation="0" >
+#         <!-- Coefficients for Owens-Millard equation. -->
+#         <Boc>0.0000</Boc>
+#         <Soc>0.0000e+000</Soc>
+#         <offset>0.0000</offset>
+#         <Pcor>0.00e+000</Pcor>
+#         <Tcor>0.0000</Tcor>
+#         <Tau>0.0</Tau>
+#       </CalibrationCoefficients>
+#       <CalibrationCoefficients equation="1" >
+#         <!-- Coefficients for Sea-Bird equation - SBE calibration in 2007 and later. -->
+#         <Soc>3.9639e-001</Soc>
+#         <offset>-0.5068</offset>
+#         <A>-3.6267e-003</A>
+#         <B> 1.7534e-004</B>
+#         <C>-2.7858e-006</C>
+#         <D0> 2.5826e+000</D0>
+#         <D1> 1.92634e-004</D1>
+#         <D2>-4.64803e-002</D2>
+#         <E> 3.6000e-002</E>
+#         <Tau20> 1.5600</Tau20>
+#         <H1>-3.3000e-002</H1>
+#         <H2> 5.0000e+003</H2>
+#         <H3> 1.4500e+003</H3>
+#       </CalibrationCoefficients>
+#     </OxygenSensor>
+#   </sensor>
+#   <sensor Channel="5" >
+#     <!-- A/D voltage 1, pH -->
+#     <pH_Sensor SensorID="43" >
+#       <SerialNumber>0920</SerialNumber>
+#       <CalibrationDate>24-Nov-20</CalibrationDate>
+#       <Slope>4.5771</Slope>
+#       <Offset>2.5123</Offset>
+#     </pH_Sensor>
+#   </sensor>
+#   <sensor Channel="6" >
+#     <!-- A/D voltage 2, Fluorometer, WET Labs WETstar -->
+#     <FluoroWetlabWetstarSensor SensorID="21" >
+#       <SerialNumber>05-4909-005</SerialNumber>
+#       <CalibrationDate>28-Oct-2005</CalibrationDate>
+#       <ScaleFactor>15.322</ScaleFactor>
+#       <!-- Blank output -->
+#       <Vblank>0.103</Vblank>
+#     </FluoroWetlabWetstarSensor>
+#   </sensor>
+#   <sensor Channel="7" >
+#     <!-- A/D voltage 3, User Polynomial -->
+#     <UserPolynomialSensor SensorID="61" >
+#       <SerialNumber>34</SerialNumber>
+#       <CalibrationDate>July 2022</CalibrationDate>
+#       <SensorName>Ares turbidity</SensorName>
+#       <A0>0.00000000</A0>
+#       <A1>1.00000000</A1>
+#       <A2>0.00000000</A2>
+#       <A3>0.00000000</A3>
+#     </UserPolynomialSensor>
+#   </sensor>
+#   <sensor Channel="8" >
+#     <!-- Serial RS-232, Oxygen Optode, Aanderaa -->
+#     <OptodeOxygenAanderaa SensorID="64" >
+#       <SerialNumber></SerialNumber>
+#       <CalibrationDate></CalibrationDate>
+#       <DoSalinityCorrection>0</DoSalinityCorrection>
+#       <DoDepthCorrection>0</DoDepthCorrection>
+#       <InternalSalinity>0.00000e+000</InternalSalinity>
+#     </OptodeOxygenAanderaa>
+#   </sensor>
+# </Sensors>
+# datcnv_date = Apr 21 2023 12:55:57, 7.26.6.28
+# datcnv_in = C:\Eastern_Shore_Islands_cruises\Ryan_Perley2023757\757A004.hex C:\Eastern_Shore_Islands_cruises\Ryan_Perley2023757\CTD\SBE19plusV2_7141_v2_plus_optode_fl_ph_turb_2022.xmlcon
+# datcnv_ox_hysteresis_correction = yes
+# datcnv_ox_tau_correction = yes
+# datcnv_bottle_scan_range_source = AFM file
+# datcnv_scans_per_bottle = 9
+*END*
+      5.032     3.1371    30.7484   14.70778    13.0398     6.0951          1       2446  0.000e+00
+      5.079     3.1371    30.7497   14.70778    13.0375     4.7496          1       2447  0.000e+00
+      5.138     3.1376    30.7491   14.70778    13.0407     5.2499          1       2448  0.000e+00
+      5.208     3.1382    30.7421   14.71494    13.0518     4.9787          1       2449  0.000e+00
+      5.294     3.1394    30.7372   14.71494    13.0782     6.1419          1       2450  0.000e+00
+      5.395     3.1401    30.7355   14.71494    13.0930     5.4253          1       2451  0.000e+00
+      5.516     3.1360    30.7313   14.71494    13.1521     6.2015          1       2452  0.000e+00
+      5.661     3.1291    30.7275   14.70653    13.1898     6.1056          1       2453  0.000e+00
+      5.828     3.1206    30.7257   14.70653    13.2308     5.9957          1       2454  0.000e+00
+      2.638     3.0079    30.7646   14.76493    13.5003     5.0103          2       3357  0.000e+00
+      2.443     3.0127    30.7481   14.76493    13.4804     5.0220          2       3358  0.000e+00
+      2.262     3.0147    30.7256   14.76493    13.4546     3.7291          2       3359  0.000e+00
+      2.097     3.0138    30.7209   14.76493    13.4292     4.2224          2       3360  0.000e+00
+      1.946     3.0114    30.7212   14.78512    13.3927     5.4685          2       3361  0.000e+00
+      1.814     3.0084    30.7264   14.78512    13.3731     6.2950          2       3362  0.000e+00
+      1.694     3.0138    30.7220   14.78512    13.3409     4.8022          2       3363  0.000e+00
+      1.581     3.0214    30.7159   14.78512    13.2891     4.7928          2       3364  0.000e+00
+      1.480     3.0270    30.7127   14.75879    13.2721     5.9279          2       3365  0.000e+00
