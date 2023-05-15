@@ -1,0 +1,37 @@
+* Sea-Bird SBE 19plus V2 Data File:
+* FileName = C:\Users\RSG_field\Ryan_Perley2022473\CTD\473A011.afm
+* Software Version SeatermAF 2.1.4
+* Temperature SN = 
+* Conductivity SN = 
+* System UpLoad Time = Aug 10 2022 14:01:33 (localtime) = Aug 10 2022 13:01:33 (UTC)
+** Platform: M. Perley 
+** Cruise: Per2022473 
+** Station:  ESI_14
+** Cast: 01 
+** Latitude: N  44 36.4309
+** Longitude: W 62 55.9254
+** Sounding: 34.5
+** Chief Scientist: Ryan Stanley 
+** Comment: CTD cast 29  - we had to tape broken spigot but it worked
+** note that there was a lot of topographic relief and when the CTD was doing the soak the bottom dropped about 10 m from 35 to 45-48 m
+* ds
+* SBE 55 V 1.4.1  SERIAL NO. 189  10 Aug 2022 14:01:25
+* main battery = 14.16 volts
+* lithium battery =  3.06 volts
+* SBE 55 is NOT ARMED
+* A>
+*END*
+
+1  1   10 Aug 2022 13:57:13  confirmed   14.2  1213
+    00840004BE
+    00840004BF
+    00840004C0
+    00840004C1
+    00840004C2
+2  6   10 Aug 2022 14:00:06  confirmed   14.2  1904
+    0066000772
+    0066000773
+    0066000774
+    0066000775
+    0066000776
+A>
