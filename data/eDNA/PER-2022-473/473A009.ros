@@ -1,0 +1,191 @@
+* Sea-Bird SBE19plus  Data File:
+* FileName = C:\Users\RSG_field\Ryan_Perley2022473\CTD\473A009.hex
+* Software version 2.3.0 SB_Terminal.dll
+* Temperature SN = 7141
+* Conductivity SN = 7141
+* System UpLoad Time = Aug 08 2022 19:37:49
+* <ApplicationData>
+* <SeatermAF>
+* <SoftwareVersion>2.1.4</SoftwareVersion>
+* <BuildDate>11-Sep-2013 15:42:25 GMT</BuildDate>
+* </SeatermAF>
+* </ApplicationData>
+* cast  27 08 Aug 2022 19:23:48 samples 59782 to 61506, avg = 1, stop = mag switch
+** Platform: M. Perley
+** Cruise: Per2022473
+** Station:  ESI_05
+** Cast: 01
+** Latitude: N  44 49.3093
+** Longitude: W 62 29.1012
+** Sounding: 20.3
+** Chief Scientist: Ryan Stanley
+** Comment: Cast 27
+# nquan = 9
+# nvalues = 18                                    
+# units = specified
+# name 0 = density00: Density [density, kg/m^3]
+# name 1 = depSM: Depth [salt water, m], lat = 45.00
+# name 2 = prdM: Pressure, Strain Gauge [db]
+# name 3 = sal00: Salinity, Practical [PSU]
+# name 4 = tv290C: Temperature [ITS-90, deg C]
+# name 5 = bpos: Bottle Position in Carousel
+# name 6 = nbf: Bottles Fired
+# name 7 = scan: Scan Count
+# name 8 = flag:  0.000e+00
+# interval = seconds: 0.25
+# start_time = Aug 08 2022 19:23:48 [Instrument's time stamp, header]
+# bad_flag = -9.990e-29
+# <Sensors count="7" >
+#   <sensor Channel="1" >
+#     <!-- Count, Temperature -->
+#     <TemperatureSensor SensorID="58" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>21-Jan-21</CalibrationDate>
+#       <A0>1.24919288e-003</A0>
+#       <A1>2.79747385e-004</A1>
+#       <A2>-1.98507588e-006</A2>
+#       <A3>2.16007031e-007</A3>
+#       <Slope>1.00000000</Slope>
+#       <Offset>0.0000</Offset>
+#     </TemperatureSensor>
+#   </sensor>
+#   <sensor Channel="2" >
+#     <!-- Frequency 0, Conductivity -->
+#     <ConductivitySensor SensorID="3" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>21-Jan-21</CalibrationDate>
+#       <UseG_J>1</UseG_J>
+#       <!-- Cell const and series R are applicable only for wide range sensors. -->
+#       <SeriesR>0.0000</SeriesR>
+#       <CellConst>2000.0000</CellConst>
+#       <ConductivityType>0</ConductivityType>
+#       <Coefficients equation="0" >
+#         <A>0.00000000e+000</A>
+#         <B>0.00000000e+000</B>
+#         <C>0.00000000e+000</C>
+#         <D>0.00000000e+000</D>
+#         <M>0.0</M>
+#         <CPcor>-9.57000000e-008</CPcor>
+#       </Coefficients>
+#       <Coefficients equation="1" >
+#         <G>-9.92225195e-001</G>
+#         <H>1.38449995e-001</H>
+#         <I>-2.39825598e-004</I>
+#         <J>3.77199441e-005</J>
+#         <CPcor>-9.57000000e-008</CPcor>
+#         <CTcor>3.2500e-006</CTcor>
+#         <!-- WBOTC not applicable unless ConductivityType = 1. -->
+#         <WBOTC>0.00000000e+000</WBOTC>
+#       </Coefficients>
+#       <Slope>1.00000000</Slope>
+#       <Offset>0.00000</Offset>
+#     </ConductivitySensor>
+#   </sensor>
+#   <sensor Channel="3" >
+#     <!-- Count, Pressure, Strain Gauge -->
+#     <PressureSensor SensorID="46" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>11-Jan-21</CalibrationDate>
+#       <PA0>4.83652284e-002</PA0>
+#       <PA1>1.55001426e-003</PA1>
+#       <PA2>6.74523834e-012</PA2>
+#       <PTEMPA0>-6.83459498e+001</PTEMPA0>
+#       <PTEMPA1>5.34490621e+001</PTEMPA1>
+#       <PTEMPA2>-6.08517786e-001</PTEMPA2>
+#       <PTCA0>5.24947930e+005</PTCA0>
+#       <PTCA1>3.44175870e+000</PTCA1>
+#       <PTCA2>-9.03093657e-002</PTCA2>
+#       <PTCB0>2.49792500e+001</PTCB0>
+#       <PTCB1>2.50000000e-004</PTCB1>
+#       <PTCB2>0.00000000e+000</PTCB2>
+#       <Offset>0.000000</Offset>
+#     </PressureSensor>
+#   </sensor>
+#   <sensor Channel="4" >
+#     <!-- A/D voltage 0, Oxygen, SBE 43 -->
+#     <OxygenSensor SensorID="38" >
+#       <SerialNumber>3758</SerialNumber>
+#       <CalibrationDate>17-Mar-21</CalibrationDate>
+#       <Use2007Equation>1</Use2007Equation>
+#       <CalibrationCoefficients equation="0" >
+#         <!-- Coefficients for Owens-Millard equation. -->
+#         <Boc>0.0000</Boc>
+#         <Soc>0.0000e+000</Soc>
+#         <offset>0.0000</offset>
+#         <Pcor>0.00e+000</Pcor>
+#         <Tcor>0.0000</Tcor>
+#         <Tau>0.0</Tau>
+#       </CalibrationCoefficients>
+#       <CalibrationCoefficients equation="1" >
+#         <!-- Coefficients for Sea-Bird equation - SBE calibration in 2007 and later. -->
+#         <Soc>3.9639e-001</Soc>
+#         <offset>-0.5068</offset>
+#         <A>-3.6267e-003</A>
+#         <B> 1.7534e-004</B>
+#         <C>-2.7858e-006</C>
+#         <D0> 2.5826e+000</D0>
+#         <D1> 1.92634e-004</D1>
+#         <D2>-4.64803e-002</D2>
+#         <E> 3.6000e-002</E>
+#         <Tau20> 1.5600</Tau20>
+#         <H1>-3.3000e-002</H1>
+#         <H2> 5.0000e+003</H2>
+#         <H3> 1.4500e+003</H3>
+#       </CalibrationCoefficients>
+#     </OxygenSensor>
+#   </sensor>
+#   <sensor Channel="5" >
+#     <!-- A/D voltage 1, pH -->
+#     <pH_Sensor SensorID="43" >
+#       <SerialNumber>0920</SerialNumber>
+#       <CalibrationDate>24-Nov-20</CalibrationDate>
+#       <Slope>4.5771</Slope>
+#       <Offset>2.5123</Offset>
+#     </pH_Sensor>
+#   </sensor>
+#   <sensor Channel="6" >
+#     <!-- A/D voltage 2, Fluorometer, WET Labs WETstar -->
+#     <FluoroWetlabWetstarSensor SensorID="21" >
+#       <SerialNumber>05-4909-005</SerialNumber>
+#       <CalibrationDate>28-Oct-2005</CalibrationDate>
+#       <ScaleFactor>15.322</ScaleFactor>
+#       <!-- Blank output -->
+#       <Vblank>0.103</Vblank>
+#     </FluoroWetlabWetstarSensor>
+#   </sensor>
+#   <sensor Channel="7" >
+#     <!-- A/D voltage 3, User Polynomial -->
+#     <UserPolynomialSensor SensorID="61" >
+#       <SerialNumber>34</SerialNumber>
+#       <CalibrationDate>July 2022</CalibrationDate>
+#       <SensorName>Ares turbidity</SensorName>
+#       <A0>0.00000000</A0>
+#       <A1>1.00000000</A1>
+#       <A2>0.00000000</A2>
+#       <A3>0.00000000</A3>
+#     </UserPolynomialSensor>
+#   </sensor>
+# </Sensors>
+# datcnv_date = Aug 08 2022 19:38:26, 7.26.6.28
+# datcnv_in = C:\Users\RSG_field\Ryan_Perley2022473\CTD\473A009.hex C:\Users\RSG_field\Ryan_Perley2022473\CTD\SBE19plusV2_7141_v2_plus_o2_fl_ph_turb_2022.xmlcon
+# datcnv_bottle_scan_range_source = AFM file
+# datcnv_scans_per_bottle = 9
+*END*
+  1024.3316     19.203     19.362    30.9568     6.9473          1          1       1120  0.000e+00
+  1024.3312     19.142     19.300    30.9569     6.9482          1          1       1121  0.000e+00
+  1024.3307     19.074     19.231    30.9568     6.9490          1          1       1122  0.000e+00
+  1024.3300     19.002     19.158    30.9563     6.9497          1          1       1123  0.000e+00
+  1024.3302     18.936     19.092    30.9571     6.9501          1          1       1124  0.000e+00
+  1024.3298     18.877     19.032    30.9572     6.9511          1          1       1125  0.000e+00
+  1024.3305     18.831     18.986    30.9585     6.9522          1          1       1126  0.000e+00
+  1024.3326     18.806     18.961    30.9615     6.9539          1          1       1127  0.000e+00
+  1024.3361     18.800     18.954    30.9666     6.9573          1          1       1128  0.000e+00
+  1023.6178      2.809      2.832    30.8385    10.6016          6          2       1553  0.000e+00
+  1023.5795      2.666      2.688    30.8048    10.6690          6          2       1554  0.000e+00
+  1023.5762      2.516      2.536    30.8110    10.7131          6          2       1555  0.000e+00
+  1023.5596      2.363      2.382    30.7995    10.7536          6          2       1556  0.000e+00
+  1023.5739      2.207      2.225    30.8283    10.7974          6          2       1557  0.000e+00
+  1023.5712      2.059      2.076    30.8380    10.8530          6          2       1558  0.000e+00
+  1023.5505      1.922      1.938    30.8260    10.9158          6          2       1559  0.000e+00
+  1023.5911      1.797      1.812    30.8938    10.9829          6          2       1560  0.000e+00
+  1023.4902      1.689      1.703    30.7851    11.0747          6          2       1561  0.000e+00
