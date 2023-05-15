@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SeatermAF_Setup ConfigurationType="11" DisplayVersion="2.1.4" FileVersion="2.1.0.4" >
+  <!-- AFM with SBE 19plusV2 -->
+  <BaudRate>9600</BaudRate>
+  <RealTimeBaudRate>9600</RealTimeBaudRate>
+  <BottleClosureLogic >
+    <!-- 0 == Close on downcast -->
+    <!-- 1 == Close on upcast -->
+    <!-- 2 == Close on elapsed time, do not record CTD data -->
+    <!-- 3 == Close when stationary -->
+    <!-- 4 == Close on elapsed time, record CTD data -->
+    <BottleClosureOption>1</BottleClosureOption>
+    <BottomBottleEnabled>1</BottomBottleEnabled>
+    <PressureToDetermineUpcast>1.00000e+001</PressureToDetermineUpcast>
+    <PressureDecreaseToDetermineUpcast>1.00000e+001</PressureDecreaseToDetermineUpcast>
+    <StationaryTimeOnBottom>2.00000e+000</StationaryTimeOnBottom>
+    <BottomPressureWindow>5.00000e+000</BottomPressureWindow>
+  </BottleClosureLogic>
+  <!-- 0 == Upload all data separated by cast -->
+  <!-- 1 == Upload a single cast -->
+  <!-- 2 == Upload by cast number range -->
+  <!-- 3 == Upload all data as a single file -->
+  <!-- 4 == Upload by scan number range -->
+  <UploadOption>1</UploadOption>
+  <!-- 0 == Prompt for header information -->
+  <!-- 1 == Include default header information -->
+  <!-- 2 == Do not include header information -->
+  <HeaderOptionCTD>0</HeaderOptionCTD>
+  <UploadBlockSize>100000</UploadBlockSize>
+  <HeaderOptionFM>0</HeaderOptionFM>
+  <Prompt index="0" value="Platform: M. Perley" />
+  <Prompt index="1" value="Cruise: Per2022473" />
+  <Prompt index="2" value="Station: " />
+  <Prompt index="3" value="Cast: 01" />
+  <Prompt index="4" value="Latitude: N " />
+  <Prompt index="5" value="Longitude: W" />
+  <Prompt index="6" value="Sounding:" />
+  <Prompt index="7" value="Chief Scientist: Ryan Stanley" />
+  <Prompt index="8" value="Comment:" />
+  <!-- 0 == Text -->
+  <!-- 1 == Binary -->
+  <UploadFormat>1</UploadFormat>
+  <!-- 0 == Alkaline -->
+  <!-- 1 == Nickel metal hydride (NiMH) -->
+  <!-- 2 == Nickel-cadmium (NiCad) -->
+  <BatteryType>2</BatteryType>
+  <Bottles >
+    <NumberOfBottles>2</NumberOfBottles>
+    <Bottle SequenceNumber="1" >
+      <Position>1</Position>
+      <FireAt>0.00000e+000</FireAt>
+    </Bottle>
+    <Bottle SequenceNumber="2" >
+      <Position>6</Position>
+      <FireAt>2.00000e+000</FireAt>
+    </Bottle>
+  </Bottles>
+</SeatermAF_Setup>
