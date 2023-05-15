@@ -353,6 +353,7 @@ sab  <- sab_zones%>%
                             rename(latitude=lat,longitude=lon)%>%
                             mutate(name=case_when(grepl("depth",type) ~ paste(name,"DT",sep=" - "), #DT - 'depth transect"
                                                   grepl("Campod",type) ~ paste(name,"CP",sep=" - "), #CP - Campod
+                                                  grepl("RV",type) ~ paste(name,"RV",sep=" - "), #RV sets
                                                   TRUE ~ name),
                                    type=ifelse(grepl("Campod",type),"Campod",type))%>%
                             dplyr::select(name,longitude,latitude,type)
@@ -373,13 +374,18 @@ sab  <- sab_zones%>%
                        st_as_sfc()%>%
                        st_as_sf()
     
+    plot_df <- strat_samples_format%>%
+               mutate(type=case_when(grepl("Campod",type) ~ "Camera/eDNA",
+                                     grepl("RV",type) ~ "Camera/eDNA",
+                                     TRUE ~ type))
+    
     sample_plot <- ggplot()+
                     geom_sf(data=basemap)+
                     geom_sf(data=buffered_benthoscape,aes(fill=classn))+
                     geom_sf(data=sab_zones,fill=NA)+
                     geom_sf(data=perley_buffers,fill=NA,lty=2)+
-                    geom_sf(data=strat_samples_format,aes(shape=type),fill="white",col="grey20",size=1.5)+
-                    geom_sf(data=strat_samples_format%>%filter(type=="Campod"),aes(shape=type),fill="white",col="grey20",size=3)+
+                    geom_sf(data=plot_df,aes(shape=type),fill="grey90",col="black",size=1.5)+
+                    geom_sf(data=plot_df%>%filter(type=="Camera/eDNA"),aes(shape=type),fill="grey90",col="black",size=3)+
                     coord_sf(xlim=st_bbox(edna_boundaries)[c(1,3)],ylim=st_bbox(edna_boundaries)[c(2,4)],expand=0)+
                     scale_shape_manual(values=c(21,22,25,19))+
                     theme_bw()+
@@ -407,14 +413,9 @@ sab  <- sab_zones%>%
     
 ## now format the final station list ---------
     
-    station_output <- rbind(strat_samples_format%>%
+    station_output <- strat_samples_format%>%
                               mutate(type=ifelse(grepl("Campod",type),"St Anns Bank Stratified eDNA",type))%>%
-                              dplyr::select(latitude,longitude,name,type,geometry),
-                            camera_locations%>%
-                              rename(name=station,latitude=lat,longitude=lon)%>%
-                              mutate(type=case_when(grepl("RV",type) ~ "Camera drop - rv",
-                                                    TRUE ~ "Camera drop - Campod"))%>%
-                              dplyr::select(latitude,longitude,name,type,geometry))%>%
+                              dplyr::select(latitude,longitude,name,type,geometry)%>%
                        st_transform(proj4string(dem_sab))%>%
                        mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))%>%
                        arrange(type,name)%>%
@@ -424,17 +425,21 @@ sab  <- sab_zones%>%
     write.csv(x=station_output%>%data.frame()%>%dplyr::select(-c(geometry,depth)),file="output/2023_mission/2024-26_StationList.csv",row.names = FALSE)
     
     #for activity approval
-    write.csv(x=station_output%>%
-                st_intersection(.,sab_zones%>%dplyr::select(Zone,geometry))%>%
-                data.frame()%>%
-                rename(station=name)%>%
-                mutate(latitude = round(latitude,2),
-                       longitude = round(longitude,2))%>%
-                arrange(type,Zone,station)%>%
-                dplyr::select(Zone,type,station,depth,longitude,latitude)%>%
-                suppressWarnings(),file="output/2023_mission/2023_StationList_activityapproval.csv",row.names = FALSE)
+    activity_approval_df <- strat_samples_format%>%
+                            st_intersection(.,sab_zones%>%dplyr::select(Zone,geometry))%>%
+                            mutate(latitude = round(st_coordinates(.)[,2],3),
+                                   longitude = round(st_coordinates(.)[,1],3))%>%
+                            st_transform(proj4string(dem_sab))%>%
+                            mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))%>%
+                            data.frame()%>%
+                            arrange(type,Zone,name)%>%
+                            dplyr::select(Zone,type,name,depth,longitude,latitude)%>%
+                            suppressWarnings()
+    
+    write.csv(x=activity_approval_df,file="output/2023_mission/2023_StationList_activityapproval.csv",row.names = FALSE)
     
     
+    #for COIP
     edna_stations_ESI <- read.csv("data/sampling_2022_coords.csv")%>%
                         filter(grepl("ESI",station))%>% 
                         mutate(type="ESI eDNA",
