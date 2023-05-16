@@ -1,0 +1,48 @@
+* Sea-Bird SBE 19plus V2 Data File:
+* FileName = C:\Users\RSG_field\Ryan_2021_Perley\CTD\171b011.afm
+* Software Version SeatermAF 2.1.4
+* Temperature SN = 
+* Conductivity SN = 
+* System UpLoad Time = Aug 11 2021 15:48:19 (localtime) = Aug 11 2021 18:48:19 (UTC)
+** Platform: M. Perley 
+** Cruise: Per2021171 
+** Station:  ESI_13
+** Cast: 01 2
+** Latitude: N  44 39.653
+** Longitude: W 62 58.434
+** Sounding: 30.1
+** Chief Scientist: Ryan Stanley 
+** Comment: 171b011
+* ds
+* SBE 55 V 1.4.1  SERIAL NO. 188  11 Aug 2021 18:48:09
+* main battery = 12.85 volts
+* lithium battery =  3.14 volts
+* SBE 55 is NOT ARMED
+* A>
+*END*
+
+1  1   11 Aug 2021 18:44:51  confirmed   12.9  1479
+    00840005C8
+    00840005C9
+    00840005CA
+    00840005CB
+    00830005CC
+2  2   11 Aug 2021 18:46:47  confirmed   12.9  1941
+    0073000797
+    0073000798
+    0073000799
+    007200079A
+    007200079B
+3  3   11 Aug 2021 18:47:07  confirmed   12.8  2023
+    00690007EA
+    00690007EB
+    00690007EC
+    00690007ED
+    00690007EE
+4  4   11 Aug 2021 18:47:13  confirmed   12.8  2046
+    0066000802
+    0066000803
+    0066000804
+    0066000805
+    0066000806
+A>

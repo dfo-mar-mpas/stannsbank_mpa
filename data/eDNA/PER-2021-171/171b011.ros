@@ -1,0 +1,198 @@
+* Sea-Bird SBE19plus  Data File:
+* FileName = C:\Users\RSG_field\Ryan_2021_Perley\CTD\171b011.hex
+* Software version 2.3.0 SB_Terminal.dll
+* Temperature SN = 7141
+* Conductivity SN = 7141
+* System UpLoad Time = Aug 11 2021 16:14:11
+* <ApplicationData>
+* <SeatermAF>
+* <SoftwareVersion>2.1.4</SoftwareVersion>
+* <BuildDate>11-Sep-2013 15:42:25 GMT</BuildDate>
+* </SeatermAF>
+* </ApplicationData>
+* cast  37 11 Aug 2021 18:38:28 samples 109849 to 114540, avg = 1, stop = mag switch
+** Platform: M. Perley
+** Cruise: Per2021171
+** Station:  ESI_13
+** Cast: 01 2
+** Latitude: N  44 39.653
+** Longitude: W 62 58.499
+** Sounding: 30.9
+** Chief Scientist: Ryan Stanley
+** Comment: 171b011
+** When I downloaded the afm file, the CTD was not turned off. We realized when ready to deploy and checked the arm armed status. But when we downloaded the file seems to have been combined. Not sure
+# nquan = 9
+# nvalues = 36                                    
+# units = specified
+# name 0 = density00: Density [density, kg/m^3]
+# name 1 = depSM: Depth [salt water, m], lat = 45.00
+# name 2 = prdM: Pressure, Strain Gauge [db]
+# name 3 = sal00: Salinity, Practical [PSU]
+# name 4 = tv290C: Temperature [ITS-90, deg C]
+# name 5 = bpos: Bottle Position in Carousel
+# name 6 = nbf: Bottles Fired
+# name 7 = scan: Scan Count
+# name 8 = flag:  0.000e+00
+# interval = seconds: 0.25
+# start_time = Aug 11 2021 18:38:28 [Instrument's time stamp, header]
+# bad_flag = -9.990e-29
+# <Sensors count="6" >
+#   <sensor Channel="1" >
+#     <!-- Count, Temperature -->
+#     <TemperatureSensor SensorID="58" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>21-Jan-21</CalibrationDate>
+#       <A0>1.24919288e-003</A0>
+#       <A1>2.79747385e-004</A1>
+#       <A2>-1.98507588e-006</A2>
+#       <A3>2.16007031e-007</A3>
+#       <Slope>1.00000000</Slope>
+#       <Offset>0.0000</Offset>
+#     </TemperatureSensor>
+#   </sensor>
+#   <sensor Channel="2" >
+#     <!-- Frequency 0, Conductivity -->
+#     <ConductivitySensor SensorID="3" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>21-Jan-21</CalibrationDate>
+#       <UseG_J>1</UseG_J>
+#       <!-- Cell const and series R are applicable only for wide range sensors. -->
+#       <SeriesR>0.0000</SeriesR>
+#       <CellConst>2000.0000</CellConst>
+#       <ConductivityType>0</ConductivityType>
+#       <Coefficients equation="0" >
+#         <A>0.00000000e+000</A>
+#         <B>0.00000000e+000</B>
+#         <C>0.00000000e+000</C>
+#         <D>0.00000000e+000</D>
+#         <M>0.0</M>
+#         <CPcor>-9.57000000e-008</CPcor>
+#       </Coefficients>
+#       <Coefficients equation="1" >
+#         <G>-9.92225195e-001</G>
+#         <H>1.38449995e-001</H>
+#         <I>-2.39825598e-004</I>
+#         <J>3.77199441e-005</J>
+#         <CPcor>-9.57000000e-008</CPcor>
+#         <CTcor>3.2500e-006</CTcor>
+#         <!-- WBOTC not applicable unless ConductivityType = 1. -->
+#         <WBOTC>0.00000000e+000</WBOTC>
+#       </Coefficients>
+#       <Slope>1.00000000</Slope>
+#       <Offset>0.00000</Offset>
+#     </ConductivitySensor>
+#   </sensor>
+#   <sensor Channel="3" >
+#     <!-- Count, Pressure, Strain Gauge -->
+#     <PressureSensor SensorID="46" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>11-Jan-21</CalibrationDate>
+#       <PA0>4.83652284e-002</PA0>
+#       <PA1>1.55001426e-003</PA1>
+#       <PA2>6.74523834e-012</PA2>
+#       <PTEMPA0>-6.83459498e+001</PTEMPA0>
+#       <PTEMPA1>5.34490621e+001</PTEMPA1>
+#       <PTEMPA2>-6.08517786e-001</PTEMPA2>
+#       <PTCA0>5.24947930e+005</PTCA0>
+#       <PTCA1>3.44175870e+000</PTCA1>
+#       <PTCA2>-9.03093657e-002</PTCA2>
+#       <PTCB0>2.49792500e+001</PTCB0>
+#       <PTCB1>2.50000000e-004</PTCB1>
+#       <PTCB2>0.00000000e+000</PTCB2>
+#       <Offset>0.000000</Offset>
+#     </PressureSensor>
+#   </sensor>
+#   <sensor Channel="4" >
+#     <!-- A/D voltage 0, Oxygen, SBE 43 -->
+#     <OxygenSensor SensorID="38" >
+#       <SerialNumber>3758</SerialNumber>
+#       <CalibrationDate>17-Mar-21</CalibrationDate>
+#       <Use2007Equation>1</Use2007Equation>
+#       <CalibrationCoefficients equation="0" >
+#         <!-- Coefficients for Owens-Millard equation. -->
+#         <Boc>0.0000</Boc>
+#         <Soc>0.0000e+000</Soc>
+#         <offset>0.0000</offset>
+#         <Pcor>0.00e+000</Pcor>
+#         <Tcor>0.0000</Tcor>
+#         <Tau>0.0</Tau>
+#       </CalibrationCoefficients>
+#       <CalibrationCoefficients equation="1" >
+#         <!-- Coefficients for Sea-Bird equation - SBE calibration in 2007 and later. -->
+#         <Soc>3.9639e-001</Soc>
+#         <offset>-0.5068</offset>
+#         <A>-3.6267e-003</A>
+#         <B> 1.7534e-004</B>
+#         <C>-2.7858e-006</C>
+#         <D0> 2.5826e+000</D0>
+#         <D1> 1.92634e-004</D1>
+#         <D2>-4.64803e-002</D2>
+#         <E> 3.6000e-002</E>
+#         <Tau20> 1.5600</Tau20>
+#         <H1>-3.3000e-002</H1>
+#         <H2> 5.0000e+003</H2>
+#         <H3> 1.4500e+003</H3>
+#       </CalibrationCoefficients>
+#     </OxygenSensor>
+#   </sensor>
+#   <sensor Channel="5" >
+#     <!-- A/D voltage 1, pH -->
+#     <pH_Sensor SensorID="43" >
+#       <SerialNumber>0920</SerialNumber>
+#       <CalibrationDate>24-Nov-20</CalibrationDate>
+#       <Slope>4.5771</Slope>
+#       <Offset>2.5123</Offset>
+#     </pH_Sensor>
+#   </sensor>
+#   <sensor Channel="6" >
+#     <!-- A/D voltage 2, Fluorometer, WET Labs WETstar -->
+#     <FluoroWetlabWetstarSensor SensorID="21" >
+#       <SerialNumber>05-4909-005</SerialNumber>
+#       <CalibrationDate>28-Oct-2005</CalibrationDate>
+#       <ScaleFactor>15.322</ScaleFactor>
+#       <!-- Blank output -->
+#       <Vblank>0.103</Vblank>
+#     </FluoroWetlabWetstarSensor>
+#   </sensor>
+# </Sensors>
+# datcnv_date = Aug 11 2021 16:14:25, 7.26.6.28
+# datcnv_in = C:\Users\RSG_field\Ryan_2021_Perley\CTD\171b011.hex C:\Users\RSG_field\Ryan_2021_Perley\SBE19plusV2_7141_v2_plus_o2_fl_ph.xmlcon
+# datcnv_bottle_scan_range_source = AFM file
+# datcnv_scans_per_bottle = 9
+*END*
+  1024.3927     31.877     32.140    30.9239     6.7292          1          1       1480  0.000e+00
+  1024.3890     31.829     32.092    30.9202     6.7327          1          1       1481  0.000e+00
+  1024.3882     31.786     32.049    30.9196     6.7345          1          1       1482  0.000e+00
+  1024.3881     31.740     32.002    30.9201     6.7360          1          1       1483  0.000e+00
+  1024.3886     31.697     31.959    30.9212     6.7376          1          1       1484  0.000e+00
+  1024.3881     31.662     31.924    30.9211     6.7402          1          1       1485  0.000e+00
+  1024.3865     31.633     31.894    30.9198     6.7432          1          1       1486  0.000e+00
+  1024.3854     31.615     31.876    30.9189     6.7456          1          1       1487  0.000e+00
+  1024.3850     31.607     31.868    30.9187     6.7476          1          1       1488  0.000e+00
+  1023.8338     15.474     15.601    30.8891     9.8835          2          2       1943  0.000e+00
+  1023.7252     15.262     15.388    30.7810    10.0272          2          2       1944  0.000e+00
+  1023.6777     15.048     15.172    30.7449    10.1401          2          2       1945  0.000e+00
+  1023.7128     14.834     14.956    30.8095    10.2268          2          2       1946  0.000e+00
+  1023.6228     14.621     14.741    30.7201    10.3440          2          2       1947  0.000e+00
+  1023.6009     14.417     14.536    30.7113    10.4286          2          2       1948  0.000e+00
+  1023.6165     14.224     14.341    30.7490    10.5055          2          2       1949  0.000e+00
+  1023.5825     14.054     14.169    30.7278    10.6056          2          2       1950  0.000e+00
+  1023.5728     13.914     14.028    30.7373    10.7026          2          2       1951  0.000e+00
+  1022.5872      5.716      5.763    30.5382    14.8744          3          3       2026  0.000e+00
+  1022.5689      5.565      5.611    30.5304    14.9295          3          3       2027  0.000e+00
+  1022.5909      5.420      5.465    30.5716    14.9723          3          3       2028  0.000e+00
+  1022.5588      5.283      5.327    30.5464    15.0292          3          3       2029  0.000e+00
+  1022.5315      5.153      5.195    30.5252    15.0784          3          3       2030  0.000e+00
+  1022.5542      5.025      5.066    30.5647    15.1120          3          3       2031  0.000e+00
+  1022.5632      4.898      4.938    30.5896    15.1568          3          3       2032  0.000e+00
+  1022.5443      4.764      4.803    30.5819    15.2146          3          3       2033  0.000e+00
+  1022.5793      4.626      4.664    30.6436    15.2702          3          3       2034  0.000e+00
+  1022.5822      2.819      2.842    30.9808    16.3973          4          4       2050  0.000e+00
+  1022.5724      2.673      2.695    31.0403    16.6389          4          4       2051  0.000e+00
+  1022.4064      2.539      2.560    30.9025    16.9001          4          4       2052  0.000e+00
+  1022.2789      2.413      2.433    30.7996    17.1085          4          4       2053  0.000e+00
+  1022.2034      2.297      2.315    30.7440    17.2481          4          4       2054  0.000e+00
+  1022.1440      2.181      2.199    30.6977    17.3489          4          4       2055  0.000e+00
+  1022.1172      2.066      2.083    30.6851    17.4195          4          4       2056  0.000e+00
+  1022.1073      1.956      1.972    30.6913    17.4805          4          4       2057  0.000e+00
+  1022.0808      1.843      1.858    30.6763    17.5422          4          4       2058  0.000e+00
