@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SeatermAF_Setup ConfigurationType="7" DisplayVersion="2.1.4" FileVersion="2.1.0.4" >
+  <!-- SBE 55 with SBE 19plus -->
+  <BaudRate>9600</BaudRate>
+  <RealTimeBaudRate>9600</RealTimeBaudRate>
+  <BottleClosureLogic >
+    <!-- 0 == Close on downcast -->
+    <!-- 1 == Close on upcast -->
+    <!-- 2 == Close on elapsed time, do not record CTD data -->
+    <!-- 3 == Close when stationary -->
+    <!-- 4 == Close on elapsed time, record CTD data -->
+    <BottleClosureOption>1</BottleClosureOption>
+    <BottomBottleEnabled>1</BottomBottleEnabled>
+    <PressureToDetermineUpcast>1.00000e+001</PressureToDetermineUpcast>
+    <PressureDecreaseToDetermineUpcast>5.00000e+000</PressureDecreaseToDetermineUpcast>
+    <StationaryTimeOnBottom>3.00000e+000</StationaryTimeOnBottom>
+    <BottomPressureWindow>1.00000e+001</BottomPressureWindow>
+  </BottleClosureLogic>
+  <!-- 0 == Upload all data separated by cast -->
+  <!-- 1 == Upload a single cast -->
+  <!-- 2 == Upload by cast number range -->
+  <!-- 3 == Upload all data as a single file -->
+  <!-- 4 == Upload by scan number range -->
+  <UploadOption>0</UploadOption>
+  <!-- 0 == Prompt for header information -->
+  <!-- 1 == Include default header information -->
+  <!-- 2 == Do not include header information -->
+  <HeaderOptionCTD>0</HeaderOptionCTD>
+  <UploadBlockSize>250</UploadBlockSize>
+  <HeaderOptionFM>0</HeaderOptionFM>
+  <Bottles >
+    <NumberOfBottles>6</NumberOfBottles>
+    <Bottle SequenceNumber="1" >
+      <Position>1</Position>
+      <FireAt>0.00000e+000</FireAt>
+    </Bottle>
+    <Bottle SequenceNumber="2" >
+      <Position>2</Position>
+      <FireAt>6.00000e+001</FireAt>
+    </Bottle>
+    <Bottle SequenceNumber="3" >
+      <Position>3</Position>
+      <FireAt>3.00000e+001</FireAt>
+    </Bottle>
+    <Bottle SequenceNumber="4" >
+      <Position>4</Position>
+      <FireAt>2.00000e+001</FireAt>
+    </Bottle>
+    <Bottle SequenceNumber="5" >
+      <Position>5</Position>
+      <FireAt>1.00000e+001</FireAt>
+    </Bottle>
+    <Bottle SequenceNumber="6" >
+      <Position>6</Position>
+      <FireAt>2.00000e+000</FireAt>
+    </Bottle>
+  </Bottles>
+</SeatermAF_Setup>
