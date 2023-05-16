@@ -1,0 +1,61 @@
+* Sea-Bird SBE 19plus V2 Data File:
+* FileName = C:\Users\RSG_field\Ryan_2021_Perley\CTD\171a002.afm
+* Software Version SeatermAF 2.1.4
+* Temperature SN = 
+* Conductivity SN = 
+* System UpLoad Time = Aug 09 2021 08:50:11 (localtime) = Aug 09 2021 11:50:11 (UTC)
+** Platform: M. Perley 
+** Cruise: Per2021171 
+** Station:  ESI-08
+** Cast: 01 
+** Latitude: N  44 40.1412
+** Longitude: W 62 20.7438
+** Sounding: 111
+** Chief Scientist: Ryan Stanley 
+** Comment: Also GC_5
+** This is the station for GC-5 as well. 5 bottles. 
+* ds
+* SBE 55 V 1.4.1  SERIAL NO. 188  09 Aug 2021 11:48:10
+* main battery = 13.07 volts
+* lithium battery =  3.12 volts
+* SBE 55 is NOT ARMED
+* A>
+*END*
+
+1  1   09 Aug 2021 11:41:15  confirmed   13.1  2239
+    00C60008C0
+    00C60008C1
+    00C50008C2
+    00C50008C3
+    00C50008C4
+2  2   09 Aug 2021 11:43:26  confirmed   13.1  2762
+    00AF000ACC
+    00AF000ACD
+    00AF000ACE
+    00AF000ACF
+    00AF000AD0
+3  3   09 Aug 2021 11:44:26  confirmed   13.1  3000
+    0096000BBB
+    0096000BBC
+    0096000BBD
+    0095000BBE
+    0095000BBF
+4  4   09 Aug 2021 11:45:17  confirmed   13.1  3203
+    007D000C87
+    007D000C88
+    007D000C89
+    007D000C8A
+    007D000C8B
+5  5   09 Aug 2021 11:46:05  confirmed   13.1  3397
+    0066000D4A
+    0066000D4B
+    0066000D4C
+    0066000D4D
+    0066000D4E
+6  6   09 Aug 2021 11:46:10  confirmed   13.0  3414
+    0065000D5C
+    0065000D5D
+    0065000D5E
+    0065000D5F
+    0065000D60
+A>

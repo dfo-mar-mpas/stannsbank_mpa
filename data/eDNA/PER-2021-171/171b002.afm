@@ -1,0 +1,61 @@
+* Sea-Bird SBE 19plus V2 Data File:
+* FileName = C:\Users\RSG_field\Ryan_2021_Perley\CTD\171b002.afm
+* Software Version SeatermAF 2.1.4
+* Temperature SN = 
+* Conductivity SN = 
+* System UpLoad Time = Aug 09 2021 09:56:29 (localtime) = Aug 09 2021 12:56:29 (UTC)
+** Platform: M. Perley 
+** Cruise: Per2021171 
+** Station:  ESI-08
+** Cast: 01 171b002
+** Latitude: N  44 40.2063
+** Longitude: W 62 21.1465
+** Sounding: 112
+** Chief Scientist: Ryan Stanley 
+** Comment: Also GC_5
+** Cast before this one failed to trigger the bottom sample. Assume trigger was caught. Recast. Had to reastart compter to reconnec to the AFM
+* ds
+* SBE 55 V 1.4.1  SERIAL NO. 188  09 Aug 2021 12:55:21
+* main battery = 13.02 volts
+* lithium battery =  3.10 volts
+* SBE 55 is NOT ARMED
+* A>
+*END*
+
+1  1   09 Aug 2021 12:47:26  confirmed   13.0  2161
+    00C7000872
+    00C7000873
+    00C7000874
+    00C7000875
+    00C7000876
+2  2   09 Aug 2021 12:51:28  confirmed   13.0  3127
+    00AF000C39
+    00AF000C3A
+    00AF000C3B
+    00AF000C3C
+    00AF000C3D
+3  3   09 Aug 2021 12:52:20  confirmed   13.0  3334
+    0096000D09
+    0096000D0A
+    0095000D0B
+    0095000D0C
+    0095000D0D
+4  4   09 Aug 2021 12:53:13  confirmed   13.0  3546
+    007D000DDE
+    007D000DDF
+    007D000DE0
+    007D000DE1
+    007D000DE2
+5  5   09 Aug 2021 12:54:01  confirmed   13.0  3738
+    0066000E9F
+    0066000EA0
+    0066000EA1
+    0065000EA2
+    0065000EA3
+6  6   09 Aug 2021 12:54:03  confirmed   13.0  3744
+    0065000EA6
+    0065000EA7
+    0065000EA8
+    0065000EA9
+    0065000EAA
+A>
