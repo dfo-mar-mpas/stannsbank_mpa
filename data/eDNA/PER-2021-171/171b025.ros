@@ -1,0 +1,188 @@
+* Sea-Bird SBE19plus  Data File:
+* FileName = C:\Users\RSG_field\Ryan_2021_Perley\CTD\171b025.hex
+* Software version 2.3.0 SB_Terminal.dll
+* Temperature SN = 7141
+* Conductivity SN = 7141
+* System UpLoad Time = Aug 18 2021 13:50:32
+* <ApplicationData>
+* <SeatermAF>
+* <SoftwareVersion>2.1.4</SoftwareVersion>
+* <BuildDate>11-Sep-2013 15:42:25 GMT</BuildDate>
+* </SeatermAF>
+* </ApplicationData>
+* cast  99 18 Aug 2021 16:39:34 samples 282664 to 284683, avg = 1, stop = mag switch
+** Platform: M. Perley
+** Cruise: Per2021171
+** Station:  SAB_01
+** Cast: 01 2
+** Latitude: N  45 501.373
+** Longitude: W 60 08.966
+** Sounding: 15.1
+** Chief Scientist: Ryan Stanley
+** Comment: 171b025
+# nquan = 9
+# nvalues = 27                                    
+# units = specified
+# name 0 = density00: Density [density, kg/m^3]
+# name 1 = depSM: Depth [salt water, m], lat = 45.00
+# name 2 = prdM: Pressure, Strain Gauge [db]
+# name 3 = sal00: Salinity, Practical [PSU]
+# name 4 = tv290C: Temperature [ITS-90, deg C]
+# name 5 = bpos: Bottle Position in Carousel
+# name 6 = nbf: Bottles Fired
+# name 7 = scan: Scan Count
+# name 8 = flag:  0.000e+00
+# interval = seconds: 0.25
+# start_time = Aug 18 2021 16:39:34 [Instrument's time stamp, header]
+# bad_flag = -9.990e-29
+# <Sensors count="6" >
+#   <sensor Channel="1" >
+#     <!-- Count, Temperature -->
+#     <TemperatureSensor SensorID="58" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>21-Jan-21</CalibrationDate>
+#       <A0>1.24919288e-003</A0>
+#       <A1>2.79747385e-004</A1>
+#       <A2>-1.98507588e-006</A2>
+#       <A3>2.16007031e-007</A3>
+#       <Slope>1.00000000</Slope>
+#       <Offset>0.0000</Offset>
+#     </TemperatureSensor>
+#   </sensor>
+#   <sensor Channel="2" >
+#     <!-- Frequency 0, Conductivity -->
+#     <ConductivitySensor SensorID="3" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>21-Jan-21</CalibrationDate>
+#       <UseG_J>1</UseG_J>
+#       <!-- Cell const and series R are applicable only for wide range sensors. -->
+#       <SeriesR>0.0000</SeriesR>
+#       <CellConst>2000.0000</CellConst>
+#       <ConductivityType>0</ConductivityType>
+#       <Coefficients equation="0" >
+#         <A>0.00000000e+000</A>
+#         <B>0.00000000e+000</B>
+#         <C>0.00000000e+000</C>
+#         <D>0.00000000e+000</D>
+#         <M>0.0</M>
+#         <CPcor>-9.57000000e-008</CPcor>
+#       </Coefficients>
+#       <Coefficients equation="1" >
+#         <G>-9.92225195e-001</G>
+#         <H>1.38449995e-001</H>
+#         <I>-2.39825598e-004</I>
+#         <J>3.77199441e-005</J>
+#         <CPcor>-9.57000000e-008</CPcor>
+#         <CTcor>3.2500e-006</CTcor>
+#         <!-- WBOTC not applicable unless ConductivityType = 1. -->
+#         <WBOTC>0.00000000e+000</WBOTC>
+#       </Coefficients>
+#       <Slope>1.00000000</Slope>
+#       <Offset>0.00000</Offset>
+#     </ConductivitySensor>
+#   </sensor>
+#   <sensor Channel="3" >
+#     <!-- Count, Pressure, Strain Gauge -->
+#     <PressureSensor SensorID="46" >
+#       <SerialNumber>7141</SerialNumber>
+#       <CalibrationDate>11-Jan-21</CalibrationDate>
+#       <PA0>4.83652284e-002</PA0>
+#       <PA1>1.55001426e-003</PA1>
+#       <PA2>6.74523834e-012</PA2>
+#       <PTEMPA0>-6.83459498e+001</PTEMPA0>
+#       <PTEMPA1>5.34490621e+001</PTEMPA1>
+#       <PTEMPA2>-6.08517786e-001</PTEMPA2>
+#       <PTCA0>5.24947930e+005</PTCA0>
+#       <PTCA1>3.44175870e+000</PTCA1>
+#       <PTCA2>-9.03093657e-002</PTCA2>
+#       <PTCB0>2.49792500e+001</PTCB0>
+#       <PTCB1>2.50000000e-004</PTCB1>
+#       <PTCB2>0.00000000e+000</PTCB2>
+#       <Offset>0.000000</Offset>
+#     </PressureSensor>
+#   </sensor>
+#   <sensor Channel="4" >
+#     <!-- A/D voltage 0, Oxygen, SBE 43 -->
+#     <OxygenSensor SensorID="38" >
+#       <SerialNumber>3758</SerialNumber>
+#       <CalibrationDate>17-Mar-21</CalibrationDate>
+#       <Use2007Equation>1</Use2007Equation>
+#       <CalibrationCoefficients equation="0" >
+#         <!-- Coefficients for Owens-Millard equation. -->
+#         <Boc>0.0000</Boc>
+#         <Soc>0.0000e+000</Soc>
+#         <offset>0.0000</offset>
+#         <Pcor>0.00e+000</Pcor>
+#         <Tcor>0.0000</Tcor>
+#         <Tau>0.0</Tau>
+#       </CalibrationCoefficients>
+#       <CalibrationCoefficients equation="1" >
+#         <!-- Coefficients for Sea-Bird equation - SBE calibration in 2007 and later. -->
+#         <Soc>3.9639e-001</Soc>
+#         <offset>-0.5068</offset>
+#         <A>-3.6267e-003</A>
+#         <B> 1.7534e-004</B>
+#         <C>-2.7858e-006</C>
+#         <D0> 2.5826e+000</D0>
+#         <D1> 1.92634e-004</D1>
+#         <D2>-4.64803e-002</D2>
+#         <E> 3.6000e-002</E>
+#         <Tau20> 1.5600</Tau20>
+#         <H1>-3.3000e-002</H1>
+#         <H2> 5.0000e+003</H2>
+#         <H3> 1.4500e+003</H3>
+#       </CalibrationCoefficients>
+#     </OxygenSensor>
+#   </sensor>
+#   <sensor Channel="5" >
+#     <!-- A/D voltage 1, pH -->
+#     <pH_Sensor SensorID="43" >
+#       <SerialNumber>0920</SerialNumber>
+#       <CalibrationDate>24-Nov-20</CalibrationDate>
+#       <Slope>4.5771</Slope>
+#       <Offset>2.5123</Offset>
+#     </pH_Sensor>
+#   </sensor>
+#   <sensor Channel="6" >
+#     <!-- A/D voltage 2, Fluorometer, WET Labs WETstar -->
+#     <FluoroWetlabWetstarSensor SensorID="21" >
+#       <SerialNumber>05-4909-005</SerialNumber>
+#       <CalibrationDate>28-Oct-2005</CalibrationDate>
+#       <ScaleFactor>15.322</ScaleFactor>
+#       <!-- Blank output -->
+#       <Vblank>0.103</Vblank>
+#     </FluoroWetlabWetstarSensor>
+#   </sensor>
+# </Sensors>
+# datcnv_date = Aug 18 2021 13:51:16, 7.26.6.28
+# datcnv_in = C:\Users\RSG_field\Ryan_2021_Perley\CTD\171b025.hex C:\Users\RSG_field\Ryan_2021_Perley\SBE19plusV2_7141_v2_plus_o2_fl_ph.xmlcon
+# datcnv_bottle_scan_range_source = AFM file
+# datcnv_scans_per_bottle = 9
+*END*
+  1023.5793     15.977     16.109    30.4731     9.4562          1          1       1640  0.000e+00
+  1023.5824     15.981     16.113    30.4765     9.4531          1          1       1641  0.000e+00
+  1023.5814     15.985     16.116    30.4748     9.4514          1          1       1642  0.000e+00
+  1023.5816     15.991     16.122    30.4744     9.4483          1          1       1643  0.000e+00
+  1023.5830     15.994     16.126    30.4755     9.4448          1          1       1644  0.000e+00
+  1023.5854     15.998     16.130    30.4780     9.4421          1          1       1645  0.000e+00
+  1023.5881     16.001     16.132    30.4812     9.4407          1          1       1646  0.000e+00
+  1023.5886     16.004     16.135    30.4819     9.4412          1          1       1647  0.000e+00
+  1023.5861     16.004     16.135    30.4788     9.4419          1          1       1648  0.000e+00
+  1022.2025      5.811      5.859    29.9266    14.4620          2          2       1952  0.000e+00
+  1022.1794      5.707      5.754    29.9365    14.6088          2          2       1953  0.000e+00
+  1022.1873      5.595      5.641    29.9924    14.7756          2          2       1954  0.000e+00
+  1022.0939      5.482      5.527    29.9275    14.9808          2          2       1955  0.000e+00
+  1021.9814      5.366      5.410    29.8290    15.1520          2          2       1956  0.000e+00
+  1021.9272      5.249      5.292    29.7933    15.2758          2          2       1957  0.000e+00
+  1021.8543      5.126      5.168    29.7261    15.3726          2          2       1958  0.000e+00
+  1021.8432      5.000      5.041    29.7290    15.4322          2          2       1959  0.000e+00
+  1021.8854      4.874      4.914    29.8031    15.4982          2          2       1960  0.000e+00
+  1021.6075      2.821      2.844    29.7533    16.5464          3          3       1977  0.000e+00
+  1021.5023      2.711      2.733    29.6441    16.6395          3          3       1978  0.000e+00
+  1021.5235      2.600      2.622    29.6859    16.6851          3          3       1979  0.000e+00
+  1021.5235      2.491      2.512    29.7011    16.7344          3          3       1980  0.000e+00
+  1021.4915      2.378      2.397    29.6804    16.8037          3          3       1981  0.000e+00
+  1021.4765      2.259      2.278    29.6775    16.8576          3          3       1982  0.000e+00
+  1021.4452      2.138      2.156    29.6503    16.9011          3          3       1983  0.000e+00
+  1021.5017      2.023      2.039    29.7401    16.9526          3          3       1984  0.000e+00
+  1021.5071      1.902      1.917    29.7760    17.0468          3          3       1985  0.000e+00

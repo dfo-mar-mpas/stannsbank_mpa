@@ -1,0 +1,43 @@
+* Sea-Bird SBE 19plus V2 Data File:
+* FileName = C:\Users\RSG_field\Ryan_2021_Perley\CTD\171a027.afm
+* Software Version SeatermAF 2.1.4
+* Temperature SN = 
+* Conductivity SN = 
+* System UpLoad Time = Aug 18 2021 11:14:15 (localtime) = Aug 18 2021 14:14:15 (UTC)
+** Platform: M. Perley 
+** Cruise: Per2021171 
+** Station:  GC_03
+** Cast: 01 1
+** Latitude: N  45 50.543
+** Longitude: W 60 5.292
+** Sounding: 34.6
+** Chief Scientist: Ryan Stanley 
+** Comment: 171a027
+** Samples in Gabrus Bay came for protection from wind and well. Very calm
+* ds
+* SBE 55 V 1.4.1  SERIAL NO. 188  18 Aug 2021 14:13:30
+* main battery = 12.71 volts
+* lithium battery =  3.16 volts
+* SBE 55 is NOT ARMED
+* A>
+*END*
+
+1  1   18 Aug 2021 14:10:28  confirmed   12.8  1480
+    00840005C9
+    00830005CA
+    00830005CB
+    00830005CC
+    00830005CD
+2  2   18 Aug 2021 14:12:11  confirmed   12.7  1891
+    0073000765
+    0073000766
+    0073000767
+    0073000768
+    0073000769
+3  3   18 Aug 2021 14:12:38  confirmed   12.7  1999
+    00660007D2
+    00660007D3
+    00660007D4
+    00660007D5
+    00660007D6
+A>
