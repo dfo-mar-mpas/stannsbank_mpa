@@ -1,0 +1,43 @@
+* Sea-Bird SBE 19plus V2 Data File:
+* FileName = C:\Users\RSG_field\Ryan_2021_Perley\CTD\171a028.afm
+* Software Version SeatermAF 2.1.4
+* Temperature SN = 
+* Conductivity SN = 
+* System UpLoad Time = Aug 18 2021 08:39:47 (localtime) = Aug 18 2021 11:39:47 (UTC)
+** Platform: M. Perley 
+** Cruise: Per2021171 
+** Station:  GC-04
+** Cast: 01 1
+** Latitude: N  44 55.546
+** Longitude: W 59 51.424
+** Sounding: 50.9
+** Chief Scientist: Ryan Stanley 
+** Comment: 171a028
+** Used thruster to compensate for the tide drag
+* ds
+* SBE 55 V 1.4.1  SERIAL NO. 188  18 Aug 2021 11:39:18
+* main battery = 12.75 volts
+* lithium battery =  3.16 volts
+* SBE 55 is NOT ARMED
+* A>
+*END*
+
+1  1   18 Aug 2021 11:35:44  confirmed   12.8  1759
+    00950006E0
+    00950006E1
+    00950006E2
+    00950006E3
+    00950006E4
+2  2   18 Aug 2021 11:37:35  confirmed   12.8  2204
+    007D00089E
+    007D00089F
+    007D0008A0
+    007D0008A1
+    007D0008A2
+3  3   18 Aug 2021 11:38:28  confirmed   12.8  2412
+    006600096F
+    0066000970
+    0066000971
+    0066000972
+    0066000973
+A>

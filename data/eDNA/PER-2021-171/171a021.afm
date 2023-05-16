@@ -1,0 +1,61 @@
+* Sea-Bird SBE 19plus V2 Data File:
+* FileName = C:\Users\RSG_field\Ryan_2021_Perley\CTD\171a021.afm
+* Software Version SeatermAF 2.1.4
+* Temperature SN = 
+* Conductivity SN = 
+* System UpLoad Time = Aug 17 2021 13:07:52 (localtime) = Aug 17 2021 16:07:52 (UTC)
+** Platform: M. Perley 
+** Cruise: Per2021171 
+** Station:  SAB_06
+** Cast: 01 1
+** Latitude: N  46 22.083
+** Longitude: W 59 05.769
+** Sounding: 229
+** Chief Scientist: Ryan Stanley 
+** Comment: 171a021
+** Sounder wasn't working so estimated depth to be between 215 and 220. Bottle was left at 220 for time based trigger for upcast.
+* ds
+* SBE 55 V 1.4.1  SERIAL NO. 188  17 Aug 2021 16:06:48
+* main battery = 12.78 volts
+* lithium battery =  3.10 volts
+* SBE 55 is NOT ARMED
+* A>
+*END*
+
+1  1   17 Aug 2021 15:57:28  confirmed   12.8  3280
+    0129000CD1
+    0129000CD2
+    0129000CD3
+    0129000CD4
+    0129000CD5
+2  2   17 Aug 2021 15:59:35  confirmed   12.8  3786
+    0113000ECC
+    0113000ECD
+    0113000ECE
+    0113000ECF
+    0113000ED0
+3  3   17 Aug 2021 16:00:29  confirmed   12.8  4002
+    00FA000FA5
+    00FA000FA6
+    00FA000FA7
+    00FA000FA8
+    00FA000FA9
+4  4   17 Aug 2021 16:02:18  confirmed   12.8  4436
+    00C8001158
+    00C8001159
+    00C800115A
+    00C800115B
+    00C800115C
+5  5   17 Aug 2021 16:04:05  confirmed   12.8  4863
+    0096001304
+    0096001305
+    0096001306
+    0096001307
+    0096001308
+6  6   17 Aug 2021 16:05:48  confirmed   12.8  5275
+    00660014A1
+    00660014A2
+    00660014A3
+    00660014A4
+    00650014A5
+A>
