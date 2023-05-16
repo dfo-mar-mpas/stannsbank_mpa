@@ -1,0 +1,37 @@
+* Sea-Bird SBE 19plus V2 Data File:
+* FileName = C:\Users\RSG_field\Ryan_Perley2022473\CTD\473A023.afm
+* Software Version SeatermAF 2.1.4
+* Temperature SN = 
+* Conductivity SN = 
+* System UpLoad Time = Aug 14 2022 16:52:48 (localtime) = Aug 14 2022 15:52:48 (UTC)
+** Platform: M. Perley 
+** Cruise: Per2022473 
+** Station:  SAB_Trans_06
+** Cast: 01 
+** Latitude: N  46 12.3838
+** Longitude: W 59 3.85
+** Sounding: 137
+** Chief Scientist: Ryan Stanley 
+** Comment: CastID 473A023 SampleID 493890-493895
+** Note that in the first cast bottles 1-3 were not attached the right trigger, and thus didn't fire at depth. This cast (41 on the CTD) will be named 473B023 and the cast associted with this AFM will be 473A023. There was no afm file downloaded for the first mis-cast (Cast 41 and CastID 473B023)
+* ds
+* SBE 55 V 1.4.1  SERIAL NO. 189  14 Aug 2022 16:51:30
+* main battery = 13.96 volts
+* lithium battery =  3.03 volts
+* SBE 55 is NOT ARMED
+* A>
+*END*
+
+1  1   14 Aug 2022 16:42:42  confirmed   14.0  2400
+    00E7000961
+    00E7000962
+    00E6000963
+    00E6000964
+    00E6000965
+2  6   14 Aug 2022 16:50:11  confirmed   14.0  4197
+    0066001067
+    0066001068
+    0066001069
+    006600106A
+    006500106B
+A>
