@@ -8,3 +8,8 @@ __Fig 1.__ St. Anns Bank Marine Protected Area. Fill colours correspond to benth
 ![](output/Acoustic/reciever_tag_locations.png)
 
 __Fig 2.__ St. Anns Bank Marine Protected Area. Deployed receiver tag locations (Atlantic cod and Atlantic Halibut) from the 2022 field season. Grey line denotes the 250m isobath.
+
+![](output/Temperature/SAB_temp_20152022_monthmean.png)
+
+__Fig 3.__ St. Anns Bank Marine Protected Area. Monthly average bottom temperature from 48 acoustic telemetry stations deployed as two linear arrays (North and South) in 2015 to 2021 and one long array in 2021 to 2022 (OTN2021).
+
