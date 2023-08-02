@@ -1,0 +1,28 @@
+Target_WP,Proposal_Station,Camera_WP_name,Bathymetry_m,Benthoscape,Latitude,Longitude
+1,Gravel-mud_2 - CP,Cam1_C,-79.292,Till >50% cobbles/gravel,45.977976,-59.03342
+2,Gravel-mud_2 - CP,Cam2_A,-122.511,Mud,45.989754,-59.045595
+3,Till-coraline algae_6 - CP,Cam3_D,-40.971,Till with coraline algae,45.965206,-59.251642
+4,Till-gravel_6 - CP,Cam4_C,-87.224,Till >50% cobbles/gravel,46.228112,-59.193925
+5,Till-gravel_7 - CP,Cam5_C,-111.536,Till >50% cobbles/gravel,46.145868,-59.025637
+6,Till-coraline algae_3 - CP,Cam6_D,-49.153,Till with coraline algae,46.040584,-59.478404
+7,Till coraline algae_4 - CP,Cam7_D,-49.102,Till with coraline algae,46.031119,-59.468509
+8,Gravel-mud_3 - RV,Cam8_A,-139.711,Mud,45.90716788,-59.0248502
+9,Gravel-mud_3 - RV,Cam9_C,-125.233,Till >50% cobbles/gravel,45.90716755,-59.04762269
+10,Mud_3 - RV,Cam10_A,-111.373,Mud,46.02800017,-59.0272996
+11,Till-coraline algae_7 - RV,Cam11_D,-66.657,Till with coraline algae,46.05916818,-59.32199222
+12,Till-gravel_8 - RV,Cam12_C,-101.372,Till >50% cobbles/gravel,46.14600054,-59.08208334
+13,Sand-SandDollars_3 - RV,Cam13_F,-57.769,Sand with Sand dollars,45.899,-59.53
+14,Sand-SandDollars_3 - RV,Cam14_D,-34.517,Till with coraline algae,45.89900116,-59.5048163
+15,,Cam15_D,-21.827,Till with coraline algae,45.89266132,-59.60218025
+16,,Cam16_D,-20.534,Till with coraline algae,45.89282922,-59.59316448
+17,,Cam17_U,-22,NA,46.09765495,-59.63536839
+18,,Cam18_U,-35,NA,46.12696319,-59.63152758
+19,,Cam19_U,-28,NA,46.13931013,-59.5820964
+20,,Cam20_E,-79.92,Gravel with crinoids,46.04014885,-58.91167825
+21,,Cam21_E,-92.723,Gravel with crinoids,45.99791667,-58.86916667
+22,,Cam22_E,-97.722,Gravel with crinoids,45.94317306,-59.31580558
+23,,Cam23_F,-89.578,Sand with Sand dollars,45.83483333,-59.54205556
+24,,Cam24_F,-56.759,Sand with Sand dollars,45.94944444,-59.48419444
+25,,Cam25_B,-139.383,Gravelly sand/mud <50% cobbles/gravel,45.90694444,-58.98938889
+26,,Cam26_D,-23.978,Till with coraline algae,45.99072725,-59.208884
+27,,Cam27_D,-31.998,Till with coraline algae,45.98369632,-59.23053758
