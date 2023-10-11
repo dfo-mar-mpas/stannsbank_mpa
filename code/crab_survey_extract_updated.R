@@ -4,11 +4,13 @@
 #######################################################
 
 library(sf)
+library(stringr)
 library(dplyr)
 library(ggplot2)
 library(rnaturalearth)
 library(Mar.datawrangling)
 library(RODBC)
+library(ggpubr)
 
 sf_use_s2 = FALSE
 
@@ -65,19 +67,36 @@ SABTOWS$LONGITUDE <- SABTOWS$LONGITUDE*-1
 
 #transform into an sf object and find stations inside vs outside the MPA
 SABTOWS2 <- SABTOWS %>% st_as_sf(coords = c("LONGITUDE","LATITUDE"),crs=latlong) %>% 
-  mutate(inside=as.numeric(st_intersects(.,sab, sparse=TRUE)))
+  mutate(inside=as.numeric(st_intersects(.,sab, sparse=TRUE)), Year=format(as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y"))
 
+SABTOWS2 <- merge(SABTOWS2, fishcodes,by.x="SPECCD_ID", by.y="SPECCD_ID", all.x=T)
+
+SABTOWS2$COMM <- str_replace(SABTOWS2$COMM, pattern = "BASKET STARS; GORGONOCEPHALIDAE,ASTERONYCHIDAE", replacement = "BASKET STARS")
+
+SABTOWS2 <- SABTOWS2  %>% filter(!is.na(COMM)) %>% filter(.,!grepl("SEAWEED, ALGAE ,KELP; THALLOPHYTA", "", "APHIA IS FOR GENUS; WAS TOSSIA"))
 
 ggplot()+
   geom_sf(data=admin, fill=gray(.9),size=0)+
   geom_sf(data=sab,colour="red", fill=NA)+
   #geom_sf(data=gully2, colour="red", fill=NA)+
-  coord_sf(xlim=c(-61, -58), ylim=c(45,47), expand=F)+
+  coord_sf(xlim=c(-61, -58), ylim=c(45.25,47.1), expand=F)+
   geom_point(data=SABTOWS, aes(x=LONGITUDE, y=LATITUDE), shape=21, fill="black", size=1.25)+
   theme_minimal()
 
+#Look at fish counts from the SAB tows
+# Create boxplots for fish lengths by species
+ggplot(SABTOWS2, aes(x = COMM, y = log(EST_NUM_CAUGHT))) +
+  facet_wrap(vars(Year),nrow=7)+
+  geom_boxplot() +
+  labs(title = "Fish Lengths by Species",
+       x = "Species",
+       y = "# Caught") +
+  theme_minimal()+
+  theme(axis.text.x =  element_text(angle=90))
+
+#####Nowlook at the morphology data (length and weight)
 # Group the data by species and calculate summary statistics
-summary_data <- fishmorph %>%
+summary_data <- fishmorph %>% na.omit(fishmorph) %>%
   group_by(COMM) %>%
   summarise(
     Mean_Length = mean(FISH_LENGTH, na.rm = TRUE),
@@ -86,17 +105,25 @@ summary_data <- fishmorph %>%
     Median_Weight = median(MEASURED_WGT, na.rm = TRUE)
   )
 
+#Add a new column in fishmorph for year by extracting year from the BOARD DATE column
+fishmorph <- na.omit(fishmorph) %>% mutate(Year = format
+              (as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y"))
+  
 # Create boxplots for fish lengths by species
-ggplot(fishmorph, aes(x = COMM, y = FISH_LENGTH)) +
+ggplot(fishmorph, aes(x = Year, y = FISH_LENGTH)) +
+  facet_wrap(vars(COMM),nrow=8, scales="free_y")+
   geom_boxplot() +
   labs(title = "Fish Lengths by Species",
        x = "Species",
        y = "Length") +
   theme_minimal()+
-  theme(axis.text.x =  element_text(angle=90))
+  theme(axis.text.x =  element_text(angle=90))+
+  stat_compare_means()
 
+ggsave(filename = "CrabSurvey_SAB_FishLengths.png",plot = last_plot(),device = "png",width = 22, height=14, units = "in",dpi = 500, bg = "white")
 # Create boxplots for fish weights by species
-ggplot(fishmorph, aes(x = COMM, y = MEASURED_WGT)) +
+ggplot(fishmorph, aes(x = Year, y = MEASURED_WGT)) +
+  facet_wrap(vars(COMM),nrow=6, scales="free_y")+
   geom_boxplot() +
   labs(title = "Fish Weights by Species",
        x = "Species",
