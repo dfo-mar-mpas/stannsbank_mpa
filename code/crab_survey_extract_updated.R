@@ -77,7 +77,7 @@ SABTOWS2 <- SABTOWS2  %>% filter(!is.na(COMM)) %>% filter(.,!grepl("SEAWEED, ALG
 
 ggplot()+
   geom_sf(data=admin, fill=gray(.9),size=0)+
-  geom_sf(data=sab,colour="red", fill=NA)+
+  geom_sf(data=sab,colour="blue", fill=NA, linewidth=1.25)+
   #geom_sf(data=gully2, colour="red", fill=NA)+
   coord_sf(xlim=c(-61, -58), ylim=c(45.25,47.1), expand=F)+
   geom_point(data=SABTOWS, aes(x=LONGITUDE, y=LATITUDE), shape=21, fill="black", size=1.25)+
