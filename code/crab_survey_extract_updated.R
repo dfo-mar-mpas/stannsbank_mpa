@@ -172,11 +172,4 @@ load("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/2022-10-31_SAB_crabsurvey_mp
 
 
 
-
-ggplot()+
-  geom_sf(data=basemap)+
-  geom_sf(data=mpas,fill=NA)+
-  geom_sf(data=crab_MPA)
-  theme_bw()+
-  coord_sf(expand=0,ylim=c(43.5,47))
   
