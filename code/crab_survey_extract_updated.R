@@ -47,15 +47,15 @@ gully <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Gully/Gully_Bound
 
 mpas <- rbind(sab,gully)
 
-#load basemap
-
-admin<-rnaturalearth::ne_countries(scale="large", country = "Canada", returnclass="sf") #grabs all of Canada, we'll narrow this down to the northwest Atlantic when plotting
-
+#basemap of Nova Scotia
+novsco <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Coastline/NS_coastline_project_Erase1.shp")%>%st_transform(latlong)%>%
+  mutate(name="Nova Scotia")%>%
+  dplyr::select(name,geometry)
 
 ggplot()+
-  geom_sf(data=admin, fill=gray(.9),size=0)+
-  geom_sf(data=sab,colour="red", fill=NA)+
-  geom_sf(data=gully, colour="red", fill=NA)+
+  geom_sf(data=novsco, fill=gray(.9),size=0)+
+  geom_sf(data=sab,colour="blue", fill=NA)+
+  geom_sf(data=gully, colour="blue", fill=NA)+
   coord_sf(xlim=c(-62, -58), ylim=c(43.5,48), expand=F)+
   geom_point(data=MPATOWS, aes(x=-LONGITUDE, y=LATITUDE), shape=21, fill="black", size=1.25)+
   theme_minimal()
@@ -76,12 +76,13 @@ SABTOWS2$COMM <- str_replace(SABTOWS2$COMM, pattern = "BASKET STARS; GORGONOCEPH
 SABTOWS2 <- SABTOWS2  %>% filter(!is.na(COMM)) %>% filter(.,!grepl("SEAWEED, ALGAE ,KELP; THALLOPHYTA", "", "APHIA IS FOR GENUS; WAS TOSSIA"))
 
 ggplot()+
-  geom_sf(data=admin, fill=gray(.9),size=0)+
+  geom_sf(data=novsco, fill=gray(.9),size=0)+
   geom_sf(data=sab,colour="blue", fill=NA, linewidth=1.25)+
   #geom_sf(data=gully2, colour="red", fill=NA)+
   coord_sf(xlim=c(-61, -58), ylim=c(45.25,47.1), expand=F)+
   geom_point(data=SABTOWS, aes(x=LONGITUDE, y=LATITUDE), shape=21, fill="black", size=1.25)+
-  theme_minimal()
+  theme_minimal()+
+  theme(panel.background = element_rect(fill="lightblue"))
 
 #Look at fish counts from the SAB tows
 # Create boxplots for fish lengths by species
