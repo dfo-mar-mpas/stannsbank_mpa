@@ -13,3 +13,6 @@ __Fig 2.__ St. Anns Bank Marine Protected Area. Deployed receiver tag locations 
 
 __Fig 3.__ St. Anns Bank Marine Protected Area. Monthly average bottom temperature from 48 acoustic telemetry stations deployed as two linear arrays (North and South) in 2015 to 2021 and one long array in 2021 to 2022 (OTN2021).
 
+![](output/2023_mission/activity_report_plot.png)
+
+__Fig 4.__ Map depicting sample collection locations corresponding to coordinates in Table 1. Extent of second panel depicted by dashed line in first. Fill colours correspond to benthoscape classification for the St. Anns Bank MPA [(Lacharite and Brown 2018)](https://onlinelibrary.wiley.com/doi/full/10.1002/aqc.3074).
