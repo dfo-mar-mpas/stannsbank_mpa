@@ -15,4 +15,4 @@ __Fig 3.__ St. Anns Bank Marine Protected Area. Monthly average bottom temperatu
 
 ![](output/2023_mission/activity_report_plot.png)
 
-__Fig 4.__ Map depicting sample collection locations corresponding to coordinates in Table 1. Extent of second panel depicted by dashed line in first. Fill colours correspond to benthoscape classification for the St. Anns Bank MPA [(Lacharite and Brown 2018)](https://onlinelibrary.wiley.com/doi/full/10.1002/aqc.3074).
+__Fig 4.__ Map depicting sample collection locations from the PER-2023-757 mission on board the CCGS M. Perley. Extent of second panel depicted by dashed line in first. Fill colours correspond to benthoscape classification for the St. Anns Bank MPA [(Lacharite and Brown 2018)](https://onlinelibrary.wiley.com/doi/full/10.1002/aqc.3074).
