@@ -15,15 +15,37 @@ latlong <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
 utm <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84=0,0,0"
 
 #Sample stations ----
+
+cam_stations <- read.csv("data/eDNA/PER-2023-767/SAB_cameraTransectNames.csv")%>%
+                dplyr::select(Transect,Target_WP)%>%
+                rename(cam_stn=Target_WP)%>%
+                mutate(cam_stn = ifelse(cam_stn == "none - inshore","GABARUS01",cam_stn))
+
+#combine duplicated stations
+dup_stations <- cam_stations%>%filter(duplicated(cam_stations$cam_stn))%>%pull(cam_stn)
+
+for(i in dup_stations){
+  
+  cam_stations <- rbind(cam_stations%>%filter(cam_stn != i),
+                        cam_stations%>%
+                          filter(cam_stn==i)%>%
+                          mutate(Transect = paste(Transect,collapse = "-"))%>%
+                          slice(1))
+}
+                
+
 stations_2023 <- read.csv("data/eDNA/PER-2023-767/SampleDataSheet.csv")%>%#Stations sampled in 2023 - this is the table from form-c
-                 filter(Station != "BLANK",
-                        Location == "St Anns Bank")%>%
+                 filter(Station != "BLANK")%>%
                  mutate(lat=as.numeric(substring(Lat,1,2)) + as.numeric(substring(Lat,4))/60,
                         lon=(as.numeric(substring(Long,1,2)) + as.numeric(substring(Long,4))/60)*-1,
                         type=ifelse(type !="eDNA","Paired",type),
-                        type=factor(type,levels=c("Paired","eDNA")))%>%
+                        type=factor(type,levels=c("Paired","eDNA")),
+                        cam_stn = ifelse(cam_stn == "",NA,cam_stn))%>%
                   st_as_sf(coords=c("lon","lat"),crs=latlong,remove=FALSE)%>%
-                 distinct(Long,.keep_all=TRUE)
+                 distinct(Long,.keep_all=TRUE)%>%
+                 left_join(.,cam_stations)
+
+stations_2023_sab <- stations_2023%>%filter(Location == "St Anns Bank")
 
 #Benthoscape classification
 benthoscape_classes <- data.frame(Assigned_c=c("A - Mud",
@@ -80,7 +102,7 @@ basemap <- coast_hr%>%
 
 plot_boundaries <- c(c(-60,-58.3,45.75,46.5))
 
-plot_lim2 <- stations_2023%>%
+plot_lim2 <- stations_2023_sab%>%
              st_bbox()%>%
              st_as_sfc()%>%
              st_transform(utm)%>%
@@ -92,7 +114,7 @@ plot_lim2 <- stations_2023%>%
 p1 <- ggplot()+
   geom_sf(data=basemap)+
   geom_sf(data=sab_zones,fill=NA)+
-  geom_sf(data=stations_2023,aes(fill=type),pch=21)+
+  geom_sf(data=stations_2023_sab,aes(fill=type),pch=21)+
   geom_sf(data=plot_lim2%>%st_as_sfc(),fill=NA,lty=2)+
   coord_sf(expand=0,xlim=plot_boundaries[c(1,2)],ylim=plot_boundaries[c(3,4)])+
   scale_fill_manual(values=c("black","white"))+
@@ -125,15 +147,6 @@ out <- stations_2023%>%
 write.csv(out,"output/2023_mission/survey_stations_activity_report.csv",row.names=F)
 
 #full list
-
-read.csv("data/eDNA/PER-2023-767/SampleDataSheet.csv")%>%#Stations sampled in 2023 - this is the table from form-c
-  filter(Station != "BLANK")%>%
-  mutate(lat=as.numeric(substring(Lat,1,2)) + as.numeric(substring(Lat,4))/60,
-         lon=(as.numeric(substring(Long,1,2)) + as.numeric(substring(Long,4))/60)*-1,
-         type=ifelse(type !="eDNA","Paired",type),
-         type=factor(type,levels=c("Paired","eDNA")))%>%
-  st_as_sf(coords=c("lon","lat"),crs=latlong,remove=FALSE)%>%
-  distinct(Long,.keep_all=TRUE)%>%
-  data.frame()%>%
-  dplyr::select(Station,Date,type,lat,lon)%>%
-  write.csv(.,"output/2023_mission/survey_stations_formc.csv",row.names=F)
+write.csv(stations_2023%>%
+            data.frame()%>%
+            dplyr::select(Station,Transect,Date,type,lat,lon),"output/2023_mission/survey_stations_formc.csv",row.names=F)
