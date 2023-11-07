@@ -61,35 +61,37 @@ ggplot()+
   theme_minimal()
 
 
+
 #filter MPATOWS data by everything >45 degrees north to remove Gully stations 
 SABTOWS <- MPATOWS %>% filter(LATITUDE>45.1)
 SABTOWS$LONGITUDE <- SABTOWS$LONGITUDE*-1
 
 #transform into an sf object and find stations inside vs outside the MPA
 SABTOWS2 <- SABTOWS %>% st_as_sf(coords = c("LONGITUDE","LATITUDE"),crs=latlong) %>% 
-  mutate(inside=as.numeric(st_intersects(.,sab, sparse=TRUE)), Year=format(as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y"))
+  mutate(Inside=as.logical(st_intersects(.,sab, sparse=TRUE)), Year=format(as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y"))  %>% replace(is.na(.),FALSE)
 
 SABTOWS2 <- merge(SABTOWS2, fishcodes,by.x="SPECCD_ID", by.y="SPECCD_ID", all.x=T)
-
-SABTOWS2$COMM <- str_replace(SABTOWS2$COMM, pattern = "BASKET STARS; GORGONOCEPHALIDAE,ASTERONYCHIDAE", replacement = "BASKET STARS")
-
-SABTOWS2 <- SABTOWS2  %>% filter(!is.na(COMM)) %>% filter(.,!grepl("SEAWEED, ALGAE ,KELP; THALLOPHYTA", "", "APHIA IS FOR GENUS; WAS TOSSIA"))
 
 ggplot()+
   geom_sf(data=novsco, fill=gray(.9),size=0)+
   geom_sf(data=sab,colour="blue", fill=NA, linewidth=1.25)+
   #geom_sf(data=gully2, colour="red", fill=NA)+
   coord_sf(xlim=c(-61, -58), ylim=c(45.25,47.1), expand=F)+
-  geom_point(data=SABTOWS, aes(x=LONGITUDE, y=LATITUDE), shape=21, fill="black", size=1.25)+
+  geom_point(data=SABTOWS2, aes(x=START_LONG*-1, y=START_LAT,colour=Inside))+
+  labs(y="Latitude",x="Longitude")+
   theme_minimal()+
   theme(panel.background = element_rect(fill="lightblue"))
 
+SABTOWS2$COMM <- str_replace(SABTOWS2$COMM, pattern = "BASKET STARS; GORGONOCEPHALIDAE,ASTERONYCHIDAE", replacement = "BASKET STARS")
+
+SABTOWS3 <- SABTOWS2  %>% filter(!is.na(COMM) & !grepl("SEAWEED, ALGAE ,KELP; THALLOPHYTA|APHIA|BARNACLES|SARSI|BUCCINIDAE|SLUGS|ISOPOD1|PEACH|RUSSIAN|UNIDENTIFIED|SEA MOUSE|EGGS",COMM) & !grepl("ASTERIAS|LAMPRETAE|LYCODES|CARIS|HORMATHIA|BOLOCERA|CALATHURA|DECAPODA|SCLEROCRANGON", SPEC)) 
+
 #Look at fish counts from the SAB tows
-# Create boxplots for fish lengths by species
-ggplot(SABTOWS2, aes(x = COMM, y = log(EST_NUM_CAUGHT))) +
-  facet_wrap(vars(Year),nrow=7)+
+# Create boxplots for fish catch by species
+ggplot(SABTOWS2, aes(x = Year, y = log(EST_NUM_CAUGHT))) +
+  facet_wrap(vars(SPEC),nrow=12)+
   geom_boxplot() +
-  labs(title = "Fish Lengths by Species",
+  labs(title = "# Caught by Species",
        x = "Species",
        y = "# Caught") +
   theme_minimal()+
@@ -131,6 +133,13 @@ ggplot(fishmorph, aes(x = Year, y = MEASURED_WGT)) +
        y = "Weight") +
   theme_minimal()+
   theme(axis.text.x = element_text(angle=90))
+
+
+###Species Accumulation Curves for Inside vs Outside the MPA
+library(BiodiversityR)
+
+
+
 
 ######################################################################################################################
 #' For extractions only, you need all of this:
