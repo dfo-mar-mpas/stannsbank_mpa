@@ -55,12 +55,14 @@ novsco <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Coastline/NS_coa
 
 ggplot()+
   geom_sf(data=novsco, fill=gray(.9),size=0)+
-  geom_sf(data=sab,colour="blue", fill=NA)+
-  geom_sf(data=gully, colour="blue", fill=NA)+
-  coord_sf(xlim=c(-62, -58), ylim=c(43.5,48), expand=F)+
+  geom_sf(data=sab,colour="blue", fill=NA, linewidth=1.05)+
+  geom_sf(data=gully, colour="blue", fill=NA, linewidth=1.05)+
+  coord_sf(xlim=c(-62, -58), ylim=c(43.5,47.5), expand=F)+
   geom_point(data=MPATOWS, aes(x=-LONGITUDE, y=LATITUDE), shape=21, fill="black", size=1.25)+
+  labs(x="LONGITUDE")+
   theme_minimal()
 
+#ggsave(filename = "EnhancedCrabStations.png", plot = last_plot(), device = "png", path = "output/", width = 6, height =10, units = "in")
 
 ###3. Do some data filtering and merging to just focus on the SAB inside and outside trawl stations
 SABTOWS <- MPATOWS %>% filter(LATITUDE>45.1) #filter MPATOWS data by everything >45 degrees north to remove Gully stations 
@@ -77,10 +79,13 @@ ggplot()+
   geom_sf(data=sab,colour="blue", fill=NA, linewidth=1.25)+
   #geom_sf(data=gully2, colour="red", fill=NA)+
   coord_sf(xlim=c(-61, -58), ylim=c(45.25,47.1), expand=F)+
-  geom_point(data=SABTOWS2, aes(x=START_LONG*-1, y=START_LAT,colour=Inside))+
+  geom_point(data=SABTOWS2, aes(x=START_LONG*-1, y=START_LAT,colour=Inside),size=3)+
   labs(y="Latitude",x="Longitude")+
   theme_minimal()+
-  theme(panel.background = element_rect(fill="lightblue"))
+  theme(panel.background = element_rect(fill="lightblue1"), text=element_text(size=20))
+
+#ggsave(filename = "SABCrabStations.png", plot = last_plot(), device = "png", path = "output/", width = 10, height =8, units = "in")
+
 
 SABTOWS2$COMM <- str_replace(SABTOWS2$COMM, pattern = "BASKET STARS; GORGONOCEPHALIDAE,ASTERONYCHIDAE", replacement = "BASKET STARS") #let's shorten this name so it plots nicer
 
@@ -88,8 +93,8 @@ SABTOWS3 <- SABTOWS2  %>% filter(!is.na(COMM) & !grepl("SEAWEED, ALGAE ,KELP; TH
 
 #Look at fish counts from the SAB tows
 # Create boxplots for fish catch by species
-ggplot(SABTOWS3, aes(x = Year, y = log(EST_NUM_CAUGHT), colour=Inside)) +
-  facet_wrap(vars(SPEC),nrow=12)+
+ggplot(SABTOWS3, aes(x = Year, y = EST_NUM_CAUGHT, colour=Inside)) +
+  facet_wrap(vars(SPEC),nrow=12, scales="free_y")+
   geom_boxplot() +
   labs(title = "# Caught by Species",
        x = "Species",
@@ -97,23 +102,19 @@ ggplot(SABTOWS3, aes(x = Year, y = log(EST_NUM_CAUGHT), colour=Inside)) +
   theme_minimal()+
   theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 6))
 
-#Let's do some diversity statistics
-#mutate data into a community matrix for a species accumulation curve
-spec.mat <-as.data.frame(SABTOWS3[,c("EST_NUM_CAUGHT","DEPTH","Inside","Year","STATION","SPEC","COMM")])
-spec.mat <-spec.mat[,-8]
-spec.mat2<-spec.mat[,]
+
 
 #####Now look at the morphology data (length and weight)
 # Group the data by species and calculate summary statistics
 summary_data <- fishmorph %>% na.omit(fishmorph) %>%
   group_by(COMM) %>%
   summarise(
+    Median_Length = median(FISH_LENGTH, na.rm = TRUE),
     Mean_Length = mean(FISH_LENGTH, na.rm = TRUE),
     Length_SD=sd(FISH_LENGTH, na.rm=TRUE),
-    Median_Length = median(FISH_LENGTH, na.rm = TRUE),
+    Median_Weight = median(MEASURED_WGT, na.rm = TRUE),
     Mean_Weight = mean(MEASURED_WGT, na.rm = TRUE),
-    Weight_SD=sd(MEASURED_WGT, na.rm=TRUE),
-    Median_Weight = median(MEASURED_WGT, na.rm = TRUE)
+    Weight_SD=sd(MEASURED_WGT, na.rm=TRUE)
   )
 
 #Add a new column in fishmorph for year by extracting year from the BOARD DATE column
@@ -129,8 +130,8 @@ ggplot(fishmorph2, aes(x = Year, y = FISH_LENGTH)) +
        x = "Species",
        y = "Length") +
   theme_minimal()+
-  theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 6))+
-  stat_compare_means(position = "jitter")
+  theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 6))#+
+  #stat_compare_means(position = "jitter")
 
 ggsave(filename = "CrabSurvey_SAB_FishLengths.png",plot = last_plot(),device = "png",width = 22, height=14, units = "in",dpi = 500, bg = "white")
 # Create boxplots for fish weights by species
@@ -142,12 +143,6 @@ ggplot(fishmorph, aes(x = Year, y = MEASURED_WGT)) +
        y = "Weight") +
   theme_minimal()+
   theme(axis.text.x = element_text(angle=90))
-
-
-###Species Accumulation Curves for Inside vs Outside the MPA
-library(vegan)
-library(BiodiversityR)
-
 
 
 
