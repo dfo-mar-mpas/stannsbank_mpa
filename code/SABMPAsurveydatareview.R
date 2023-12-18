@@ -13,6 +13,7 @@ library(ggplot2)
 library(tidyr)
 library(lubridate)
 
+
 # ----get catch data for all tows inside the MPA ----
 require(ROracle)
 con= dbConnect(DBI::dbDriver("Oracle"), oracle.username, oracle.password, oracle.server)
@@ -35,7 +36,7 @@ order by board_date, station, speccd_id"))
 sab<-sabdat
 str(sab)
 #separate date
-sab$BOARD_DATE <- as.Date(sab$BOARD_DATE, format = "%Y-%m-%d hh:mm:ss")
+sab$BOARD_DATE <- format(as.Date(sab$BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d"),"%Y"))
 sab = sab %>% 
   mutate(BOARD_DATE = ymd(BOARD_DATE)) %>% 
   mutate_at(vars(BOARD_DATE), funs(year, month, day))
@@ -84,6 +85,7 @@ data1$SPECCD_ID[data1$SPECCD_ID == 211] <- "Skates NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 241] <- "Northern Hagfish"
 data1$SPECCD_ID[data1$SPECCD_ID == 300] <- "Sculpin NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 301] <- "Sculpin NS"
+data1$SPECCD_ID[data1$SPECCD_ID == 302] <- "Sculpin NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 303] <- "Sculpin NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 304] <- "Sculpin NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 306] <- "Sculpin NS"
@@ -154,15 +156,15 @@ data1$SPECCD_ID[data1$SPECCD_ID == 4514] <- "Squid NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 4521] <- "Octopus"
 data1$SPECCD_ID[data1$SPECCD_ID == 4522] <- "Bobtail Squid"
 data1$SPECCD_ID[data1$SPECCD_ID == 5100] <- "Sea Spider"
-data1$SPECCD_ID[data1$SPECCD_ID == 6100] <- "Star NS"
-data1$SPECCD_ID[data1$SPECCD_ID == 6113] <- "Star NS"
+data1$SPECCD_ID[data1$SPECCD_ID == 6100] <- "Sea Stars"
+data1$SPECCD_ID[data1$SPECCD_ID == 6113] <- "Sea Stars"
 data1$SPECCD_ID[data1$SPECCD_ID == 6115] <- "Mud Star"
 data1$SPECCD_ID[data1$SPECCD_ID == 6117] <- "Horse Star"
 data1$SPECCD_ID[data1$SPECCD_ID == 6119] <- "Blood Star"
 data1$SPECCD_ID[data1$SPECCD_ID == 6121] <- "Purple Sunstar"
 data1$SPECCD_ID[data1$SPECCD_ID == 6123] <- "Spiny Sunstar"
-data1$SPECCD_ID[data1$SPECCD_ID == 6125] <- "Star NS"
-data1$SPECCD_ID[data1$SPECCD_ID == 6128] <- "Star NS"
+data1$SPECCD_ID[data1$SPECCD_ID == 6125] <- "Sea Stars"
+data1$SPECCD_ID[data1$SPECCD_ID == 6128] <- "Sea Stars"
 data1$SPECCD_ID[data1$SPECCD_ID == 6200] <- "Brittle Star"
 data1$SPECCD_ID[data1$SPECCD_ID == 6300] <- "Basket Star"
 data1$SPECCD_ID[data1$SPECCD_ID == 6400] <- "Sea Urchin"
@@ -171,6 +173,7 @@ data1$SPECCD_ID[data1$SPECCD_ID == 6413] <- "Sea Urchin"
 data1$SPECCD_ID[data1$SPECCD_ID == 6500] <- "Sand Dollar"
 data1$SPECCD_ID[data1$SPECCD_ID == 6511] <- "Sand Dollar"
 data1$SPECCD_ID[data1$SPECCD_ID == 6600] <- "Sea Cucumbers"
+data1$SPECCD_ID[data1$SPECCD_ID == 6717] <- "Sea Cucumbers"
 data1$SPECCD_ID[data1$SPECCD_ID == 8300] <- "Anemones NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 8313] <- "Anemones NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 8318] <- "Sea Pen"
@@ -179,8 +182,11 @@ data1$SPECCD_ID[data1$SPECCD_ID == 8500] <- "Jellyfish NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 8520] <- "Jellyfish NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 8600] <- "Sponges NS"
 data1$SPECCD_ID[data1$SPECCD_ID == 9300] <- "Seaweeds NS"
+data1$SPECCD_ID[data1$SPECCD_ID == 641] <- "Arctic Eelpout"
+data1$SPECCD_ID[data1$SPECCD_ID == 6127] <- "Sea Stars"
+data1$SPECCD_ID[data1$SPECCD_ID == 6129] <- "Sea Stars"
 
-datacheck<-data1 %>%  filter(SPECCD_ID == "Sea Urchin", year == 2006)
+datacheck<-data1 %>%  filter(SPECCD_ID == "Sea Urchin", year == 2016)
 
 # separate date for new file
 data1$BOARD_DATE <- as.Date(data1$BOARD_DATE, format = "%Y-%m-%d hh:mm:ss")
@@ -194,26 +200,30 @@ table1 <- data1 %>%
   group_by(year, SPECCD_ID) %>%
   summarise(numcaught = sum(EST_NUM_CAUGHT), wt = sum(EST_DISCARD_WT)) 
 table1
-write.table(table1,file="SABMPAspectableallyears.csv", sep=",")
+write.table(table1,file="output/CrabSurvey_SABMPAspectableallyears.csv", sep=",")
 
 table1a<-data1 %>% # individuals by spec by year
   group_by(SPECCD_ID, year) %>% 
   summarise(N = sum(EST_NUM_CAUGHT)) %>% 
   spread(year, N)
 table1a
-write.table(table1a,file="SABMPAspectableallyears_by_spec.csv", sep=",")
+write.table(table1a,file="output/SABMPAspectableallyears_by_spec.csv", sep=",")
 
 
 specplot <- ggplot(table1 %>% filter(numcaught > 99)) +
-  geom_point(aes(x = year, y = numcaught, col = SPECCD_ID), size = 4, shape = "triangle") + 
-  geom_line(aes(x = year, y = numcaught, col = SPECCD_ID)) +
+  geom_point(aes(x = year, y = log(numcaught), col = SPECCD_ID), size = 3, shape = "circle") + 
+  geom_line(aes(x = year, y = log(numcaught), col = SPECCD_ID)) +
   xlab("Year") +
-  ylab("Number Captured") + 
+  ylab("Log Number Captured") + 
   theme_bw(12) +
-  scale_x_continuous(breaks = c(2004, 2008, 2012, 2016, 2020)) +
-  ggtitle("St Anns Bank MPA Captured Species (2004-2020)")
+  scale_x_continuous(breaks = c(2015, 2016, 2017, 2018, 2019, 2021, 2022, 2023)) +
+  scale_color_viridis(discrete = T, option ="D")+
+  scale_fill_viridis(discrete = T)+
+  ggtitle("St Anns Bank MPA Captured Species (2015-2023)")+
+  guides(col=guide_legend(title="Species"))
 specplot
 
+ggsave(filename = "AllSpeciesCaughtSAB.png", plot=specplot, device = "png", path = "output/", width = 10, height = 8, units = "in", dpi = 400)
 
 # species caught per year, for current year
 table2 <-data1 %>%
