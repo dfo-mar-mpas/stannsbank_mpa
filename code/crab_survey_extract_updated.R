@@ -20,12 +20,15 @@ latlong <- "+init=epsg:4326 +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +to
 utm <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84=0,0,0"
 
 ###1. get the trawl data from our network - this was pulled by Brent Wilson for us in summer 2023. See end of script for R code to pull data too. 
-load("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/EnhancedStations2023/MPAFishMorph.RDATA")
-load("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/EnhancedStations2023/MPATOWS.RDATA")
-
 #Get the fish species code from ANDES
 fishcodes <- read.csv("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
 head(fishcodes) #fish codes, aphia-ID's, common and species names
+
+load("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/EnhancedStations2023/MPAFishMorph.RDATA")
+load("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/EnhancedStations2023/MPATOWS.RDATA")
+catchdat <- read.csv("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/SABMPA_Dec2023export.csv", header = T) 
+catchdat <- merge(catchdat, fishcodes, by.x="SPECCD_ID", by.y="SPECCD_ID", all.x=T) #Amy Glass did a more recent pull in December 2023 so comparing this csv file to the MPATOWS RData object
+sab <- catchdat #make this compatible with Amy's annual report code just to make things easier
 head(MPAFishMorph) #fish SPECCD_ID, quantity, weight, length 
 head(MPATOWS) #lots of variables about the set catch, including temperature, coordinates, # caught etc 
 
@@ -62,7 +65,7 @@ ggplot()+
   labs(x="LONGITUDE")+
   theme_minimal()
 
-#ggsave(filename = "EnhancedCrabStations.png", plot = last_plot(), device = "png", path = "output/", width = 6, height =10, units = "in")
+#ggsave(filename = "EnhancedCrabStations.png", plot = last_plot(), device = "png", path = "output/", width = 6, height =10, units = "in", dpi=500)
 
 ###3. Do some data filtering and merging to just focus on the SAB inside and outside trawl stations
 SABTOWS <- MPATOWS %>% filter(LATITUDE>45.1) #filter MPATOWS data by everything >45 degrees north to remove Gully stations 
@@ -121,31 +124,39 @@ summary_data <- fishmorph %>% na.omit(fishmorph) %>%
 fishmorph2 <- na.omit(fishmorph) %>% mutate(Year = format
               (as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y")) 
 fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="YELLOWTAIL FLOUNDER; LIMANDA", replacement = "YELLOWTAIL")
+fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="TURBOT,GREENLAND HALIBUT", replacement = "GREENLAND HALIBUT")
+fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="MONKFISH,GOOSEFISH,ANGLER", replacement = "ANGLERFISH")
+fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="HERRING ATLANTIC", replacement = "ATLANTIC HERRING")
+
+#Have to replace 2020 with 2019 since there was no 2020 survey
+fishmorph2 <- fishmorph2 %>% mutate(Year=replace(Year, Year==2020, 2019)) %>% as.data.frame()
   
 # Create boxplots for fish lengths by species
-ggplot(fishmorph2, aes(x = Year, y = FISH_LENGTH)) +
+ggplot(fishmorph2 %>% filter(EST_NUM_CAUGHT > 5), aes(x = Year, y = FISH_LENGTH)) +
   facet_wrap(vars(COMM),nrow=8, scales="free_y")+
   geom_boxplot() +
   labs(title = "Fish Lengths by Species",
        x = "Species",
        y = "Length") +
   theme_minimal()+
-  theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 6))#+
+  theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 8))#+
   #stat_compare_means(position = "jitter")
 
-ggsave(filename = "CrabSurvey_SAB_FishLengths.png",plot = last_plot(),device = "png",width = 22, height=14, units = "in",dpi = 500, bg = "white")
+ggsave(filename = "CrabSurvey_SAB_FishLengths.png",plot = last_plot(),path="output/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
+
+
 # Create boxplots for fish weights by species
-ggplot(fishmorph, aes(x = Year, y = MEASURED_WGT)) +
-  facet_wrap(vars(COMM),nrow=6, scales="free_y")+
+ggplot(fishmorph2 %>% filter(EST_NUM_CAUGHT>5), aes(x = Year, y = MEASURED_WGT)) +
+  facet_wrap(vars(COMM),nrow=5, scales="free_y")+
   geom_boxplot() +
-  labs(title = "Fish Weights by Species",
-       x = "Species",
-       y = "Weight") +
+  labs(x = "Species",
+       y = "Weight (g)") +
   theme_minimal()+
-  theme(axis.text.x = element_text(angle=90))
+  theme(axis.text.x = element_text(angle=90), strip.text.x = element_text(size=7))
 
+ggsave(filename = "CrabSurvey_SAB_FishWeights.png",plot = last_plot(), path = "output/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
 
-
+save.image("2023CrabSurveyDat.RData")
 ######################################################################################################################
 #' For extractions only, you need all of this:
 
