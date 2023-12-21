@@ -12,20 +12,26 @@ head(data1)
 data1$LONGITUDE <- data1$LONGITUDE*-1
 #Add inside vs outside
 data2 <- data1 %>% st_as_sf(coords = c("LONGITUDE","LATITUDE"),crs=latlong) %>% 
-  mutate(Inside=as.logical(st_intersects(.,sab, sparse=TRUE)), Year=format(as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y"))  %>% replace(is.na(.),FALSE)
+  mutate(Inside=as.logical(st_intersects(.,sab, sparse=TRUE)), Year=format(as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y"), enhanced=as.logical(STATION %in% unique(as.integer(SABTOWS3$STATION))))  %>% replace(is.na(.),FALSE)
 data2$LONGITUDE <- data1$LONGITUDE
 data2$LATITUDE <- data1$LATITUDE
 
+  
 ggplot()+
   geom_sf(data=novsco, fill=gray(.9),size=0)+
-  geom_sf(data=sab,colour="blue", fill=NA, linewidth=1.25)+
+  geom_sf(data=sab_benthoscape,aes(fill=class),lwd=0.25)+
+  geom_sf(data=sab,colour="blue", fill=NA, linewidth=1)+
   #geom_sf(data=gully2, colour="red", fill=NA)+
-  coord_sf(xlim=c(-61, -58), ylim=c(45.25,47.1), expand=F)+
-  geom_point(data=data2, aes(x=LONGITUDE, y=LATITUDE, color=Inside),size=3)+
-  scale_color_manual(values=c("gold1","midnightblue"))+
+  coord_sf(xlim=c(-60.5, -58.3), ylim=c(45.25,47.1), expand=F)+
+  geom_point(data=data2, aes(x=LONGITUDE, y=LATITUDE, colour=Inside, shape=enhanced, size=enhanced))+
+  scale_size_manual(values=c(1.75,2.5))+
+  scale_color_manual(values=c("grey46","black"))+
   labs(y="Latitude",x="Longitude")+
   theme_minimal()+
-  theme(panel.background = element_rect(fill="lightblue1"), text=element_text(size=20))
+  theme(panel.background = element_rect(fill="lightcyan1"), axis.text.x=element_text(size=12), axis.text.y=element_text(size=12), axis.title = element_text(size=16), legend.text = element_text(size=10))
+
+ggsave(filename = "SurveyStationsMap2023.png",plot = last_plot(), device = "png", path = "output/", width = 16, height=10, units="in", dpi=600)
+
 
 #richness
 rich_df <- data2%>%
