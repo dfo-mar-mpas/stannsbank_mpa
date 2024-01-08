@@ -156,7 +156,9 @@ ggplot(fishmorph2 %>% filter(EST_NUM_CAUGHT>5), aes(x = Year, y = MEASURED_WGT))
 
 ggsave(filename = "CrabSurvey_SAB_FishWeights.png",plot = last_plot(), path = "output/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
 
-save.image("2023CrabSurveyDat.RData")
+save.image("data/2023CrabSurveyDat.RData")
+
+
 ######################################################################################################################
 #' For extractions only, you need all of this:
 

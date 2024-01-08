@@ -6,10 +6,13 @@ library(pwr2)
 library(BiodiversityR)
 library(vegan)
 
+load("data/2023CrabSurveyDat.RData")
+
+
 #stole some code from Ryan
 #use data1 dataframe from datareview script for richness
 head(data1)
-data1$LONGITUDE <- data1$LONGITUDE*-1
+data1$LONGITUDE <- data1$LONGITUDE*-1 #check if this needs to be done depending on what data image you're loading
 #Add inside vs outside
 data2 <- data1 %>% st_as_sf(coords = c("LONGITUDE","LATITUDE"),crs=latlong) %>% 
   mutate(Inside=as.logical(st_intersects(.,sab, sparse=TRUE)), Year=format(as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y"), enhanced=as.logical(STATION %in% unique(as.integer(SABTOWS3$STATION))))  %>% replace(is.na(.),FALSE)
@@ -66,4 +69,7 @@ ggplot()+
   guides(col=guide_legend(title = "Survey Station"))
 
 #Species accumulation curves
+
+
+#Power analyses - looking at how many trawl sets it takes to achieve high statistical power to determine biodiversity/richness (and abundance or biomass of some species?)
 

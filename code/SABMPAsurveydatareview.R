@@ -12,6 +12,7 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(lubridate)
+library(viridis)
 
 
 # ----get catch data for all tows inside the MPA ----
@@ -186,7 +187,7 @@ data1$SPECCD_ID[data1$SPECCD_ID == 641] <- "Arctic Eelpout"
 data1$SPECCD_ID[data1$SPECCD_ID == 6127] <- "Sea Stars"
 data1$SPECCD_ID[data1$SPECCD_ID == 6129] <- "Sea Stars"
 
-datacheck<-data1 %>%  filter(SPECCD_ID == "Sea Urchin", year == 2016)
+data1 %>%  filter(SPECCD_ID == "Sea Urchin", year == 2016)
 
 # separate date for new file
 data1$BOARD_DATE <- as.Date(data1$BOARD_DATE, format = "%Y-%m-%d hh:mm:ss")
@@ -203,7 +204,7 @@ table1
 write.table(table1,file="output/CrabSurvey_SABMPAspectableallyears.csv", sep=",")
 
 table1a<-data1 %>% # individuals by spec by year
-  group_by(SPECCD_ID, year) %>% 
+  group_by(SPEC, year) %>% 
   summarise(N = sum(EST_NUM_CAUGHT)) %>% 
   spread(year, N)
 table1a
@@ -214,7 +215,7 @@ specplot <- ggplot(table1 %>% filter(numcaught > 99)) +
   geom_point(aes(x = year, y = log(numcaught), col = SPECCD_ID), size = 3, shape = "circle") + 
   geom_line(aes(x = year, y = log(numcaught), col = SPECCD_ID)) +
   xlab("Year") +
-  ylab("Log Number Captured") + 
+  ylab("Log(# Captured)") + 
   theme_bw(12) +
   scale_x_continuous(breaks = c(2015, 2016, 2017, 2018, 2019, 2021, 2022, 2023)) +
   scale_color_viridis(discrete = T, option ="D")+
@@ -227,12 +228,12 @@ ggsave(filename = "AllSpeciesCaughtSAB.png", plot=specplot, device = "png", path
 
 # species caught per year, for current year
 table2 <-data1 %>%
-  filter(year == "2019") %>%
-  group_by(SPECCD_ID) %>%
+  filter(year == "2023") %>%
+  group_by(SPEC) %>%
   summarise(total = sum(EST_NUM_CAUGHT), wt = sum(EST_DISCARD_WT))
 table2
 
-write.table(table2,file="SABMPAspectable.csv", sep=",")
+write.table(table2,file="output/SABMPAspectable2023.csv", sep=",")
 
 #----stomach sample details----
 require(ROracle)
@@ -288,7 +289,7 @@ table5in2 <-t1 %>%
 table5in2
 write.table(table5in2,file="SABMPAstom_in_total_table.csv", sep=",")
 
-#to get total number of stomach samples taken adjecent to the SABMPA
+#to get total number of stomach samples taken adjacent to the SABMPA
 table5out <-t1 %>%
   filter(year == '2019', STATION %in% c('036', '051', '204', '206', '507')) %>%
   count(STATION)
