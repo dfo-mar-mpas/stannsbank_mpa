@@ -5,6 +5,7 @@ library(ggplot2)
 library(pwr2)
 library(BiodiversityR)
 library(vegan)
+library(iNEXT)
 
 load("data/2023CrabSurveyDat.RData")
 
@@ -23,7 +24,7 @@ data2$LATITUDE <- data1$LATITUDE
 ggplot()+
   geom_sf(data=novsco, fill=gray(.9),size=0)+
   geom_sf(data=sab_benthoscape,aes(fill=class),lwd=0.25)+
-  geom_sf(data=sab,colour="blue", fill=NA, linewidth=1)+
+  geom_sf(data=sabshape,colour="blue", fill=NA, linewidth=1)+
   #geom_sf(data=gully2, colour="red", fill=NA)+
   coord_sf(xlim=c(-60.5, -58.3), ylim=c(45.25,47.1), expand=F)+
   geom_point(data=data2, aes(x=LONGITUDE, y=LATITUDE, colour=Inside, shape=enhanced, size=enhanced))+
@@ -69,6 +70,16 @@ ggplot()+
   guides(col=guide_legend(title = "Survey Station"))
 
 #Species accumulation curves
+sad_data <- data3 %>% as.data.frame() %>%
+  group_by(Year, STATION) %>%
+  summarize(species_counts = n()) 
+
+
+ggiNEXT(sad_data, type = 1, facet.var = "Year")
+# Type 1: Chao1 richness estimator
+# Type 2: Bootstrap-based richness estimator
+# Type 3: Sample-size-based rarefaction/extrapolation
+# Type 4: Sample-size-based extrapolation for incomplete sampling
 
 
 #Power analyses - looking at how many trawl sets it takes to achieve high statistical power to determine biodiversity/richness (and abundance or biomass of some species?)

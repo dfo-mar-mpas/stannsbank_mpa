@@ -186,6 +186,8 @@ data1$SPECCD_ID[data1$SPECCD_ID == 9300] <- "Seaweeds"
 data1$SPECCD_ID[data1$SPECCD_ID == 641] <- "Arctic Eelpout"
 data1$SPECCD_ID[data1$SPECCD_ID == 6127] <- "Sea Stars"
 data1$SPECCD_ID[data1$SPECCD_ID == 6129] <- "Sea Stars"
+data1$SPECCD_ID[data1$SPECCD_ID == 6213] <- "Ophiura sarsii"
+
 
 data1 %>%  filter(SPECCD_ID == "Sea Urchin", year == 2016)
 
@@ -211,7 +213,7 @@ table1a
 write.table(table1a,file="output/SABMPAspectableallyears_by_spec.csv", sep=",")
 
 
-specplot <- ggplot(table1 %>% filter(numcaught > 99)) +
+specplot <- ggplot(table1 %>% filter(numcaught > 50)) +
   geom_point(aes(x = year, y = log(numcaught), col = SPECCD_ID), size = 3, shape = "circle") + 
   geom_line(aes(x = year, y = log(numcaught), col = SPECCD_ID)) +
   xlab("Year") +
