@@ -6,7 +6,7 @@ MPA.SAB.data = function (current_year) {
   ######NEED TO MODIFY THE REST SIMILAR TO MPA.gully.data############
 
 getwd()
-setwd("C:/Users/GlassA/Desktop/covid copies/SABMPA")
+#setwd("C:/Users/GlassA/Desktop/covid copies/SABMPA")
 
 library(dplyr)
 library(ggplot2)
@@ -34,7 +34,7 @@ AND (st.fishset_id = ca.fishset_id
 AND st.haulccd_id = '1')
 and st.station in ('016', '017', '018', '029', '031', '032', '034', '091', '093', '205', '511', '609', '611', '801')  
 order by board_date, station, speccd_id"))
-sab<-sabdat
+
 str(sab)
 #separate date
 sab$BOARD_DATE <- format(as.Date(sab$BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d"),"%Y"))
@@ -191,6 +191,8 @@ data1$SPECCD_ID[data1$SPECCD_ID == 6213] <- "Ophiura sarsii"
 
 data1 %>%  filter(SPECCD_ID == "Sea Urchin", year == 2016)
 
+data1$Inside <- SABTOWS2$Inside
+
 # separate date for new file
 data1$BOARD_DATE <- as.Date(data1$BOARD_DATE, format = "%Y-%m-%d hh:mm:ss")
 data1 = data1 %>% 
@@ -200,33 +202,34 @@ summary(data1)
 
 # table of total species caught per year 
 table1 <- data1 %>%
-  group_by(year, SPECCD_ID) %>%
+  group_by(year, SPECCD_ID, Inside, AREA_SWEPT) %>%
   summarise(numcaught = sum(EST_NUM_CAUGHT), wt = sum(EST_DISCARD_WT)) 
 table1
-write.table(table1,file="output/CrabSurvey_SABMPAspectableallyears.csv", sep=",")
+write.table(table1,file="output/CrabSurvey/SABMPAspectableallyears.csv", sep=",")
 
 table1a<-data1 %>% # individuals by spec by year
   group_by(SPEC, year) %>% 
   summarise(N = sum(EST_NUM_CAUGHT)) %>% 
   spread(year, N)
 table1a
-write.table(table1a,file="output/SABMPAspectableallyears_by_spec.csv", sep=",")
+write.table(table1a,file="output/CrabSurvey/SABMPAspectableallyears_by_spec.csv", sep=",")
 
-
+#this looks weird standardized by AREA_SWEPT, maybe change it up
 specplot <- ggplot(table1 %>% filter(numcaught > 50)) +
-  geom_point(aes(x = year, y = log(numcaught), col = SPECCD_ID), size = 3, shape = "circle") + 
-  geom_line(aes(x = year, y = log(numcaught), col = SPECCD_ID)) +
+  geom_point(aes(x = year, y = log(numcaught*(AREA_SWEPT/mean(AREA_SWEPT, na.rm=T))), col = SPECCD_ID), size = 3, shape = "circle") + 
+  geom_line(aes(x = year, y = log(numcaught*(AREA_SWEPT/mean(AREA_SWEPT, na.rm=T))), col = SPECCD_ID)) +
+  facet_wrap(vars(Inside), nrow=2)+
   xlab("Year") +
   ylab("Log(# Captured)") + 
-  theme_bw(12) +
+  theme_bw(14) +
   scale_x_continuous(breaks = c(2015, 2016, 2017, 2018, 2019, 2021, 2022, 2023)) +
   scale_color_viridis(discrete = T, option ="D")+
   scale_fill_viridis(discrete = T)+
-  ggtitle("St Anns Bank MPA Captured Species (2015-2023)")+
+  #ggtitle("St Anns Bank MPA Captured Species (2015-2023)")+
   guides(col=guide_legend(title="Species"))
 specplot
 
-ggsave(filename = "AllSpeciesCaughtSAB.png", plot=specplot, device = "png", path = "output/", width = 10, height = 8, units = "in", dpi = 400)
+ggsave(filename = "AllSpeciesCaughtSAB.png", plot=specplot, device = "png", path = "output/CrabSurvey/", width = 10, height = 8, units = "in", dpi = 400)
 
 # species caught per year, for current year
 table2 <-data1 %>%

@@ -101,7 +101,8 @@ sab_benthoscape <- read_sf("data/Shapefiles/benthoscape.shp")%>%
          class = gsub("F - ","",class))
 
 #load bathymetry 
-ras <- raster("data/Bathymetry/sab_dem.tif")
+ras <- raster("data/Bathymetry/sab_dem.tif") %>%
+  projectRaster(.,crs=latlong)
 rasproj <- proj4string(ras)
 
 #bathymetry comparison

@@ -26,13 +26,13 @@ head(fishcodes) #fish codes, aphia-ID's, common and species names
 
 #These are OLD FILES only to 2022 - These files have ALL of the MPA stations (Gully and SAB) and the fish morphology data
 #load("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/EnhancedStations2023/MPAFishMorph.RDATA")
-load("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/EnhancedStations2023/MPATOWS.RDATA") #load this one so we can make a map of the Gully and SAB stations
+load("data/CrabSurvey/OldData/MPATOWS.RDATA") #load this one so we can make a map of the Gully and SAB stations, this is only the enhanced stations
 
 #Load the full fish morph data and then subset
 load("data/CrabSurvey/FishMorph.RData")
 
-#This is just restricted to SAB and includes data from 2015 to 2023
-catchdat <- read.csv("C:/Users/JEFFERYN/Documents/GitHub/stannsbank_mpa/data/CrabSurvey/SABMPA2023export.csv", header = T) 
+#This is just restricted to SAB and includes all stations from 2015 to 2023
+catchdat <- read.csv("data/CrabSurvey/SABMPA2023export.csv", header = T) 
 catchdat<- catchdat %>% unite(TRIP_STATION, c("TRIP", "STATION"), remove = F)
 
 #Load area swept data
@@ -49,19 +49,21 @@ arsw %>% summarise(mean=mean(AREA_SWEPT,na.rm = T),
 catchdat <- merge(catchdat, fishcodes, by.x="SPECCD_ID", by.y="SPECCD_ID", all.x=T) #Amy Glass did a more recent pull in December 2023 so comparing this csv file to the MPATOWS RData object
 
 #now join by area swept file - can use Trip and Station to join
-catchdata <- left_join(arsw, catchdat, by = "TRIP_STATION", relationship = "many-to-many")
-#remove useless columns
+catchdata <- left_join(arsw, catchdat, by = "TRIP_STATION", relationship = "many-to-many", keep = F)
+#remove redundant columns
 catchdata <- catchdata[,-c(8, 11)]
 sab <- catchdata #make this compatible with Amy's annual report code just to make things easier
-head(MPAFishMorph) #fish SPECCD_ID, quantity, weight, length 
+#head(MPAFishMorph) #fish SPECCD_ID, quantity, weight, length 
 head(MPATOWS) #lots of variables about the set catch, including temperature, coordinates, # caught etc 
 
 #First need to remove some redundant columns from MPAWTOWS
 MPATOWS <- MPATOWS[,-c(12,13,17,36)]
 
-#Merge species codes into MPAFishMorph
+#Merge species codes into fishmorphs object. This is a big file that needs to be subset by SAB TRIP and STATION
 fishmorphs <- merge(fishmorphs, fishcodes, by.x="SPECCD_ID", by.y="SPECCD_ID", all.x=T)
 
+
+##########################################################################################################
 #### 2. Make some basic maps of the study areas
 #load MPA polygons
 sabshape <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/StAnnsBank_MPA.shp")%>%
@@ -73,7 +75,6 @@ gully <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Gully/Gully_Bound
   mutate(name="Gully MPA")%>%
   dplyr::select(name,geometry)
 
-#mpas <- rbind(sabshape,gully)
 
 #basemap of Nova Scotia
 novsco <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Coastline/NS_coastline_project_Erase1.shp")%>%st_transform(latlong)%>%
@@ -93,7 +94,7 @@ ggplot()+
 #ggsave(filename = "output/EnhancedCrabStations.png", plot = last_plot(), device = "png", path = "output/", width = 6, height =10, units = "in", dpi=500)
 
 ###3. Do some data filtering and merging to just focus on the SAB inside and outside trawl stations
-SABTOWS <- catchdata %>% filter(LATITUDE>45.1) #filter MPATOWS data by everything >45 degrees north to remove Gully stations 
+SABTOWS <- catchdata %>% filter(LATITUDE>45.1) #filter MPATOWS data by everything >45 degrees north to remove Gully stations
 SABTOWS$LONGITUDE <- SABTOWS$LONGITUDE*-1
 
 #transform into an sf object and find stations inside vs outside the MPA
@@ -116,6 +117,8 @@ ggplot()+
 #ggsave(filename = "SABCrabStations.png", plot = last_plot(), device = "png", path = "output/", width = 10, height =8, units = "in")
 
 
+########################################################################################################
+### 4. Plot up some of the fish catch and morpho data
 SABTOWS2$COMM <- str_replace(SABTOWS2$COMM, pattern = "BASKET STARS; GORGONOCEPHALIDAE,ASTERONYCHIDAE", replacement = "BASKET STARS") #let's shorten this name so it plots nicer
 
 SABTOWS3 <- SABTOWS2  %>% filter(!is.na(COMM) & !grepl("SEAWEED, ALGAE ,KELP; THALLOPHYTA|APHIA|BARNACLES|SARSI|BUCCINIDAE|SLUGS|ISOPOD1|PEACH|RUSSIAN|UNIDENTIFIED|SEA MOUSE|EGGS",COMM) & !grepl("ASTERIAS|LAMPRETAE|LYCODES|CARIS|HORMATHIA|BOLOCERA|CALATHURA|DECAPODA|SCLEROCRANGON", SPEC)) 
@@ -131,7 +134,7 @@ ggplot(SABTOWS3, aes(x = Year, y = EST_NUM_CAUGHT, colour=Inside)) +
   theme_minimal()+
   theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 6))
 
-ggsave(filename = "FishCatchinSAB.png", plot=last_plot(), device="png", path="output/", width=16, height = 12, units="in", dpi=500)
+#ggsave(filename = "FishCatchinSAB.png", bg="white", plot=last_plot(), device="png", path="output/CrabSurvey/", width=18, height = 12, units="in", dpi=500)
 
 
 #####Now look at the morphology data (length and weight)
@@ -150,7 +153,7 @@ summary_data <- fishmorph %>% group_by(COMM) %>%
     Weight_SD=sd(FISH_WEIGHT, na.rm=TRUE)
   )
 
-write.csv(x = summary_data, file = "output/Fish_weight_length_summary.csv", quote = F)
+#write.csv(x = summary_data, file = "output/CrabSurvey/Fish_weight_length_summary.csv", quote = F)
 #Add a new column in fishmorph for year by extracting year from the BOARD DATE column
 fishmorph2 <- fishmorph
 fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="YELLOWTAIL FLOUNDER; LIMANDA", replacement = "YELLOWTAIL")
@@ -182,7 +185,7 @@ ggplot(fishmorph3 %>% filter(EST_NUM_CAUGHT > 2), aes(x = Year, y = log(FISH_LEN
   theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 8))#+
   #stat_compare_means(position = "jitter")
 
-ggsave(filename = "CrabSurvey_SAB_FishLengths.png",plot = last_plot(),path="output/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
+ggsave(filename = "CrabSurvey_SAB_FishLengths.png",plot = last_plot(),path="output/CrabSurvey/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
 
 
 # Create boxplots for fish weights by species
@@ -194,9 +197,9 @@ ggplot(fishmorph3 %>% filter(EST_NUM_CAUGHT>2), aes(x = Year, y = FISH_WEIGHT)) 
   theme_minimal()+
   theme(axis.text.x = element_text(angle=90), strip.text.x = element_text(size=7))
 
-ggsave(filename = "CrabSurvey_SAB_FishWeights.png",plot = last_plot(), path = "output/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
+ggsave(filename = "CrabSurvey_SAB_FishWeights.png",plot = last_plot(), path = "output/CrabSurvey/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
 
-save.image("data/2023CrabSurveyDat.RData")
+save.image("data/CrabSurvey/2023CrabSurveyDat.RData")
 
 
 ######################################################################################################################

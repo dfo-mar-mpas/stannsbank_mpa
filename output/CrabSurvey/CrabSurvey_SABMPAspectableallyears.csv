@@ -1,0 +1,772 @@
+"year","SPECCD_ID","Inside","numcaught","wt"
+"1",2015,"Alligatorfish",TRUE,10,0.4
+"2",2015,"American Plaice",FALSE,151,11.8
+"3",2015,"American Plaice",TRUE,304,23.6
+"4",2015,"Anemones",FALSE,18,3.1
+"5",2015,"Anemones",TRUE,61,2.8
+"6",2015,"Arctic Eelpout",FALSE,2,0.3
+"7",2015,"Atlantic Cod",FALSE,12,7.4
+"8",2015,"Atlantic Cod",TRUE,147,38.1
+"9",2015,"Atlantic Sea Poacher",FALSE,1,0.1
+"10",2015,"Basket Star",FALSE,22,4.4
+"11",2015,"Basket Star",TRUE,34,4.8
+"12",2015,"Blood Star",FALSE,7,0.3
+"13",2015,"Blood Star",TRUE,11,0.4
+"14",2015,"Bobtail Squid",FALSE,6,0.3
+"15",2015,"Bobtail Squid",TRUE,5,0.3
+"16",2015,"Bristle Worm",TRUE,2,0.2
+"17",2015,"Brittle Star",FALSE,14,0.3
+"18",2015,"Brittle Star",TRUE,264,1.4
+"19",2015,"Coral NS",TRUE,4,0.2
+"20",2015,"Daubed Shanny",FALSE,1,0.1
+"21",2015,"Eelpouts",FALSE,2,0.2
+"22",2015,"Eelpouts",TRUE,12,1.5
+"23",2015,"Fourbeard Rockling",FALSE,9,0.5
+"24",2015,"Fourbeard Rockling",TRUE,5,0.3
+"25",2015,"Fourline Snakeblenny",TRUE,4,0.3
+"26",2015,"Halibut",FALSE,2,10.9
+"27",2015,"Hermit Crab",FALSE,12,0.4
+"28",2015,"Hermit Crab",TRUE,21,0.5
+"29",2015,"Herring",FALSE,2,0.4
+"30",2015,"Herring",TRUE,4,0.6
+"31",2015,"Horse Star",FALSE,9,1.5
+"32",2015,"Horse Star",TRUE,42,5.1
+"33",2015,"Icelandic Scallop",TRUE,5,0.5
+"34",2015,"Jellyfish",FALSE,5,0.3
+"35",2015,"Jellyfish",TRUE,11,0.9
+"36",2015,"Lesser Toad Crab",TRUE,26,1.645
+"37",2015,"Longfin Hake",FALSE,52,4.1
+"38",2015,"Longfin Hake",TRUE,169,11.2
+"39",2015,"Mackerel",TRUE,1,0.1
+"40",2015,"Marlinspike Grenadier",FALSE,29,0.7
+"41",2015,"Marlinspike Grenadier",TRUE,79,2.5
+"42",2015,"Monkfish",FALSE,2,12.5
+"43",2015,"Monkfish",TRUE,2,15.2
+"44",2015,"Mud Star",FALSE,371,2.9
+"45",2015,"Mud Star",TRUE,263,1.5
+"46",2015,"Northern Stone Crab",FALSE,21,3.941
+"47",2015,"Northern Stone Crab",TRUE,17,3.167
+"48",2015,"Octopus",FALSE,7,0.2
+"49",2015,"Octopus",TRUE,6,0.4
+"50",2015,"Purple Sunstar",FALSE,3,0.8
+"51",2015,"Purple Sunstar",TRUE,3,0.4
+"52",2015,"Redfish spp.",FALSE,63,9.2
+"53",2015,"Redfish spp.",TRUE,4564,291.8
+"54",2015,"Sand Dollar",TRUE,4,0.2
+"55",2015,"Sculpin NS",FALSE,1,0.1
+"56",2015,"Sculpin NS",TRUE,25,0.6
+"57",2015,"Sculpins",TRUE,57,1.9
+"58",2015,"Sea Cucumbers",TRUE,19,7
+"59",2015,"Sea Pen",FALSE,268,1.2
+"60",2015,"Sea Pen",TRUE,2550,7
+"61",2015,"Sea Potato",FALSE,1,0.1
+"62",2015,"Sea Potato",TRUE,314,13.4
+"63",2015,"Sea Spider",TRUE,9,0.4
+"64",2015,"Sea Squirts",TRUE,1,0.1
+"65",2015,"Sea Stars",FALSE,27,0.9
+"66",2015,"Sea Stars",TRUE,71,2.1
+"67",2015,"Sea Urchin",TRUE,54,1.2
+"68",2015,"Seaweeds",FALSE,5,0.3
+"69",2015,"Seaweeds",TRUE,7,0.5
+"70",2015,"Shortfin Squid",FALSE,1,0.1
+"71",2015,"Shortfin Squid",TRUE,1,0.1
+"72",2015,"Shrimp",FALSE,474,4.68
+"73",2015,"Shrimp",TRUE,215,2.8
+"74",2015,"Silver Hake",FALSE,1,0.1
+"75",2015,"Silver Hake",TRUE,3,0.3
+"76",2015,"Skate Eggs",FALSE,10,0.2
+"77",2015,"Skate Eggs",TRUE,1,0.1
+"78",2015,"Smooth Skate",FALSE,5,2.5
+"79",2015,"Smooth Skate",TRUE,15,3.5
+"80",2015,"Snailfish spp.",TRUE,1,0.1
+"81",2015,"Snow Crab",FALSE,121,3.086
+"82",2015,"Snow Crab",TRUE,309,11.826
+"83",2015,"Spiny Lumpsucker",TRUE,2,0.2
+"84",2015,"Spiny Sunstar",TRUE,11,0.6
+"85",2015,"Sponges",FALSE,31,1
+"86",2015,"Sponges",TRUE,566,32.8
+"87",2015,"Striped Atlantic Wolffish",TRUE,20,2.2
+"88",2015,"Thorny Skate",FALSE,28,2.4
+"89",2015,"Thorny Skate",TRUE,40,19.85
+"90",2015,"Toad Crab",TRUE,6,0.274
+"91",2015,"Turbot",FALSE,2,0.2
+"92",2015,"Turbot",TRUE,8,2
+"93",2015,"Whelks",FALSE,7,0.4
+"94",2015,"Whelks",TRUE,36,0.8
+"95",2015,"White Hake",FALSE,41,14.9
+"96",2015,"White Hake",TRUE,108,40.5
+"97",2015,"Witch Flounder",FALSE,188,34.9
+"98",2015,"Witch Flounder",TRUE,548,92.6
+"99",2015,"Yellowtail Flounder",TRUE,9,0.7
+"100",2016,"Alligatorfish",TRUE,3,0.2
+"101",2016,"American Plaice",FALSE,105,10
+"102",2016,"American Plaice",TRUE,431,33.7
+"103",2016,"Anemones",FALSE,22,1.9
+"104",2016,"Anemones",TRUE,51,1.2
+"105",2016,"Atlantic Cod",FALSE,5,3.4
+"106",2016,"Atlantic Cod",TRUE,41,17.6
+"107",2016,"Atlantic Rock Crab",TRUE,1,0.29
+"108",2016,"Atlantic Sea Poacher",FALSE,4,0.1
+"109",2016,"Barnacles",TRUE,2,0.1
+"110",2016,"Basket Star",FALSE,6,1.4
+"111",2016,"Basket Star",TRUE,38,5.5
+"112",2016,"Blood Star",FALSE,7,0.3
+"113",2016,"Blood Star",TRUE,17,0.6
+"114",2016,"Bobtail Squid",FALSE,1,0.1
+"115",2016,"Bobtail Squid",TRUE,1,0.1
+"116",2016,"Brittle Star",FALSE,1,0.1
+"117",2016,"Brittle Star",TRUE,271,1
+"118",2016,"Coral NS",TRUE,2,0.2
+"119",2016,"Daubed Shanny",TRUE,1,0.1
+"120",2016,"Eelpouts",FALSE,1,0.1
+"121",2016,"Eelpouts",TRUE,NA,1.5
+"122",2016,"Fourbeard Rockling",FALSE,2,0.1
+"123",2016,"Fourbeard Rockling",TRUE,5,0.4
+"124",2016,"Halibut",TRUE,1,1.5
+"125",2016,"Hermit Crab",FALSE,16,0.3
+"126",2016,"Hermit Crab",TRUE,27,0.7
+"127",2016,"Herring",TRUE,91,12.8
+"128",2016,"Horse Star",FALSE,18,1.4
+"129",2016,"Horse Star",TRUE,48,5.7
+"130",2016,"Jellyfish",TRUE,4,3.1
+"131",2016,"Jonah Crab",TRUE,1,0.271
+"132",2016,"Lesser Toad Crab",TRUE,41,3.732
+"133",2016,"Longfin Hake",FALSE,43,4.5
+"134",2016,"Longfin Hake",TRUE,54,4
+"135",2016,"Marlinspike Grenadier",FALSE,33,1.1
+"136",2016,"Marlinspike Grenadier",TRUE,67,2
+"137",2016,"Monkfish",FALSE,1,3.3
+"138",2016,"Monkfish",TRUE,2,15.4
+"139",2016,"Mud Star",FALSE,4725,37.1
+"140",2016,"Mud Star",TRUE,605,3.7
+"141",2016,"Northern Stone Crab",FALSE,12,3.431
+"142",2016,"Northern Stone Crab",TRUE,9,2.197
+"143",2016,"Octopus",FALSE,4,0.3
+"144",2016,"Octopus",TRUE,8,0.3
+"145",2016,"Purple Sunstar",TRUE,4,0.4
+"146",2016,"Redfish spp.",FALSE,547,43.1
+"147",2016,"Redfish spp.",TRUE,1429,120.7
+"148",2016,"Sand Dollar",TRUE,496,9.7
+"149",2016,"Sculpin NS",TRUE,6,0.3
+"150",2016,"Sculpins",FALSE,1,0.1
+"151",2016,"Sculpins",TRUE,24,1.6
+"152",2016,"Sea Cucumbers",TRUE,26,9.3
+"153",2016,"Sea Pen",FALSE,58,0.2
+"154",2016,"Sea Pen",TRUE,1250,3
+"155",2016,"Sea Potato",TRUE,103,5.8
+"156",2016,"Sea Spider",FALSE,1,0.1
+"157",2016,"Sea Spider",TRUE,3,0.3
+"158",2016,"Sea Squirts",FALSE,1,0.1
+"159",2016,"Sea Squirts",TRUE,5,0.2
+"160",2016,"Sea Stars",FALSE,17,0.3
+"161",2016,"Sea Stars",TRUE,39,1.9
+"162",2016,"Sea Urchin",FALSE,7,0.1
+"163",2016,"Sea Urchin",TRUE,93,1.8
+"164",2016,"Seaweeds",FALSE,7,0.3
+"165",2016,"Seaweeds",TRUE,14,0.9
+"166",2016,"Shortfin Squid",FALSE,1,0.1
+"167",2016,"Shortfin Squid",TRUE,1,0.1
+"168",2016,"Shrimp",FALSE,455,3.3
+"169",2016,"Shrimp",TRUE,413,3.8
+"170",2016,"Silver Hake",FALSE,16,3.1
+"171",2016,"Silver Hake",TRUE,42,9.3
+"172",2016,"Skate Eggs",FALSE,9,0.2
+"173",2016,"Skate Eggs",TRUE,2,0.1
+"174",2016,"Smooth Skate",FALSE,5,2.8
+"175",2016,"Smooth Skate",TRUE,13,3.7
+"176",2016,"Snow Crab",FALSE,138,10.65
+"177",2016,"Snow Crab",TRUE,156,12.721
+"178",2016,"Spiny Sunstar",TRUE,5,0.3
+"179",2016,"Sponges",FALSE,14,1.5
+"180",2016,"Sponges",TRUE,236,14.3
+"181",2016,"Spotted Wolffish",TRUE,1,0.6
+"182",2016,"Striped Atlantic Wolffish",TRUE,17,2.7
+"183",2016,"Thorny Skate",FALSE,28,10.5
+"184",2016,"Thorny Skate",TRUE,31,11.3
+"185",2016,"Toad Crab",TRUE,1,0.11
+"186",2016,"Turbot",FALSE,4,1.3
+"187",2016,"Whelk Eggs",TRUE,1,0.1
+"188",2016,"Whelks",FALSE,8,0.3
+"189",2016,"Whelks",TRUE,25,0.8
+"190",2016,"White Hake",FALSE,40,17
+"191",2016,"White Hake",TRUE,31,10.3
+"192",2016,"Witch Flounder",FALSE,244,39.5
+"193",2016,"Witch Flounder",TRUE,414,65.5
+"194",2016,"Yellowtail Flounder",TRUE,5,0.3
+"195",2017,"Alligatorfish",TRUE,4,0.2
+"196",2017,"American Plaice",FALSE,105,6.1
+"197",2017,"American Plaice",TRUE,283,17.6
+"198",2017,"Anemones",FALSE,14,1.5
+"199",2017,"Anemones",TRUE,34,1.9
+"200",2017,"Atlantic Cod",FALSE,3,2.2
+"201",2017,"Atlantic Cod",TRUE,41,11.1
+"202",2017,"Atlantic Saury",TRUE,1,0.1
+"203",2017,"Atlantic Sea Poacher",FALSE,1,0.1
+"204",2017,"Atlantic Sea Poacher",TRUE,1,0.1
+"205",2017,"Basket Star",FALSE,6,1.3
+"206",2017,"Basket Star",TRUE,45,7
+"207",2017,"Blood Star",FALSE,7,0.2
+"208",2017,"Blood Star",TRUE,3,0.1
+"209",2017,"Bobtail Squid",TRUE,1,0.1
+"210",2017,"Bristle Worm",FALSE,1,0.1
+"211",2017,"Bristle Worm",TRUE,1,0.1
+"212",2017,"Brittle Star",TRUE,198,1.1
+"213",2017,"Clams",FALSE,1,0.1
+"214",2017,"Coral NS",FALSE,1,0.1
+"215",2017,"Eelpouts",FALSE,1,0.2
+"216",2017,"Eelpouts",TRUE,3,0.4
+"217",2017,"Fourbeard Rockling",TRUE,2,0.2
+"218",2017,"Fourline Snakeblenny",TRUE,2,0.1
+"219",2017,"Hermit Crab",FALSE,7,0.3
+"220",2017,"Hermit Crab",TRUE,39,0.5
+"221",2017,"Herring",TRUE,2,0.4
+"222",2017,"Horse Star",FALSE,18,2.2
+"223",2017,"Horse Star",TRUE,47,7.8
+"224",2017,"Icelandic Scallop",TRUE,1,0.1
+"225",2017,"Jellyfish",TRUE,1,0.1
+"226",2017,"Lesser Toad Crab",TRUE,29,3.54
+"227",2017,"Longfin Hake",FALSE,4,0.5
+"228",2017,"Longfin Hake",TRUE,5,0.5
+"229",2017,"Marlinspike Grenadier",FALSE,17,0.6
+"230",2017,"Marlinspike Grenadier",TRUE,58,1.9
+"231",2017,"Monkfish",FALSE,3,0.7
+"232",2017,"Monkfish",TRUE,4,5.3
+"233",2017,"Mud Star",FALSE,2478,17.7
+"234",2017,"Mud Star",TRUE,685,3.8
+"235",2017,"Northern Stone Crab",FALSE,19,4.455
+"236",2017,"Northern Stone Crab",TRUE,9,1.679
+"237",2017,"Octopus",FALSE,3,0.2
+"238",2017,"Octopus",TRUE,7,0.3
+"239",2017,"Purple Sunstar",TRUE,5,0.4
+"240",2017,"Redfish spp.",FALSE,893,88.8
+"241",2017,"Redfish spp.",TRUE,1582,200
+"242",2017,"Sculpin NS",TRUE,23,1.1
+"243",2017,"Sculpins",TRUE,29,1.5
+"244",2017,"Sea Cucumbers",TRUE,12,3.1
+"245",2017,"Sea Pen",FALSE,203,0.9
+"246",2017,"Sea Pen",TRUE,891,2.8
+"247",2017,"Sea Potato",TRUE,130,9.6
+"248",2017,"Sea Spider",TRUE,3,0.2
+"249",2017,"Sea Squirts",FALSE,1,0.1
+"250",2017,"Sea Squirts",TRUE,5,0.1
+"251",2017,"Sea Stars",FALSE,23,0.5
+"252",2017,"Sea Stars",TRUE,27,1.1
+"253",2017,"Sea Urchin",FALSE,5,0.1
+"254",2017,"Sea Urchin",TRUE,38,2.1
+"255",2017,"Seaweeds",FALSE,9,0.4
+"256",2017,"Seaweeds",TRUE,40,0.9
+"257",2017,"Shortfin Squid",FALSE,2,0.3
+"258",2017,"Shortfin Squid",TRUE,5,1.1
+"259",2017,"Shrimp",FALSE,596,3.9
+"260",2017,"Shrimp",TRUE,171,2.1
+"261",2017,"Silver Hake",FALSE,19,4
+"262",2017,"Silver Hake",TRUE,19,4.3
+"263",2017,"Skate Eggs",FALSE,1,0.1
+"264",2017,"Skate Eggs",TRUE,3,0.2
+"265",2017,"Smooth Skate",FALSE,9,4.5
+"266",2017,"Smooth Skate",TRUE,21,8.5
+"267",2017,"Snow Crab",FALSE,268,24.35
+"268",2017,"Snow Crab",TRUE,141,12.981
+"269",2017,"Spiny Sunstar",FALSE,1,0.1
+"270",2017,"Spiny Sunstar",TRUE,7,0.6
+"271",2017,"Sponges",FALSE,9,0.7
+"272",2017,"Sponges",TRUE,534,23
+"273",2017,"Striped Atlantic Wolffish",FALSE,2,0.4
+"274",2017,"Striped Atlantic Wolffish",TRUE,6,2
+"275",2017,"Thorny Skate",FALSE,20,14.1
+"276",2017,"Thorny Skate",TRUE,43,12.6
+"277",2017,"Toad Crab",TRUE,8,1.592
+"278",2017,"Turbot",FALSE,4,0.9
+"279",2017,"Turbot",TRUE,1,0.1
+"280",2017,"Whelks",FALSE,9,0.3
+"281",2017,"Whelks",TRUE,21,0.5
+"282",2017,"White Hake",FALSE,10,5.3
+"283",2017,"White Hake",TRUE,22,6.5
+"284",2017,"Witch Flounder",FALSE,457,81.1
+"285",2017,"Witch Flounder",TRUE,499,78.2
+"286",2017,"Yellowtail Flounder",TRUE,12,1.1
+"287",2018,"2221",FALSE,1,0.1
+"288",2018,"Alligatorfish",TRUE,2,0.2
+"289",2018,"American Plaice",FALSE,71,5.8
+"290",2018,"American Plaice",TRUE,228,16
+"291",2018,"Anemones",FALSE,14,2
+"292",2018,"Anemones",TRUE,43,1.8
+"293",2018,"Atlantic Cod",FALSE,25,23.6
+"294",2018,"Atlantic Cod",TRUE,38,9.962
+"295",2018,"Basket Star",FALSE,8,1.5
+"296",2018,"Basket Star",TRUE,48,7
+"297",2018,"Blood Star",FALSE,4,0.3
+"298",2018,"Blood Star",TRUE,20,0.8
+"299",2018,"Bristle Worm",TRUE,1,0.1
+"300",2018,"Brittle Star",FALSE,2,0.1
+"301",2018,"Brittle Star",TRUE,59,0.7
+"302",2018,"Clams",TRUE,3,0.1
+"303",2018,"Coral NS",TRUE,1,0.1
+"304",2018,"Daubed Shanny",TRUE,1,0.7
+"305",2018,"Eelpouts",FALSE,2,0.1
+"306",2018,"Eelpouts",TRUE,1,0.2
+"307",2018,"Fourbeard Rockling",FALSE,2,0.1
+"308",2018,"Halibut",TRUE,1,1
+"309",2018,"Hermit Crab",FALSE,2,0.1
+"310",2018,"Hermit Crab",TRUE,17,0.5
+"311",2018,"Herring",FALSE,3,0.3
+"312",2018,"Horse Star",FALSE,18,2.5
+"313",2018,"Horse Star",TRUE,86,11.8
+"314",2018,"Icelandic Scallop",TRUE,2,0.1
+"315",2018,"Jellyfish",FALSE,1,0.4
+"316",2018,"Jellyfish",TRUE,7,1.4
+"317",2018,"Lesser Toad Crab",FALSE,1,0.159
+"318",2018,"Lesser Toad Crab",TRUE,59,6.081
+"319",2018,"Longfin Hake",FALSE,23,1.9
+"320",2018,"Longfin Hake",TRUE,50,4.1
+"321",2018,"Marlinspike Grenadier",FALSE,19,0.7
+"322",2018,"Marlinspike Grenadier",TRUE,62,2
+"323",2018,"Monkfish",FALSE,1,0.693
+"324",2018,"Monkfish",TRUE,1,4.2
+"325",2018,"Mud Star",FALSE,1841,14.6
+"326",2018,"Mud Star",TRUE,272,4.4
+"327",2018,"Northern Stone Crab",FALSE,17,5.217
+"328",2018,"Northern Stone Crab",TRUE,26,6.046
+"329",2018,"Octopus",FALSE,6,0.2
+"330",2018,"Octopus",TRUE,9,0.5
+"331",2018,"Purple Sunstar",TRUE,3,0.3
+"332",2018,"Redfish spp.",FALSE,118,12.8
+"333",2018,"Redfish spp.",TRUE,1710,193.1
+"334",2018,"Sand Dollar",TRUE,204,4.8
+"335",2018,"Sculpin NS",TRUE,1,0.1
+"336",2018,"Sculpins",TRUE,18,1.7
+"337",2018,"Sea Cucumbers",TRUE,38,10.4
+"338",2018,"Sea Mouse",FALSE,1,0.1
+"339",2018,"Sea Pen",FALSE,111,0.3
+"340",2018,"Sea Pen",TRUE,1926,6.8
+"341",2018,"Sea Potato",TRUE,261,18.8
+"342",2018,"Sea Slug",FALSE,1,0.1
+"343",2018,"Sea Spider",TRUE,6,0.3
+"344",2018,"Sea Squirts",FALSE,1,0.1
+"345",2018,"Sea Squirts",TRUE,2,0.1
+"346",2018,"Sea Stars",FALSE,37,1.5
+"347",2018,"Sea Stars",TRUE,52,1.3
+"348",2018,"Sea Urchin",TRUE,149,2.3
+"349",2018,"Seaweeds",FALSE,1,0.1
+"350",2018,"Seaweeds",TRUE,3,0.3
+"351",2018,"Shortfin Squid",FALSE,1,0.2
+"352",2018,"Shortfin Squid",TRUE,13,2.8
+"353",2018,"Shrimp",FALSE,524,4.2
+"354",2018,"Shrimp",TRUE,111,1.2
+"355",2018,"Silver Hake",FALSE,35,6
+"356",2018,"Silver Hake",TRUE,12,2
+"357",2018,"Skate Eggs",FALSE,2,0.1
+"358",2018,"Skate Eggs",TRUE,3,0.1
+"359",2018,"Smooth Skate",FALSE,15,4.2
+"360",2018,"Smooth Skate",TRUE,38,12.6
+"361",2018,"Snow Crab",FALSE,297,33.723
+"362",2018,"Snow Crab",TRUE,218,11.609
+"363",2018,"Spiny Sunstar",TRUE,14,0.9
+"364",2018,"Sponges",FALSE,32,1.2
+"365",2018,"Sponges",TRUE,789,28
+"366",2018,"Striped Atlantic Wolffish",TRUE,17,3.3
+"367",2018,"Thorny Skate",FALSE,22,10.7
+"368",2018,"Thorny Skate",TRUE,39,8.6
+"369",2018,"Toad Crab",TRUE,1,0.001
+"370",2018,"Turbot",FALSE,3,0.2
+"371",2018,"Turbot",TRUE,1,0.1
+"372",2018,"Whelk Eggs",TRUE,1,0.1
+"373",2018,"Whelks",FALSE,7,0.2
+"374",2018,"Whelks",TRUE,28,0.6
+"375",2018,"White Hake",FALSE,46,15.2
+"376",2018,"White Hake",TRUE,33,9.9
+"377",2018,"Witch Flounder",FALSE,2453,576.3
+"378",2018,"Witch Flounder",TRUE,1067,203
+"379",2018,"Yellowtail Flounder",TRUE,10,0.7
+"380",2019,"6111",FALSE,1,0.1
+"381",2019,"Alligatorfish",TRUE,5,0.3
+"382",2019,"American Plaice",FALSE,159,13.1
+"383",2019,"American Plaice",TRUE,379,25.4
+"384",2019,"Anemones",FALSE,30,1
+"385",2019,"Anemones",TRUE,54,1.6
+"386",2019,"Atlantic Cod",FALSE,7,2.5
+"387",2019,"Atlantic Cod",TRUE,75,22.3
+"388",2019,"Atlantic Rock Crab",FALSE,1,0.36
+"389",2019,"Atlantic Sea Poacher",FALSE,1,0.1
+"390",2019,"Atlantic Sea Poacher",TRUE,15,0.4
+"391",2019,"Basket Star",FALSE,59,12.6
+"392",2019,"Basket Star",TRUE,69,10.9
+"393",2019,"Blood Star",FALSE,40,0.7
+"394",2019,"Blood Star",TRUE,10,0.6
+"395",2019,"Bobtail Squid",TRUE,3,0.1
+"396",2019,"Bristle Worm",FALSE,1,0.1
+"397",2019,"Bristle Worm",TRUE,7,0.2
+"398",2019,"Brittle Star",FALSE,1,0.1
+"399",2019,"Brittle Star",TRUE,207,1.4
+"400",2019,"Clams",TRUE,1,0.1
+"401",2019,"Coral NS",FALSE,2,0.1
+"402",2019,"Coral NS",TRUE,2,0.1
+"403",2019,"Daubed Shanny",TRUE,2,0.2
+"404",2019,"Eelpouts",TRUE,3,0.3
+"405",2019,"Fourbeard Rockling",TRUE,2,0.2
+"406",2019,"Hermit Crab",FALSE,10,0.5
+"407",2019,"Hermit Crab",TRUE,24,0.9
+"408",2019,"Herring",TRUE,1,0.3
+"409",2019,"Horse Star",FALSE,24,3.3
+"410",2019,"Horse Star",TRUE,55,6.9
+"411",2019,"Icelandic Scallop",TRUE,2,0.1
+"412",2019,"Jellyfish",FALSE,1,0.2
+"413",2019,"Jellyfish",TRUE,2,0.2
+"414",2019,"Lesser Toad Crab",TRUE,29,3.594
+"415",2019,"Longfin Hake",FALSE,6,1.1
+"416",2019,"Longfin Hake",TRUE,24,2.7
+"417",2019,"Mackerel",TRUE,1,0.1
+"418",2019,"Marlinspike Grenadier",FALSE,34,1.5
+"419",2019,"Marlinspike Grenadier",TRUE,51,2.2
+"420",2019,"Monkfish",FALSE,1,0.4
+"421",2019,"Monkfish",TRUE,4,31.6
+"422",2019,"Mud Star",FALSE,322,5.4
+"423",2019,"Mud Star",TRUE,175,1.5
+"424",2019,"Northern Stone Crab",FALSE,21,2.523
+"425",2019,"Northern Stone Crab",TRUE,17,2.738
+"426",2019,"Octopus",FALSE,8,0.5
+"427",2019,"Octopus",TRUE,4,0.2
+"428",2019,"Purple Sunstar",TRUE,23,2.6
+"429",2019,"Redfish spp.",FALSE,183,28.4
+"430",2019,"Redfish spp.",TRUE,304,45.8
+"431",2019,"Sand Dollar",FALSE,1,0.1
+"432",2019,"Sand Dollar",TRUE,9,0.2
+"433",2019,"Sculpin NS",FALSE,2,0.1
+"434",2019,"Sculpin NS",TRUE,1,0.1
+"435",2019,"Sculpins",FALSE,2,2.1
+"436",2019,"Sculpins",TRUE,49,4.5
+"437",2019,"Sea Cucumbers",TRUE,8,1.5
+"438",2019,"Sea Mouse",TRUE,1,0.1
+"439",2019,"Sea Pen",FALSE,77,0.4
+"440",2019,"Sea Pen",TRUE,828,5.3
+"441",2019,"Sea Potato",TRUE,97,8.4
+"442",2019,"Sea Scallop",TRUE,1,0.1
+"443",2019,"Sea Spider",TRUE,7,0.2
+"444",2019,"Sea Squirts",FALSE,4,0.4
+"445",2019,"Sea Squirts",TRUE,9,0.2
+"446",2019,"Sea Stars",FALSE,16,0.8
+"447",2019,"Sea Stars",TRUE,56,2.1
+"448",2019,"Sea Urchin",FALSE,2,0.2
+"449",2019,"Sea Urchin",TRUE,126,5.8
+"450",2019,"Seaweeds",FALSE,8,0.6
+"451",2019,"Seaweeds",TRUE,8,0.7
+"452",2019,"Shortfin Squid",FALSE,6,1.2
+"453",2019,"Shrimp",FALSE,352,4.1
+"454",2019,"Shrimp",TRUE,139,2.5
+"455",2019,"Silver Hake",FALSE,10,0.9
+"456",2019,"Silver Hake",TRUE,2,0.3
+"457",2019,"Skate Eggs",FALSE,3,0.1
+"458",2019,"Smooth Skate",FALSE,15,3.9
+"459",2019,"Smooth Skate",TRUE,47,10.1
+"460",2019,"Snow Crab",FALSE,274,29.785
+"461",2019,"Snow Crab",TRUE,723,34.973
+"462",2019,"Spiny Lumpsucker",TRUE,1,0.1
+"463",2019,"Spiny Sunstar",TRUE,13,0.5
+"464",2019,"Sponges",FALSE,16,1.2
+"465",2019,"Sponges",TRUE,348,22.4
+"466",2019,"Striped Atlantic Wolffish",FALSE,1,0.6
+"467",2019,"Striped Atlantic Wolffish",TRUE,5,1.1
+"468",2019,"Thorny Skate",FALSE,18,6.1
+"469",2019,"Thorny Skate",TRUE,64,20.7
+"470",2019,"Toad Crab",TRUE,9,1.837
+"471",2019,"Turbot",FALSE,4,0.3
+"472",2019,"Turbot",TRUE,3,0.3
+"473",2019,"Whelks",FALSE,14,0.7
+"474",2019,"Whelks",TRUE,40,1.3
+"475",2019,"White Hake",FALSE,7,2.6
+"476",2019,"White Hake",TRUE,28,15.4
+"477",2019,"Witch Flounder",FALSE,696,131.7
+"478",2019,"Witch Flounder",TRUE,1027,178.4
+"479",2019,"Yellowtail Flounder",TRUE,4,0.4
+"480",2021,"1201",TRUE,1,0.1
+"481",2021,"1202",FALSE,1,0.1
+"482",2021,"1202",TRUE,2,0.2
+"483",2021,"204",TRUE,1,2.7
+"484",2021,"2999",TRUE,1,0.1
+"485",2021,"6110",TRUE,3,0.1
+"486",2021,"Alewife",TRUE,1,0.1
+"487",2021,"Alligatorfish",TRUE,2,0.2
+"488",2021,"American Plaice",FALSE,108,7.2
+"489",2021,"American Plaice",TRUE,343,28.8
+"490",2021,"Anemones",FALSE,3,0.7
+"491",2021,"Anemones",TRUE,46,1
+"492",2021,"Arctic Eelpout",TRUE,1,0.2
+"493",2021,"Atlantic Cod",FALSE,27,11.5
+"494",2021,"Atlantic Cod",TRUE,95,37.5
+"495",2021,"Barnacles",TRUE,35,0.2
+"496",2021,"Basket Star",FALSE,144,31.7
+"497",2021,"Basket Star",TRUE,117,21.9
+"498",2021,"Blood Star",FALSE,14,0.1
+"499",2021,"Blood Star",TRUE,29,0.8
+"500",2021,"Bristle Worm",TRUE,2,0.2
+"501",2021,"Brittle Star",TRUE,65,0.5
+"502",2021,"Coral NS",TRUE,4,0.2
+"503",2021,"Daubed Shanny",FALSE,3,0.1
+"504",2021,"Eelpouts",TRUE,3,0.4
+"505",2021,"Fourbeard Rockling",TRUE,2,0.1
+"506",2021,"Fourline Snakeblenny",TRUE,1,0.1
+"507",2021,"Halibut",TRUE,1,0.4
+"508",2021,"Hermit Crab",TRUE,5,0.4
+"509",2021,"Herring",TRUE,50,9.8
+"510",2021,"Horse Star",FALSE,30,3.8
+"511",2021,"Horse Star",TRUE,102,14
+"512",2021,"Icelandic Scallop",TRUE,2,0.2
+"513",2021,"Jellyfish",FALSE,2,0.3
+"514",2021,"Jellyfish",TRUE,5,1.3
+"515",2021,"Lesser Toad Crab",TRUE,21,1.539
+"516",2021,"Longfin Hake",FALSE,8,1.2
+"517",2021,"Longfin Hake",TRUE,9,1.3
+"518",2021,"Marlinspike Grenadier",FALSE,19,0.6
+"519",2021,"Marlinspike Grenadier",TRUE,70,2.1
+"520",2021,"Monkfish",TRUE,1,13.7
+"521",2021,"Mud Star",FALSE,50,0.2
+"522",2021,"Mud Star",TRUE,137,1.2
+"523",2021,"Northern Stone Crab",FALSE,11,1.771
+"524",2021,"Northern Stone Crab",TRUE,48,5.714
+"525",2021,"Octopus",FALSE,5,0.2
+"526",2021,"Octopus",TRUE,19,0.6
+"527",2021,"Purple Sunstar",FALSE,4,0.9
+"528",2021,"Purple Sunstar",TRUE,18,2
+"529",2021,"Redfish spp.",FALSE,411,75.5
+"530",2021,"Redfish spp.",TRUE,177,29.7
+"531",2021,"Sand Dollar",TRUE,30,0.8
+"532",2021,"Sculpin NS",FALSE,1,0.1
+"533",2021,"Sculpins",FALSE,3,0.3
+"534",2021,"Sculpins",TRUE,26,3.7
+"535",2021,"Sea Cucumbers",TRUE,29,8.4
+"536",2021,"Sea Pen",FALSE,609,1.74
+"537",2021,"Sea Pen",TRUE,398,6.6
+"538",2021,"Sea Potato",FALSE,1,0.1
+"539",2021,"Sea Potato",TRUE,104,6.5
+"540",2021,"Sea Raven",TRUE,1,0.6
+"541",2021,"Sea Spider",TRUE,1,0.1
+"542",2021,"Sea Squirts",TRUE,5,0.1
+"543",2021,"Sea Stars",FALSE,51,0.8
+"544",2021,"Sea Stars",TRUE,126,4.4
+"545",2021,"Sea Urchin",TRUE,71,3.7
+"546",2021,"Seaweeds",FALSE,1,0.1
+"547",2021,"Seaweeds",TRUE,6,0.5
+"548",2021,"Shortfin Squid",FALSE,5,0.7
+"549",2021,"Shortfin Squid",TRUE,2,0.3
+"550",2021,"Shrimp",FALSE,19,0.4
+"551",2021,"Shrimp",TRUE,114,1.3
+"552",2021,"Silver Hake",FALSE,93,18.3
+"553",2021,"Silver Hake",TRUE,71,31.7
+"554",2021,"Smooth Skate",FALSE,11,1.7
+"555",2021,"Smooth Skate",TRUE,11,3.934
+"556",2021,"Snakeblenny",FALSE,3,0.1
+"557",2021,"Snow Crab",FALSE,131,7.856
+"558",2021,"Snow Crab",TRUE,252,33.482
+"559",2021,"Spiny Sunstar",FALSE,1,0.1
+"560",2021,"Spiny Sunstar",TRUE,13,0.8
+"561",2021,"Sponges",FALSE,7,0.7
+"562",2021,"Sponges",TRUE,6685,33.5
+"563",2021,"Striped Atlantic Wolffish",TRUE,17,4.2
+"564",2021,"Thorny Skate",FALSE,45,9.1
+"565",2021,"Thorny Skate",TRUE,44,11
+"566",2021,"Toad Crab",TRUE,6,0.82
+"567",2021,"Turbot",TRUE,1,0.2
+"568",2021,"Whelk Eggs",TRUE,1,0.1
+"569",2021,"Whelks",TRUE,26,0.8
+"570",2021,"White Hake",FALSE,9,3.9
+"571",2021,"White Hake",TRUE,22,9.9
+"572",2021,"Witch Flounder",FALSE,241,45.4
+"573",2021,"Witch Flounder",TRUE,466,93.7
+"574",2021,"Yellowtail Flounder",FALSE,1,0.3
+"575",2021,"Yellowtail Flounder",TRUE,23,1.9
+"576",2022,"1827",TRUE,1,0.1
+"577",2022,"2213",FALSE,2,0.1
+"578",2022,"2312",TRUE,2,0.2
+"579",2022,"2414",TRUE,3,0.2
+"580",2022,"313",TRUE,1,0.1
+"581",2022,"620",TRUE,1,0.5
+"582",2022,"6611",TRUE,16,6.6
+"583",2022,"8316",TRUE,9,0.2
+"584",2022,"8317",FALSE,2,0.2
+"585",2022,"8317",TRUE,5,0.2
+"586",2022,"8601",TRUE,3,0.9
+"587",2022,"Alewife",FALSE,1,0.1
+"588",2022,"Alligatorfish",TRUE,7,0.5
+"589",2022,"American Plaice",FALSE,22,1.9
+"590",2022,"American Plaice",TRUE,345,26.8
+"591",2022,"Anemones",FALSE,18,2.4
+"592",2022,"Anemones",TRUE,73,2
+"593",2022,"Atlantic Cod",FALSE,1,0.4
+"594",2022,"Atlantic Cod",TRUE,135,51.7
+"595",2022,"Atlantic Sea Poacher",TRUE,11,0.2
+"596",2022,"Basket Star",TRUE,43,6.7
+"597",2022,"Blood Star",FALSE,11,0.1
+"598",2022,"Blood Star",TRUE,34,1.1
+"599",2022,"Bobtail Squid",FALSE,1,0.1
+"600",2022,"Bobtail Squid",TRUE,3,0.1
+"601",2022,"Bristle Worm",FALSE,1,0.1
+"602",2022,"Bristle Worm",TRUE,4,0.1
+"603",2022,"Brittle Star",TRUE,61,0.9
+"604",2022,"Clams",TRUE,2,0.1
+"605",2022,"Coral NS",TRUE,1,0.1
+"606",2022,"Eelpouts",FALSE,1,0.2
+"607",2022,"Eelpouts",TRUE,2,0.7
+"608",2022,"Fourbeard Rockling",FALSE,2,0.3
+"609",2022,"Fourbeard Rockling",TRUE,3,0.5
+"610",2022,"Fourline Snakeblenny",TRUE,2,0.2
+"611",2022,"Haddock",TRUE,1,0.2
+"612",2022,"Hermit Crab",FALSE,3,0.1
+"613",2022,"Hermit Crab",TRUE,12,0.8
+"614",2022,"Herring",FALSE,1,0.2
+"615",2022,"Herring",TRUE,156,23.4
+"616",2022,"Horse Star",FALSE,40,4.9
+"617",2022,"Horse Star",TRUE,119,13.7
+"618",2022,"Icelandic Scallop",TRUE,7,0.2
+"619",2022,"Jellyfish",FALSE,1,0.1
+"620",2022,"Jonah Crab",FALSE,1,0.36
+"621",2022,"Jonah Crab",TRUE,2,0.341
+"622",2022,"Lesser Toad Crab",TRUE,11,0.273
+"623",2022,"Longfin Hake",FALSE,17,2.2
+"624",2022,"Longfin Hake",TRUE,47,4.3
+"625",2022,"Mackerel",TRUE,3,0.2
+"626",2022,"Marlinspike Grenadier",FALSE,71,2.3
+"627",2022,"Marlinspike Grenadier",TRUE,131,3.7
+"628",2022,"Monkfish",FALSE,3,1.9
+"629",2022,"Monkfish",TRUE,2,14.7
+"630",2022,"Mud Star",FALSE,2297,23.3
+"631",2022,"Mud Star",TRUE,34,0.6
+"632",2022,"Northern Stone Crab",FALSE,34,6.643
+"633",2022,"Northern Stone Crab",TRUE,70,9.965
+"634",2022,"Octopus",FALSE,6,0.3
+"635",2022,"Octopus",TRUE,10,0.6
+"636",2022,"Ophiura sarsii",TRUE,59,0.2
+"637",2022,"Purple Sunstar",TRUE,8,0.8
+"638",2022,"Redfish spp.",FALSE,846,169.2
+"639",2022,"Redfish spp.",TRUE,1420,278.1
+"640",2022,"Sand Dollar",TRUE,173,2.5
+"641",2022,"Sculpin NS",TRUE,6,0.2
+"642",2022,"Sculpins",TRUE,40,4.7
+"643",2022,"Sea Cucumbers",TRUE,3,0.2
+"644",2022,"Sea Pen",FALSE,44,0.4
+"645",2022,"Sea Pen",TRUE,641,2.3
+"646",2022,"Sea Potato",TRUE,174,7.5
+"647",2022,"Sea Spider",TRUE,1,0.1
+"648",2022,"Sea Squirts",FALSE,1,0.1
+"649",2022,"Sea Squirts",TRUE,16,0.6
+"650",2022,"Sea Stars",FALSE,68,1.2
+"651",2022,"Sea Stars",TRUE,83,2.2
+"652",2022,"Sea Urchin",TRUE,71,3.9
+"653",2022,"Seaweeds",FALSE,3,0.2
+"654",2022,"Seaweeds",TRUE,3,0.3
+"655",2022,"Shortfin Squid",TRUE,1,0.2
+"656",2022,"Shrimp",FALSE,76,0.8
+"657",2022,"Shrimp",TRUE,62,1.3
+"658",2022,"Silver Hake",FALSE,41,7
+"659",2022,"Silver Hake",TRUE,25,4
+"660",2022,"Smooth Skate",FALSE,8,2.9
+"661",2022,"Smooth Skate",TRUE,21,5.8
+"662",2022,"Snow Crab",FALSE,47,13.58
+"663",2022,"Snow Crab",TRUE,158,15.09
+"664",2022,"Spiny Sunstar",TRUE,21,0.9
+"665",2022,"Sponges",FALSE,7,0.4
+"666",2022,"Sponges",TRUE,627,11.7
+"667",2022,"Striped Atlantic Wolffish",TRUE,19,5.2
+"668",2022,"Thorny Skate",FALSE,7,4.8
+"669",2022,"Thorny Skate",TRUE,54,18.2
+"670",2022,"Toad Crab",TRUE,1,0.217
+"671",2022,"Turbot",FALSE,5,3.5
+"672",2022,"Turbot",TRUE,1,0.1
+"673",2022,"Whelks",FALSE,5,0.2
+"674",2022,"Whelks",TRUE,41,2
+"675",2022,"White Hake",FALSE,12,10
+"676",2022,"White Hake",TRUE,53,16.1
+"677",2022,"Witch Flounder",FALSE,459,97
+"678",2022,"Witch Flounder",TRUE,864,160
+"679",2022,"Yellowtail Flounder",TRUE,21,1.4
+"680",2023,"1202",FALSE,1,0.1
+"681",2023,"1202",TRUE,1,0.1
+"682",2023,"1901",TRUE,4,0.5
+"683",2023,"6611",TRUE,20,8
+"684",2023,"Alligatorfish",TRUE,1,0.1
+"685",2023,"American Plaice",FALSE,91,6.9
+"686",2023,"American Plaice",TRUE,277,17.8
+"687",2023,"Anemones",FALSE,13,2.1
+"688",2023,"Anemones",TRUE,76,1
+"689",2023,"Atlantic Cod",FALSE,17,13
+"690",2023,"Atlantic Cod",TRUE,208,69.2
+"691",2023,"Atlantic Sea Poacher",TRUE,1,0.1
+"692",2023,"Basket Star",FALSE,37,7.7
+"693",2023,"Basket Star",TRUE,61,10.2
+"694",2023,"Blood Star",FALSE,9,0.3
+"695",2023,"Blood Star",TRUE,7,0.4
+"696",2023,"Brittle Star",TRUE,28,0.4
+"697",2023,"Clams",TRUE,1,0.1
+"698",2023,"Coral NS",FALSE,1,0.1
+"699",2023,"Coral NS",TRUE,5,0.5
+"700",2023,"Eelpouts",FALSE,1,0.2
+"701",2023,"Eelpouts",TRUE,7,1.4
+"702",2023,"Fourbeard Rockling",FALSE,1,0.1
+"703",2023,"Fourbeard Rockling",TRUE,2,0.2
+"704",2023,"Fourline Snakeblenny",TRUE,2,0.2
+"705",2023,"Halibut",TRUE,1,0.9
+"706",2023,"Hermit Crab",FALSE,1,0.1
+"707",2023,"Hermit Crab",TRUE,4,0.3
+"708",2023,"Herring",FALSE,7,1
+"709",2023,"Herring",TRUE,23,3.7
+"710",2023,"Horse Star",FALSE,44,5.9
+"711",2023,"Horse Star",TRUE,135,22.1
+"712",2023,"Icelandic Scallop",TRUE,7,0.4
+"713",2023,"Jonah Crab",FALSE,2,0.608
+"714",2023,"Jonah Crab",TRUE,1,0.058
+"715",2023,"Lesser Toad Crab",TRUE,29,3.373
+"716",2023,"Longfin Hake",FALSE,3,0.1
+"717",2023,"Longfin Hake",TRUE,31,3.2
+"718",2023,"Marlinspike Grenadier",FALSE,18,0.7
+"719",2023,"Marlinspike Grenadier",TRUE,55,1.8
+"720",2023,"Monkfish",FALSE,1,2
+"721",2023,"Monkfish",TRUE,2,6.6
+"722",2023,"Mud Star",FALSE,347,3.2
+"723",2023,"Mud Star",TRUE,27,0.4
+"724",2023,"Northern Hagfish",TRUE,1,0.1
+"725",2023,"Northern Stone Crab",FALSE,40,4.381
+"726",2023,"Northern Stone Crab",TRUE,41,4.212
+"727",2023,"Octopus",FALSE,8,0.4
+"728",2023,"Octopus",TRUE,5,0.4
+"729",2023,"Pollock",TRUE,1,0.1
+"730",2023,"Purple Sunstar",TRUE,4,0.6
+"731",2023,"Redfish spp.",FALSE,440,87.1
+"732",2023,"Redfish spp.",TRUE,544,110.7
+"733",2023,"Sand Dollar",TRUE,86,2
+"734",2023,"Sculpin NS",TRUE,1,0.1
+"735",2023,"Sculpins",TRUE,25,2
+"736",2023,"Sea Cucumbers",FALSE,4,0.2
+"737",2023,"Sea Cucumbers",TRUE,112,3.9
+"738",2023,"Sea Pen",FALSE,48,0.2
+"739",2023,"Sea Pen",TRUE,1227,2.9
+"740",2023,"Sea Potato",TRUE,209,8.9
+"741",2023,"Sea Squirts",FALSE,1,0.1
+"742",2023,"Sea Squirts",TRUE,6,0.1
+"743",2023,"Sea Stars",FALSE,71,1.5
+"744",2023,"Sea Stars",TRUE,146,4.2
+"745",2023,"Sea Urchin",TRUE,155,8
+"746",2023,"Seaweeds",FALSE,4,0.3
+"747",2023,"Seaweeds",TRUE,4,0.3
+"748",2023,"Shrimp",FALSE,13,0.2
+"749",2023,"Shrimp",TRUE,32,1.1
+"750",2023,"Silver Hake",FALSE,32,4.4
+"751",2023,"Silver Hake",TRUE,14,1
+"752",2023,"Smooth Skate",FALSE,12,4.3
+"753",2023,"Smooth Skate",TRUE,33,10.7
+"754",2023,"Snow Crab",FALSE,119,14.061
+"755",2023,"Snow Crab",TRUE,192,23.304
+"756",2023,"Spiny Lumpsucker",TRUE,1,0.1
+"757",2023,"Spiny Sunstar",TRUE,23,1.7
+"758",2023,"Sponges",FALSE,4,0.4
+"759",2023,"Sponges",TRUE,344,4.1
+"760",2023,"Striped Atlantic Wolffish",TRUE,17,5.4
+"761",2023,"Thorny Skate",FALSE,11,2.9
+"762",2023,"Thorny Skate",TRUE,52,20
+"763",2023,"Turbot",FALSE,2,2.2
+"764",2023,"Turbot",TRUE,1,0.2
+"765",2023,"Whelks",FALSE,3,0.1
+"766",2023,"Whelks",TRUE,48,1.6
+"767",2023,"White Hake",FALSE,24,10.6
+"768",2023,"White Hake",TRUE,38,20.9
+"769",2023,"Witch Flounder",FALSE,622,121.8
+"770",2023,"Witch Flounder",TRUE,670,126.88
+"771",2023,"Yellowtail Flounder",TRUE,11,1.3
