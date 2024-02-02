@@ -83,15 +83,15 @@ novsco <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Coastline/NS_coa
 
 ggplot()+
   geom_sf(data=novsco, fill=gray(.9),size=0)+
-  geom_sf(data=sabshape,colour="blue", fill=NA, linewidth=1.05)+
-  geom_sf(data=gully, colour="blue", fill=NA, linewidth=1.05)+
+  geom_sf(data=sabshape,colour="blue", fill=NA, linewidth=0.75)+
+  geom_sf(data=gully, colour="blue", fill=NA, linewidth=0.75)+
   coord_sf(xlim=c(-62, -58), ylim=c(43.5,47.5), expand=F)+
-  geom_point(data=MPATOWS, aes(x=-LONGITUDE, y=LATITUDE), shape=21, fill="black", size=1.25)+
+  geom_point(data=MPATOWS, aes(x=-LONGITUDE, y=LATITUDE), shape=21, fill="black", size=1.05)+
   #geom_point(data=set2023MPA, aes(x=LON, y=LAT), shape=21, fill="black", size=1.25)+
   labs(x="LONGITUDE")+
   theme_minimal()
 
-#ggsave(filename = "output/EnhancedCrabStations.png", plot = last_plot(), device = "png", path = "output/", width = 6, height =10, units = "in", dpi=500)
+#ggsave(filename = "output/CrabSurvey/EnhancedCrabStations.png", plot = last_plot(), device = "png", path = "output/", width = 6, height =10, units = "in", dpi=500)
 
 ###3. Do some data filtering and merging to just focus on the SAB inside and outside trawl stations
 SABTOWS <- catchdata %>% filter(LATITUDE>45.1) #filter MPATOWS data by everything >45 degrees north to remove Gully stations
@@ -187,7 +187,17 @@ ggplot(fishmorph3 %>% filter(EST_NUM_CAUGHT > 2), aes(x = Year, y = log(FISH_LEN
 
 ggsave(filename = "CrabSurvey_SAB_FishLengths.png",plot = last_plot(),path="output/CrabSurvey/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
 
+ggplot(fishmorph3 %>% filter(EST_NUM_CAUGHT > 40), aes(x = Year, y = FISH_LENGTH)) +
+  geom_errorbar(width=0.1)+
+  geom_point() +
+  facet_wrap(vars(COMM),nrow=5, scales="free_y")+
+  labs(x = "Species",
+       y = "Length") +
+  theme_minimal()+
+  theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 8))#+
+#stat_compare_means(position = "jitter")
 
+ggsave(filename = "CrabSurvey_SAB_FishLengths.png",plot = last_plot(),path="output/CrabSurvey/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
 # Create boxplots for fish weights by species
 ggplot(fishmorph3 %>% filter(EST_NUM_CAUGHT>2), aes(x = Year, y = FISH_WEIGHT)) +
   facet_wrap(vars(COMM),nrow=5, scales="free_y")+
