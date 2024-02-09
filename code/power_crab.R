@@ -21,13 +21,19 @@ spid <- read.csv("data/CrabSurvey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv") %>%
   rowwise() %>%
   mutate(sp_name = if_else(SPEC=="",
                            if_else(COMM=="",as.character(SPECCD_ID),COMM),
-                           SPEC))
+                           SPEC)) 
 crab <- read.csv("data/CrabSurvey/SABMPA2023export.csv") %>%
   left_join(crab_swept,by = join_by(TRIP, "SET_NO"=="SET", STATION)) %>%
   mutate(CPUE = EST_NUM_CAUGHT/AREA_SWEPT,
          station_date=paste(STATION,BOARD_DATE,sep = ": "),
          LONGITUDE=-LONGITUDE) %>%
-  left_join(spid,by = join_by(SPECCD_ID))
+  left_join(spid,by = join_by(SPECCD_ID)) %>% 
+  mutate(sp_name=if_else(is.na(sp_name),
+                         as.character(SPECCD_ID),
+                         sp_name)) 
+
+
+
 
 # get bathy
 bbsab <- st_bbox(sab)
@@ -84,8 +90,10 @@ richness_BACI <- richness %>%
                         "Before"))
 
 # set up crab for BACI
-crab_BACI <- crab %>%
-  mutate(year=station_date %>%
+crab_BACI <- crab %>%  
+  complete(sp_name, nesting(STATION, BOARD_DATE),fill=list(CPUE=0))  # add in 0's%>%
+  mutate(station_date=paste(STATION,BOARD_DATE,sep = ": "),
+         year=station_date %>%
            gsub(".*: ","",.) %>%
 
            gsub("-.*","",.)) %>%
@@ -94,7 +102,7 @@ crab_BACI <- crab %>%
                         "After",
                         "Before"),
          STATION = as.character(STATION)) %>%
-  left_join(crabstations %>% as.data.frame() %>% dplyr::select(-geometry),by="STATION")
+  left_join(crabstations %>% as.data.frame() %>% dplyr::select(-geometry),by="STATION") 
 
 
 # combine crab and richness for power analysis
@@ -107,25 +115,25 @@ BACI <- data.frame(sp=c(richness_BACI$sp,crab_BACI$sp_name),
 
 # prepare empty results df
 results <- expand.grid(sp=c("Richness",
-                            "HIPPOGLOSSOIDES PLATESSOIDES",
-                            "GLYPTOCEPHALUS CYNOGLOSSUS",
-                            "SEBASTES",
-                            "AMBLYRAJA RADIATA",
+                            # "HIPPOGLOSSOIDES PLATESSOIDES",
+                            # "GLYPTOCEPHALUS CYNOGLOSSUS",
+                            # "SEBASTES",
+                            # "AMBLYRAJA RADIATA",
                             "GADUS MORHUA",
                             "CHIONOECETES OPILIO"),
-                       replicate=1:3,
+                       replicate=1:5,
                        sites=c(5,
-                               15,
-                               50,
+                               # 15,
+                               # 50,
                                100),
                        trend=c("Increase","Decrease"),
-                       effect_size=seq(0.1,0.9,0.1),
+                       effect_size=seq(0.1,0.9,0.4),
                        p=NA
 )
 
 ############# simulate! ####################
 start <- Sys.time()
-plan("future::multisession",workers=round(detectCores()*0.75))
+plan(multisession,workers=round(detectCores()*0.5))
 for(s in unique(results$sp)){
   # fit model to species data
   sp_data <- BACI %>% filter(sp==s)
@@ -144,8 +152,8 @@ for(s in unique(results$sp)){
     while(inherits(p,"try-error")){
       p <- try({
         # randomly select random effect variables for sites
-        r1 <- sample(unique(BACI$rand1),spresults$sites[row],replace=TRUE)
-        r2 <- sample(unique(BACI$rand2),spresults$sites[row],replace=TRUE)
+        r1 <- rep(sample(unique(BACI$rand1),spresults$sites[row],replace=TRUE),2)
+        r2 <- rep(sample(unique(BACI$rand2),spresults$sites[row],replace=TRUE),2)
         r1index <- r1 %>%
           lapply(function(x){
             which(x==periodeffect$grp)
@@ -157,26 +165,24 @@ for(s in unique(results$sp)){
             which(x==periodeffect$grp)
           }) %>%
           unlist()
+        
+        PERIOD <- rep(c("Before","After"),each=spresults$sites[row])
 
         # simulate dependent variable
-        simdata <- bind_rows(BACI %>%
-                               filter(sp==spresults$sp[row],
-                                      PERIOD=="Before") %>%
-                               dplyr::select(PERIOD,rand1,rand2,dependent),
-                             data.frame(PERIOD="After",
-                                        rand1=r1,
-                                        rand2=r2,
-                                        dependent=rnegbin(n=spresults$sites[row],
-                                                                 mu=exp(fixef(realdatamodel)[1]+
-                                                                          rnorm(spresults$sites[row],
-                                                                                periodeffect$condval[r1index],
-                                                                                periodeffect$condsd[r1index])+
-                                                                          rnorm(spresults$sites[row],
-                                                                                periodeffect$condval[r2index],
-                                                                                periodeffect$condsd[r2index])),
-                                                                 theta = theta)*(if_else(spresults$trend[row]=="Increase",
-                                                                                         1+spresults$effect_size[row],
-                                                                                         1-spresults$effect_size[row])))
+        simdata <- data.frame(PERIOD=PERIOD,
+                              rand1=r1,
+                              rand2=r2,
+                              dependent=rnegbin(n=spresults$sites[row]*2,
+                                                mu=exp(fixef(realdatamodel)[1]+
+                                                         rnorm(spresults$sites[row],
+                                                               periodeffect$condval[r1index],
+                                                               periodeffect$condsd[r1index])+
+                                                         rnorm(spresults$sites[row],
+                                                               periodeffect$condval[r2index],
+                                                               periodeffect$condsd[r2index])),
+                                                theta = theta)*(rep(c(1,if_else(spresults$trend[row]=="Increase",
+                                                                        1+spresults$effect_size[row],
+                                                                        1-spresults$effect_size[row])),each=spresults$sites[row]))
         )
         simdata %>% group_by(PERIOD) %>% reframe(cpue=mean(dependent,na.rm=T));spresults[row,]
 
@@ -195,7 +201,7 @@ for(s in unique(results$sp)){
     }
     return(p)
     # }
-  }) %>% unlist()
+  },.progress = TRUE) %>% unlist()
   results[results$sp==s,] <- spresults
 
 }
