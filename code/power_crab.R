@@ -91,8 +91,8 @@ richness_BACI <- richness %>%
 
 # set up crab for BACI
 crab_BACI <- crab %>%
-  complete(sp_name, nesting(STATION, BOARD_DATE),fill=list(CPUE=0))  # add in 0's%>%
-mutate(station_date=paste(STATION,BOARD_DATE,sep = ": "),
+  complete(sp_name, nesting(STATION, BOARD_DATE),fill=list(CPUE=0)) %>%  # add in 0's
+  mutate(station_date=paste(STATION,BOARD_DATE,sep = ": "),
        year=station_date %>%
          gsub(".*: ","",.) %>%
          
