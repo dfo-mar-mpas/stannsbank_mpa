@@ -119,7 +119,7 @@ results <- expand.grid(sp=c("Richness",
                             "GLYPTOCEPHALUS CYNOGLOSSUS",
                             "SEBASTES",
                             "AMBLYRAJA RADIATA",
-                            "GADUS MORHUA"#,
+                            "GADUS MORHUA",
                             "CHIONOECETES OPILIO"
 ),
 replicate=1:50,
@@ -196,6 +196,10 @@ for(s in unique(results$sp)){
         # Likelihood Ratio Test
         LRT <- anova(simdatawithperiod,simdatawithoutperiod)
         spresults$p[row] <- LRT$`Pr(>Chisq)`[2]
+        p <- LRT$`Pr(>Chisq)`[2]
+        rm(r1,r2,r1index,r2index,PERIOD,simdata,simdatawithperiod,simdatawithoutperiod,LRT)
+        gc()
+        return(p)
         
       }, silent = TRUE)
       # if(inherits(p,"try-error")) browser()
