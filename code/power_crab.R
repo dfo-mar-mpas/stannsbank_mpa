@@ -185,7 +185,7 @@ for(s in unique(results$sp)){
                                                                                 1+spresults$effect_size[row],
                                                                                 1-spresults$effect_size[row])),each=spresults$sites[row]))
         )
-        simdata %>% group_by(PERIOD) %>% reframe(cpue=mean(dependent,na.rm=T));spresults[row,]
+        # simdata %>% group_by(PERIOD) %>% reframe(cpue=mean(dependent,na.rm=T));spresults[row,]
         
         # model fit with and without PERIOD as a fixed effect
         simdatawithperiod <- lme4::glmer.nb(formula= dependent ~ PERIOD+(1|rand1)+(1|rand2),
