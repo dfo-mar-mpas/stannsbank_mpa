@@ -21,8 +21,11 @@ utm <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84
 
 #### 1. get the trawl data from our network - this was pulled by Brent Wilson for us in summer 2023 and then again in Jan 2024 to add the 2023 fish morph data. See end of script for R code to pull data too. 
 #Get the fish species code from ANDES - these get updated from time to time so may need to replace this csv eventually
-fishcodes <- read.csv("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
+fishcodes <- read.csv("data/CrabSurvey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
 head(fishcodes) #fish codes, aphia-ID's, common and species names
+
+stns<-read.csv("data/CrabSurvey/StationInfo.csv",header = T)
+colnames(stns)<-c("STATION", "Enhanced", "Inside")
 
 #These are OLD FILES only to 2022 - These files have ALL of the MPA stations (Gully and SAB) and the fish morphology data
 #load("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/EnhancedStations2023/MPAFishMorph.RDATA")
@@ -88,10 +91,10 @@ ggplot()+
   coord_sf(xlim=c(-62, -58), ylim=c(43.5,47.5), expand=F)+
   geom_point(data=MPATOWS, aes(x=-LONGITUDE, y=LATITUDE), shape=21, fill="black", size=1.05)+
   #geom_point(data=set2023MPA, aes(x=LON, y=LAT), shape=21, fill="black", size=1.25)+
-  labs(x="LONGITUDE")+
+  labs(x="Longitude", y="Latitude")+
   theme_minimal()
 
-#ggsave(filename = "output/CrabSurvey/EnhancedCrabStations.png", plot = last_plot(), device = "png", path = "output/", width = 6, height =10, units = "in", dpi=500)
+ggsave(filename = "output/CrabSurvey/EnhancedCrabStations.png", plot = last_plot(), device = "png", width = 6, height =10, units = "in", dpi=500)
 
 ###3. Do some data filtering and merging to just focus on the SAB inside and outside trawl stations
 SABTOWS <- catchdata %>% filter(LATITUDE>45.1) #filter MPATOWS data by everything >45 degrees north to remove Gully stations
@@ -140,7 +143,7 @@ ggplot(SABTOWS3, aes(x = Year, y = EST_NUM_CAUGHT, colour=Inside)) +
 #####Now look at the morphology data (length and weight)
 # Group the data by species and calculate summary statistics
 #Also filter by TRIP_ID from the SABTOWS data 
-fishmorph <- fishmorphs %>% filter(TRIP_ID %in% SABTOWS3$TRIP_ID)
+fishmorph <- fishmorphs %>% filter(STATION %in% stns$STATION)
 fishmorph <- fishmorph[!(is.na(fishmorph$COMM) | fishmorph$COMM==""), ]
 
 summary_data <- fishmorph %>% group_by(COMM) %>%
@@ -167,6 +170,9 @@ fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="SNAKE BLENNY; LUMPRETAEF
 fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="SNOWFLAKE HOOKEAR SCULPIN", replacement = "SNOWFLAKE SCULPIN")
 fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="HOOKEAR SCULPIN,ATL.", replacement = "HOOKEAR SCULPIN")
 fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="SHORTTAILED EELPOUT VAHL", replacement = "LYCODES SP.")
+fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="RIBBED SCULPIN; PINGELI", replacement = "RIBBED SCULPIN")
+fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="STRIPED ATLANTIC WOLFFISH", replacement = "ATLANTIC WOLFFISH")
+fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="COD ATLANTIC", replacement = "ATLANTIC COD")
 
 
 #Have to replace 2020 with 2019 since there was no 2020 survey
@@ -175,21 +181,26 @@ fishmorph2$COMM <-str_replace(fishmorph2$COMM, pattern="SHORTTAILED EELPOUT VAHL
 # Create boxplots for fish lengths by species
 fishmorph3 <- fishmorph2[!(is.na(fishmorph2$FISH_LENGTH) | fishmorph2$FISH_LENGTH==""),]
 fishmorph3 <- fishmorph3[!(is.na(fishmorph3$FISH_WEIGHT) | fishmorph3$FISH_WEIGHT==""),]
+fishmorph3$STATION<-as.integer(fishmorph3$STATION)
 
-ggplot(fishmorph3 %>% filter(EST_NUM_CAUGHT > 2), aes(x = Year, y = log(FISH_LENGTH))) +
+fishmorph4 <-merge(fishmorph3, stns, by="STATION", all.x=T)
+
+ggplot(fishmorph4 %>% filter(EST_NUM_CAUGHT > 2), aes(x = Year, y = log(FISH_LENGTH), fill=Inside)) +
   geom_boxplot(outlier.shape = NA) +
-  facet_wrap(vars(COMM),nrow=5, scales="free_y")+
-  labs(x = "Species",
+  facet_wrap(vars(COMM),nrow=4, scales="free_y")+
+  scale_fill_manual(labels=c("Outside","Inside"), values=c("red","blue"))+
+  labs(x = "Year",
        y = "Log(Length)") +
   theme_minimal()+
-  theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 8))#+
+  theme(axis.line=element_line(colour="black"), panel.border = element_blank(),
+        text=element_text(size=14), axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 12), legend.title = element_blank())#+
   #stat_compare_means(position = "jitter")
 
-ggsave(filename = "CrabSurvey_SAB_FishLengths.png",plot = last_plot(),path="output/CrabSurvey/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
+ggsave(filename = "output/CrabSurvey/CrabSurvey_SAB_FishLengths.png",plot = last_plot(),device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
 
-ggplot(fishmorph3 %>% filter(EST_NUM_CAUGHT > 40), aes(x = Year, y = FISH_LENGTH)) +
-  geom_errorbar(width=0.1)+
-  geom_point() +
+ggplot(fishmorph4 %>% filter(EST_NUM_CAUGHT > 20), aes(x = Year, y = FISH_LENGTH, fill=Inside)) +
+  #geom_errorbar(width=0.1)+
+  geom_boxplot() +
   facet_wrap(vars(COMM),nrow=5, scales="free_y")+
   labs(x = "Species",
        y = "Length") +
@@ -197,15 +208,42 @@ ggplot(fishmorph3 %>% filter(EST_NUM_CAUGHT > 40), aes(x = Year, y = FISH_LENGTH
   theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 8))#+
 #stat_compare_means(position = "jitter")
 
-ggsave(filename = "CrabSurvey_SAB_FishLengths.png",plot = last_plot(),path="output/CrabSurvey/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
+#Show just snow crab sizes over time
+
+sc_summary <- fishmorph4 %>% filter(COMM=="SNOW/QUEEN CRAB") %>%
+  group_by(Year) %>%
+  summarise(mean_width = mean(FISH_LENGTH, na.rm = TRUE),
+            sd_width = sd(FISH_LENGTH, na.rm = TRUE),
+            lower.l = mean_width - sd_width,
+            upper.l = mean_width + sd_width,
+            mean_weight = mean(FISH_WEIGHT, na.rm = TRUE),
+            sd_weight = sd(FISH_WEIGHT, na.rm = TRUE),
+            lower.w = mean_weight - sd_weight,
+            upper.w = mean_weight + sd_weight)
+
+library(rphylopic)
+#crub <- browse_phylopic(name = "Snow Crab")
+ggplot(sc_summary, aes(x = Year, y = mean_width, group=1)) +
+  geom_point(size=4)+
+  geom_errorbar(aes(ymin = lower.l, ymax = upper.l), width=.1)+
+  geom_line() +
+  #geom_ribbon(aes(ymin = lower.l, ymax = upper.l), alpha = 0.2) +
+  labs(x = "Year", y = "Mean Carapace Width (mm)") +
+  theme_bw()+
+  theme(axis.line=element_line(colour="black"), panel.border = element_blank(),
+                               text=element_text(size=18))
+ggsave(filename = "SnowCrab_MeanSize.png",plot = last_plot(),path="output/CrabSurvey/",device = "png",width = 10, height=6, units = "in",dpi = 600, bg = "white")
+
 # Create boxplots for fish weights by species
-ggplot(fishmorph3 %>% filter(EST_NUM_CAUGHT>2), aes(x = Year, y = FISH_WEIGHT)) +
+ggplot(fishmorph4 %>% filter(EST_NUM_CAUGHT>2), aes(x = Year, y = FISH_WEIGHT, fill=Inside)) +
   facet_wrap(vars(COMM),nrow=5, scales="free_y")+
   geom_boxplot() +
-  labs(x = "Species",
+  scale_fill_manual(labels=c("Outside","Inside"), values=c("red","blue"))+
+  labs(x = "Year",
        y = "Weight") +
   theme_minimal()+
-  theme(axis.text.x = element_text(angle=90), strip.text.x = element_text(size=7))
+  theme(axis.line=element_line(colour="black"), panel.border = element_blank(),
+        text=element_text(size=14), axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 12), legend.title = element_blank())
 
 ggsave(filename = "CrabSurvey_SAB_FishWeights.png",plot = last_plot(), path = "output/CrabSurvey/",device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
 

@@ -31,8 +31,9 @@ ggplot()+
   scale_size_manual(values=c(1.75,2.5))+
   scale_color_manual(values=c("grey46","black"))+
   labs(y="Latitude",x="Longitude")+
-  theme_minimal()+
-  theme(panel.background = element_rect(fill="lightcyan1"), axis.text.x=element_text(size=12), axis.text.y=element_text(size=12), axis.title = element_text(size=16), legend.text = element_text(size=10))
+  theme_bw()+
+  theme(panel.background = element_rect(fill="lightcyan1"), axis.text.x=element_text(size=12), axis.text.y=element_text(size=12), axis.title = element_text(size=16), legend.text = element_text(size=10), legend.position = "right")
+  #ggrepel::geom_label_repel(data=data2, mapping=aes(x=LONGITUDE, y=LATITUDE, label=STATION.x),max.overlaps=2000)
 
 ggsave(filename = "SurveyStationsMap2023.png",plot = last_plot(), device = "png", path = "output/CrabSurvey/", width = 16, height=10, units="in", dpi=600)
 
@@ -55,14 +56,15 @@ rich_df <- data2%>%
 
 
 sab_rich_depth <- ggplot(rich_df%>%filter(nspecies>9),aes(x=depth, y=nspecies, col=Inside, group=Inside))+
-  geom_point()+
+  geom_point(size=2)+
   #facet_wrap(vars(year), nrow=2)+
   stat_smooth(method="lm")+
+  scale_colour_manual(labels=c("Outside","Inside"), values=c("red","blue"))+
   theme_bw()+
   labs(x="Depth (m)",y="Richness",col="")+
-  theme(legend.position = "none")
+  theme(legend.position = "bottom")
 sab_rich_depth
-ggsave("output/CrabSurvey/richness_by_depth.png",sab_rich_depth,height = 8,width=8,units="in",dpi=300)
+ggsave("output/CrabSurvey/richness_by_depth.png",sab_rich_depth,height = 8,width=8,units="in",dpi=600)
 
 
 rich_count <- rich_df%>%
@@ -138,24 +140,47 @@ ggsave("output/SAB_crabsurvey_richness_inside_outside.png",inside_outside_plot ,
 
 #Plot net temp per year and station
 ggplot()+
-  geom_point(data=data2, aes(x=year, y=NET_TEMPERATURE, colour=as.factor(STATION.x)),size=3)+
+  geom_point(data=data2 %>% filter(NET_TEMPERATURE>0), aes(x=as.factor(year), y=NET_TEMPERATURE, colour=depth),size=3)+
   #geom_smooth(method="lm")+
-  ylab(label =expression( "Net Temperature ("*degree*'C)'))+
+  scale_colour_continuous(breaks=c(75, 125, 175, 225))+
+  xlab(label="Year")+
+  ylab(label = expression( "Net Temperature ("*degree*'C)'))+
+  scale_x_discrete(name="Year", labels=c("2015", "2016", "2017", "2018", "2019", "2021", "2022", "2023"))+
   theme_bw()+
-  theme(text=element_text(size=15))+
-  guides(col=guide_legend(title = "Survey Station"))
+  theme(axis.line=element_line(colour="black"), panel.border = element_blank(),
+                                          text=element_text(size=18))+
+  guides(col=guide_legend(title = "Depth (m)"))
 
 
-ggsave("output/CrabSurvey/NetTemperatures.png",last_plot() ,height = 8,width=12,units="in",dpi=400)
+ggsave("output/CrabSurvey/NetTemperatures2.png",last_plot() ,height = 8,width=12,units="in",dpi=400)
 
 ##############################
-####Species accumulation curves
+####Species accumulation curves and NMDS
 data3 <- data2 %>% dplyr::select(c(STATION.x, year, SPEC, EST_NUM_CAUGHT, Inside))
 data3 <- data3[!(is.na(data3$SPEC) | data3$SPEC==""),]
 data4 <- data3 %>% group_by(SPEC) %>% 
   mutate(row=row_number()) %>% 
   pivot_wider(names_from = SPEC, values_from = EST_NUM_CAUGHT,values_fill = 0) %>%
   dplyr::select(-row) %>% as.data.frame()
+
+data5<-as.matrix(data4[,4:length(colnames(data4))])
+rownames(data5) <- paste(data4$STATION.x, data4$year, sep="_")
+
+sabnmds <- metaMDS(data5, distance = "bray", k=2)
+
+
+specdat_2015 <- data4 %>% dplyr::filter(year==2015)
+specdat_2016 <- data4 %>% dplyr::filter(year==2016)
+specdat_2017 <- data4 %>% dplyr::filter(year==2017)
+specdat_2018 <- data4 %>% dplyr::filter(year==2018)
+specdat_2019 <- data4 %>% dplyr::filter(year==2019)
+specdat_2021 <- data4 %>% dplyr::filter(year==2021)
+specdat_2022 <- data4 %>% dplyr::filter(year==2022)
+specdat_2023 <- data4 %>% dplyr::filter(year==2023)
+list.dfs<-list(specdat_2015, specdat_2016, specdat_2017, specdat_2018, specdat_2019, specdat_2021, specdat_2022, specdat_2023)
+for (i in 1:length(list.dfs)){
+metaMDS(as.matrix[i],distance = "bray", k = 2)
+}
 
 divdat <- iNEXT(data4, datatype = "abundance")
 
