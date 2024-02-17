@@ -27,7 +27,13 @@ crab <- read.csv("data/CrabSurvey/SABMPA2023export.csv") %>%
   mutate(CPUE = EST_NUM_CAUGHT/AREA_SWEPT,
          station_date=paste(STATION,BOARD_DATE,sep = ": "),
          LONGITUDE=-LONGITUDE) %>%
-  left_join(spid,by = join_by(SPECCD_ID))
+  left_join(spid,by = join_by(SPECCD_ID)) %>%
+  mutate(sp_name=if_else(is.na(sp_name),
+                         as.character(SPECCD_ID),
+                         sp_name))
+
+
+
 
 # get bathy
 bbsab <- st_bbox(sab)
@@ -53,7 +59,7 @@ crabstations <- crab %>%
   st_join(benthoscape) %>%
   mutate(Class_name=if_else(is.na(Class_name),
                             "Unclassified",
-                            Class_name)) %>% 
+                            Class_name)) %>%
   dplyr::select(STATION,z,Class_name) %>%
   mutate(STATION = as.character(STATION),
          z_class = if_else(z>=(-100),
@@ -85,10 +91,12 @@ richness_BACI <- richness %>%
 
 # set up crab for BACI
 crab_BACI <- crab %>%
-  mutate(year=station_date %>%
-           gsub(".*: ","",.) %>%
-
-           gsub("-.*","",.)) %>%
+  complete(sp_name, nesting(STATION, BOARD_DATE),fill=list(CPUE=0)) %>%  # add in 0's
+  mutate(station_date=paste(STATION,BOARD_DATE,sep = ": "),
+       year=station_date %>%
+         gsub(".*: ","",.) %>%
+         
+         gsub("-.*","",.)) %>%
   filter(year>2013) %>%
   mutate(PERIOD=if_else(year>2018,
                         "After",
@@ -99,11 +107,11 @@ crab_BACI <- crab %>%
 
 # combine crab and richness for power analysis
 BACI <- data.frame(sp=c(richness_BACI$sp,crab_BACI$sp_name),
-                   dependent=c(richness_BACI$Richness,0.01*crab_BACI$CPUE),
+                   dependent=c(richness_BACI$Richness,crab_BACI$CPUE),
                    rand1=c(richness_BACI$Class_name,crab_BACI$Class_name),
                    rand2=c(richness_BACI$z_class,crab_BACI$z_class),
                    PERIOD=c(richness_BACI$PERIOD,crab_BACI$PERIOD)) #%>%
-  #filter(!(sp=="GADUS MORHUA"&dependent>200)) # filter our one extremely large cod catch
+#filter(!(sp=="GADUS MORHUA"&dependent>200)) # filter our one extremely large cod catch
 
 # prepare empty results df
 results <- expand.grid(sp=c("Richness",
@@ -112,40 +120,41 @@ results <- expand.grid(sp=c("Richness",
                             "SEBASTES",
                             "AMBLYRAJA RADIATA",
                             "GADUS MORHUA",
-                            "CHIONOECETES OPILIO"),
-                       replicate=1:3,
-                       sites=c(5,
-                               15,
-                               50,
-                               100),
-                       trend=c("Increase","Decrease"),
-                       effect_size=seq(0.1,0.9,0.1),
-                       p=NA
+                            "CHIONOECETES OPILIO"
+),
+replicate=1:50,
+sites=c(5,
+        15,
+        50,
+        100),
+trend=c("Increase","Decrease"),
+effect_size=seq(0.1,0.9,0.4),
+p=NA
 )
 
 ############# simulate! ####################
 start <- Sys.time()
-plan("future::multisession",workers=round(detectCores()*0.75))
+plan(multisession,workers=round(detectCores()*0.5))
 for(s in unique(results$sp)){
   # fit model to species data
   sp_data <- BACI %>% filter(sp==s)
   realdatamodel <- lme4::glmer.nb(formula= dependent ~ PERIOD+(1|rand1)+(1|rand2),
                                   data = sp_data)
-
+  
   # get parameters from sp model
   theta <- lme4::getME(realdatamodel,"glmer.nb.theta")
   periodeffect <- ranef(realdatamodel) %>%
     as.data.frame()
   spresults <- results[results$sp==s,]
-
+  
   # simualtion all variables for sp
   spresults$p <- future_map(1:nrow(spresults),function(row){
     p <- try(log("a"),silent = TRUE)
     while(inherits(p,"try-error")){
       p <- try({
         # randomly select random effect variables for sites
-        r1 <- sample(unique(BACI$rand1),spresults$sites[row],replace=TRUE)
-        r2 <- sample(unique(BACI$rand2),spresults$sites[row],replace=TRUE)
+        r1 <- rep(sample(unique(BACI$rand1),spresults$sites[row],replace=TRUE),2)
+        r2 <- rep(sample(unique(BACI$rand2),spresults$sites[row],replace=TRUE),2)
         r1index <- r1 %>%
           lapply(function(x){
             which(x==periodeffect$grp)
@@ -157,47 +166,49 @@ for(s in unique(results$sp)){
             which(x==periodeffect$grp)
           }) %>%
           unlist()
-
+        
+        PERIOD <- rep(c("Before","After"),each=spresults$sites[row])
+        
         # simulate dependent variable
-        simdata <- bind_rows(BACI %>%
-                               filter(sp==spresults$sp[row],
-                                      PERIOD=="Before") %>%
-                               dplyr::select(PERIOD,rand1,rand2,dependent),
-                             data.frame(PERIOD="After",
-                                        rand1=r1,
-                                        rand2=r2,
-                                        dependent=rnegbin(n=spresults$sites[row],
-                                                                 mu=exp(fixef(realdatamodel)[1]+
-                                                                          rnorm(spresults$sites[row],
-                                                                                periodeffect$condval[r1index],
-                                                                                periodeffect$condsd[r1index])+
-                                                                          rnorm(spresults$sites[row],
-                                                                                periodeffect$condval[r2index],
-                                                                                periodeffect$condsd[r2index])),
-                                                                 theta = theta)*(if_else(spresults$trend[row]=="Increase",
-                                                                                         1+spresults$effect_size[row],
-                                                                                         1-spresults$effect_size[row])))
+        simdata <- data.frame(PERIOD=PERIOD,
+                              rand1=r1,
+                              rand2=r2,
+                              dependent=rnegbin(n=spresults$sites[row]*2,
+                                                mu=exp(fixef(realdatamodel)[1]+
+                                                         rnorm(spresults$sites[row],
+                                                               periodeffect$condval[r1index],
+                                                               periodeffect$condsd[r1index])+
+                                                         rnorm(spresults$sites[row],
+                                                               periodeffect$condval[r2index],
+                                                               periodeffect$condsd[r2index])),
+                                                theta = theta)*(rep(c(1,if_else(spresults$trend[row]=="Increase",
+                                                                                1+spresults$effect_size[row],
+                                                                                1-spresults$effect_size[row])),each=spresults$sites[row]))
         )
-        simdata %>% group_by(PERIOD) %>% reframe(cpue=mean(dependent,na.rm=T));spresults[row,]
-
+        # simdata %>% group_by(PERIOD) %>% reframe(cpue=mean(dependent,na.rm=T));spresults[row,]
+        
         # model fit with and without PERIOD as a fixed effect
         simdatawithperiod <- lme4::glmer.nb(formula= dependent ~ PERIOD+(1|rand1)+(1|rand2),
                                             data = simdata)
         simdatawithoutperiod <- lme4::glmer.nb(formula= dependent ~ (1|rand1)+(1|rand2),
                                                data = simdata)
-
+        
         # Likelihood Ratio Test
         LRT <- anova(simdatawithperiod,simdatawithoutperiod)
         spresults$p[row] <- LRT$`Pr(>Chisq)`[2]
-
+        p <- LRT$`Pr(>Chisq)`[2]
+        rm(r1,r2,r1index,r2index,PERIOD,simdata,simdatawithperiod,simdatawithoutperiod,LRT)
+        gc()
+        return(p)
+        
       }, silent = TRUE)
       # if(inherits(p,"try-error")) browser()
     }
     return(p)
     # }
-  }) %>% unlist()
+  },.progress = TRUE) %>% unlist()
   results[results$sp==s,] <- spresults
-
+  
 }
 end <- Sys.time()-start
 end
@@ -221,3 +232,4 @@ ggplot(resultssummary,aes(x=`Effect Size`,y=Power,color=`Number of Samples`,grou
   theme_bw()
 
 saveRDS(results,"power_crab.RDS")
+
