@@ -1,7 +1,7 @@
-#Diet data exploration
+#Diet data exploration from Maritimes Snow Crab Survey
 
 ##libraries
-library(sp)
+library(sf)
 library(rgdal)
 library(raster)
 library(shape)
@@ -16,48 +16,41 @@ library(dplyr)
 #Read in diet data pulled from ISDB - note at the time of coding (Feb 2024) the 2023 data was not processed
 diet <- read.csv("data/CrabSurvey/MPA.Diet.SnowCrabSurvey.Feb.2023.csv")
 head(diet)
-
+str(diet)
 plot(diet$SLONGDD, diet$SLATDD)
 
-sabdiet <- diet %>% filter(SLATDD > 45.1) %>% mutate(Year=as.Date(as.numeric(SDATE), tryFormats = c("%d-%m-%Y", "%d/%m/%Y")),"%Y")
+sabdiet <- diet %>% filter(SLATDD > 45.1) #%>% mutate(Year=as.Date(as.numeric(SDATE), tryFormats = c("%d-%m-%Y", "%d/%m/%Y")),"%Y")
 dim(sabdiet)
-
-## SAB RV survey diet database summary code
-# Harri Pettitt-Wade
-# harri.pettitt-wade@dfo-mpo.gc.ca
-
-
-
+unique(diet$SDATE)
+latlong <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
 
 
 #Read in the St Anns Polygon
-SAB <- readOGR("/SAB Gut contents/StAnnBank/StAnnsBank_MPA.shp")
+sabshape <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/StAnnsBank_MPA.shp")%>%
+  st_transform(latlong)%>%
+  mutate(name="St Anns Bank")
 
-diets_Oct2022 <- read.csv("SAB Gut contents/FH.DataRequest.OCT.2022.csv")
+#diets_Oct2022 <- read.csv("SAB Gut contents/FH.DataRequest.OCT.2022.csv")
 
-str(diets_Oct2022)
 
-diets_splist <- read.csv("SAB Gut contents/FH.Species.List.OCT2022.csv")
+diets_splist <- read.csv("R:/Science/CESD/HES_MPAGroup/Data/Diet Data/FH.Species.List.OCT2022.csv")
+head(diets_splist)
 
-diets$PRED_SEQ
-
-diets_splist$SPECCD
-
-#diets_ <- dets %>%
-#  filter(station == "CAMP")
 
 diets_splist_prey <- diets_splist
 diets_splist_pred <- diets_splist
 
 data.table::setnames(diets_splist_prey,  c("SPECCD"), 
                      c("PREYSPECCD")) 
+data.table::setnames(diets_splist_pred,  c("SPECCD"), 
+                     c("PREYSPECCD")) 
 
-diets_FULL <- merge(diets, diets_splist_prey, by.x = diets$PREYSPECCD, by.y = diets_splist$PREYSPECCD, all.x = TRUE, allow.cartesian = TRUE)
+diets_FULL <- merge(sabdiet, diets_splist_prey, by.x = "PREYSPECCD", by.y = "PREYSPECCD", all.x = TRUE)
 
 #dat
 diets_FULL <- merge(diets,diets_splist_prey,by.x="PREYSPECCD",by.y="PREYSPECCD",all.x=F, allow.cartesian = TRUE)
 
-diets_full_preds <- merge(diets,diets_splist_pred,by.x="SPEC",by.y="SPEC",all.x=F, allow.cartesian = TRUE)
+diets_full_preds <- merge(sabdiet,diets_splist_pred,by.x="SPEC",by.y="SPEC",all.x=F, allow.cartesian = TRUE)
 
 data.table::setnames(diets_splist_pred,c("PREYSPECCD","COMMON","SPECIES","PHYLUM","CLASS","ORD","FAMILY","GENUS"),
                      c("SPEC","COMMON_pred","SPECIES_pred","PHYLUM_pred","CLASS_pred","ORD_pred","FAMILY_pred","GENUS_pred"))
