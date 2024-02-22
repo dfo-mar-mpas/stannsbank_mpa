@@ -26,7 +26,7 @@ crab <- read.csv("data/CrabSurvey/SABMPA2023export.csv") %>%
   left_join(crab_swept,by = join_by(TRIP, "SET_NO"=="SET", STATION)) %>%
   mutate(CPUE = EST_NUM_CAUGHT/AREA_SWEPT,
          station_date=paste(STATION,BOARD_DATE,sep = ": "),
-         LONGITUDE=-LONGITUDE) %>%
+         LONGITUDE=-LONGITUDE, YEAR=format(as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y")) %>%
   left_join(spid,by = join_by(SPECCD_ID))
 
 
@@ -84,6 +84,7 @@ comm_crab_ID <- crab %>%
 ID <- comm_crab_ID %>%
   dplyr::select(ID,BOARD_DATE,STATION) %>%
   mutate(STATION=as.character(STATION))
+
 comm_crab <- comm_crab_ID %>%
   tibble::column_to_rownames("ID")%>%
   #select(-BOARD_DATE,-STATION) %>%
@@ -120,7 +121,8 @@ nmdstheme <- theme_bw()+
         axis.text.y=element_blank(),
         axis.ticks.y=element_blank(),
         panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+        panel.grid.minor = element_blank(),
+        text=element_text(size=18))
 
 
 # regular ggplot
@@ -128,6 +130,7 @@ p <- ggplot() +
   geom_polygon(data=hull.data,aes(x=NMDS1,y=NMDS2,fill=Class_name),alpha=0.30) + # add the hulls
   # geom_text(data=species.scores,aes(x=NMDS1,y=NMDS2,label=species),alpha=0.5) +  # add the sp.labels
   geom_point(data=data.scores,aes(text=ID,x=NMDS1,y=NMDS2,shape=Class_name,colour=Class_name),size=3) +
+  #scale_color_gradient(low="blue", high="black")+
   scale_colour_brewer(palette = "Paired") +
   coord_equal()+
   scale_shape_manual(values=c(15,7,18,16,10,8,17))+
@@ -135,7 +138,7 @@ p <- ggplot() +
   nmdstheme
 p
 
-
+ggsave(filename = "CrabSurvey_NMDS.png",plot = last_plot(), device = "png", path = "output/CrabSurvey/", width = 10, height=8, units="in", dpi=500,bg = "white")
 
 # plotly interaction
 plotly::ggplotly(p,tooltip = "text")
@@ -199,6 +202,8 @@ p <- ggplot() +
   coord_equal()+
   theme_bw()
 p
+
+ggsave(filename = "CrabSurvey_NMDS_ByDepth.png",plot = last_plot(), device = "png", path = "output/CrabSurvey/", width = 10, height=8, units="in", dpi=500,bg = "white")
 
 ############ Summer RV  with inverts ###################
 # tempfn <- tempfile()
@@ -550,5 +555,11 @@ p <- ggplot() +
   scale_colour_brewer(palette = "YlGnBu") +
   coord_equal()+
   scale_shape_manual(values=c(15,7,18,16,10,8,17))+
-  theme_bw()
+  theme_bw()+
+  theme( text=element_text(size=18))
 p
+
+ggsave("RVsurvey_NMDS_byDepth.png",plot = last_plot(), device = "png", path = "output/CrabSurvey/",width = 10, height=8, units="in",bg = "white")
+
+
+save.image("data/CrabSurvey/CrabSurveyNMDS.RData")

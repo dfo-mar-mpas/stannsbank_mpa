@@ -94,7 +94,7 @@ ggplot()+
   labs(x="Longitude", y="Latitude")+
   theme_minimal()
 
-ggsave(filename = "output/CrabSurvey/EnhancedCrabStations.png", plot = last_plot(), device = "png", width = 6, height =10, units = "in", dpi=500)
+#ggsave(filename = "output/CrabSurvey/EnhancedCrabStations.png", plot = last_plot(), device = "png", width = 6, height =10, units = "in", dpi=500)
 
 ###3. Do some data filtering and merging to just focus on the SAB inside and outside trawl stations
 SABTOWS <- catchdata %>% filter(LATITUDE>45.1) #filter MPATOWS data by everything >45 degrees north to remove Gully stations
