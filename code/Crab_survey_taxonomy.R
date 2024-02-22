@@ -1,0 +1,61 @@
+#load libraries ----------
+
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(taxize)
+library(RCurl)
+
+#load functions -----------
+
+#this is from the eDNA analysis from the offshore. 
+script <- RCurl::getURL("https://raw.githubusercontent.com/rystanley/offshore_edna/main/code/ClassifyFunction.R", ssl.verifypeer = FALSE)
+eval(parse(text = script),envir=.GlobalEnv)
+rm(script)  
+
+#load the snow crab species data -----
+tax_df <- read.csv("output/taxonomic_raw.csv")%>%
+          filter(!species_filter %in% c("SEAWEED, ALGAE ,KELP; THALLOPHYTA"),
+                 !grepl("eggs",tolower(species_filter)))%>%
+          mutate(species = ifelse(species_filter == "LEPTASTERIAS (HEXASTERIAS) POLARIS","LEPTASTERIAS POLARIS",species_filter),
+                 species = ifelse(species_filter == "PORANIOMORPHA (PORANIOMORPHA) HISPIDA", "PORANIOMORPHA HISPIDA",species_filter))
+
+PhyloNames <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
+
+#run the taxonomic classification ** note that there will be time that require input (to select amongst options. By default go with the 'accepted' and closest match)
+
+tax_list <- data.frame()
+
+for(i in 74:nrow(tax_df)){
+  
+  sp=tax_df[i,"species"]%>%tolower()
+  
+  message(paste0("Working on ",sp," ",i," of ",nrow(tax_df)))
+  
+  temp <- classification(sp,db="worms") #run classification
+  
+  temp2 <- temp[[1]]%>% #unpack classification
+          data.frame()%>%
+          select(rank,name)%>%
+          spread(rank,name)%>%
+          mutate(aphiaID = temp[[1]]%>%data.frame()%>%slice(n())%>%pull(id))
+  
+  temp3 <- temp2%>% #trim classification
+           select(all_of(c(names(temp2)[names(temp2)%in%PhyloNames],"aphiaID")))
+  
+  #if data is missing or a certain taxonomic level isn't identified.
+  missing_cols <- setdiff(c(PhyloNames,"aphiaID"),names(temp3))
+  
+  if(length(missing_cols)>0){
+    
+    temp3[,missing_cols] <- NA
+    
+    temp3 <- temp3[,c(PhyloNames,"aphiaID")]
+    
+  }
+  
+  tax_list <- rbind(tax_list,temp3)
+  
+}
+
+write.csv(tax_list,"output/crab_taxa_clean.csv",row.names = FALSE)

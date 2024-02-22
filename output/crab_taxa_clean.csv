@@ -1,0 +1,117 @@
+"Class","Family","Genus","Kingdom","Order","Phylum","Species","aphiaID"
+"Teleostei","Gadidae","Gadus","Animalia","Gadiformes","Chordata","Gadus morhua",126436
+"Teleostei","Merlucciidae","Merluccius","Animalia","Gadiformes","Chordata","Merluccius bilinearis",158962
+"Teleostei","Sebastidae","Sebastes","Animalia","Perciformes","Chordata",NA,126175
+"Teleostei","Pleuronectidae","Reinhardtius","Animalia","Pleuronectiformes","Chordata","Reinhardtius hippoglossoides",127144
+"Teleostei","Pleuronectidae","Hippoglossoides","Animalia","Pleuronectiformes","Chordata","Hippoglossoides platessoides",127137
+"Teleostei","Pleuronectidae","Glyptocephalus","Animalia","Pleuronectiformes","Chordata","Glyptocephalus cynoglossus",127136
+"Teleostei","Anarhichadidae","Anarhichas","Animalia","Perciformes","Chordata","Anarhichas lupus",126758
+"Teleostei","Lotidae","Enchelyopus","Animalia","Gadiformes","Chordata","Enchelyopus cimbrius",126450
+"Elasmobranchii","Rajidae","Amblyraja","Animalia","Rajiformes","Chordata","Amblyraja radiata",105865
+"Teleostei","Zoarcidae","Lycodes","Animalia","Perciformes","Chordata",NA,126104
+"Malacostraca","Pandalidae","Pandalus","Animalia","Decapoda","Arthropoda","Pandalus montagui",107651
+"Malacostraca","Lithodidae","Lithodes","Animalia","Decapoda","Arthropoda","Lithodes maja",107205
+"Malacostraca","Oregoniidae","Chionoecetes","Animalia","Decapoda","Arthropoda","Chionoecetes opilio",107315
+"Malacostraca","Paguridae",NA,"Animalia","Decapoda","Arthropoda",NA,106738
+"Gastropoda","Buccinidae","Buccinum","Animalia","Neogastropoda","Mollusca",NA,137701
+"Cephalopoda","Sepiolidae","Semirossia","Animalia","Sepiida","Mollusca","Semirossia tenera",157036
+"Asteroidea",NA,NA,"Animalia",NA,"Echinodermata",NA,123080
+"Asteroidea","Ctenodiscidae","Ctenodiscus","Animalia","Paxillosida","Echinodermata","Ctenodiscus crispatus",123915
+"Asteroidea","Goniasteridae","Hippasteria","Animalia","Valvatida","Echinodermata","Hippasteria phrygiana",124043
+"Anthozoa",NA,NA,"Animalia","Actiniaria","Cnidaria",NA,1360
+"Scyphozoa",NA,NA,"Animalia",NA,"Cnidaria",NA,135220
+NA,NA,NA,"Animalia",NA,"Porifera",NA,558
+"Teleostei","Cottidae","Myoxocephalus","Animalia","Perciformes","Chordata","Myoxocephalus aenaeus",159519
+"Teleostei","Agonidae",NA,"Animalia","Perciformes","Chordata",NA,125588
+"Ascidiacea","Pyuridae","Boltenia","Animalia","Stolidobranchia","Chordata",NA,103514
+"Malacostraca","Crangonidae","Crangon","Animalia","Decapoda","Arthropoda",NA,107007
+"Polychaeta",NA,NA,"Animalia",NA,"Annelida",NA,883
+"Pycnogonida",NA,NA,"Animalia",NA,"Arthropoda",NA,1302
+"Asteroidea","Echinasteridae","Henricia","Animalia","Spinulosida","Echinodermata","Henricia sanguinolenta",123974
+"Asteroidea","Solasteridae","Solaster","Animalia","Valvatida","Echinodermata","Solaster endeca",124160
+"Ophiuroidea",NA,NA,"Animalia",NA,"Echinodermata",NA,123084
+"Anthozoa",NA,NA,"Animalia",NA,"Cnidaria",NA,1292
+"Teleostei","Stichaeidae","Eumesogrammus","Animalia","Perciformes","Chordata","Eumesogrammus praecisus",159817
+"Malacostraca","Oregoniidae","Hyas","Animalia","Decapoda","Arthropoda","Hyas araneus",107322
+"Asteroidea","Solasteridae","Crossaster","Animalia","Valvatida","Echinodermata","Crossaster papposus",124154
+"Ophiuroidea",NA,NA,"Animalia","Euryalida","Echinodermata",NA,242196
+"Echinoidea","Strongylocentrotidae","Strongylocentrotus","Animalia","Camarodonta","Echinodermata","Strongylocentrotus droebachiensis",124321
+"Holothuroidea",NA,NA,"Animalia",NA,"Echinodermata",NA,123083
+"Teleostei","Clupeidae","Clupea","Animalia","Clupeiformes","Chordata","Clupea harengus",126417
+"Teleostei","Cottidae","Myoxocephalus","Animalia","Perciformes","Chordata","Myoxocephalus scorpius",127203
+"Teleostei","Cottidae","Triglops","Animalia","Perciformes","Chordata","Triglops pingelii",127207
+"Teleostei","Liparidae","Liparis","Animalia","Perciformes","Chordata",NA,126160
+"Malacostraca","Thoridae","Spirontocaris","Animalia","Decapoda","Arthropoda","Spirontocaris spinus",107533
+"Malacostraca","Crangonidae","Sclerocrangon","Animalia","Decapoda","Arthropoda",NA,107013
+"Malacostraca","Oregoniidae","Hyas","Animalia","Decapoda","Arthropoda","Hyas coarctatus",107323
+"Bivalvia","Pectinidae","Chlamys","Animalia","Pectinida","Mollusca","Chlamys islandica",140692
+"Asteroidea","Goniasteridae","Mediaster","Animalia","Valvatida","Echinodermata","Mediaster bairdi",124045
+"Teleostei","Scombridae","Scomber","Animalia","Scombriformes","Chordata","Scomber scombrus",127023
+"Teleostei","Cyclopteridae","Eumicrotremus","Animalia","Perciformes","Chordata","Eumicrotremus spinosus",127217
+"Teleostei","Zoarcidae","Lycodes","Animalia","Perciformes","Chordata","Lycodes vahlii",127118
+"Elasmobranchii","Rajidae","Malacoraja","Animalia","Rajiformes","Chordata","Malacoraja senta",158554
+"Ascidiacea","Ascidiidae","Ascidia","Animalia","Phlebobranchia","Chordata",NA,103483
+"Malacostraca","Pandalidae","Pandalus","Animalia","Decapoda","Arthropoda","Pandalus borealis",107649
+"Echinoidea",NA,NA,"Animalia","Clypeasteroida","Echinodermata",NA,123100
+"Teleostei","Phycidae","Urophycis","Animalia","Gadiformes","Chordata","Urophycis tenuis",126504
+"Teleostei","Phycidae","Phycis","Animalia","Gadiformes","Chordata","Phycis chesteri",158988
+"Teleostei","Macrouridae","Nezumia","Animalia","Gadiformes","Chordata","Nezumia bairdii",183289
+"Cephalopoda","Ommastrephidae","Illex","Animalia","Oegopsida","Mollusca","Illex illecebrosus",153087
+"Cephalopoda",NA,NA,"Animalia","Octopoda","Mollusca",NA,11718
+"Anthozoa",NA,NA,"Animalia","Scleralcyonacea","Cnidaria",NA,1609360
+"Teleostei","Lophiidae","Lophius","Animalia","Lophiiformes","Chordata","Lophius americanus",159184
+"Malacostraca","Thoridae","Spirontocaris","Animalia","Decapoda","Arthropoda","Spirontocaris liljeborgii",107531
+"Malacostraca","Crangonidae","Pontophilus","Animalia","Decapoda","Arthropoda","Pontophilus norvegicus",107563
+"Echinoidea","Schizasteridae","Brisaster","Animalia","Spatangoida","Echinodermata","Brisaster fragilis",124404
+"Asteroidea","Goniasteridae","Pentagonaster","Animalia","Valvatida","Echinodermata",NA,123302
+"Asteroidea","Poraniidae","Poraniomorpha","Animalia","Valvatida","Echinodermata","Poraniomorpha hispida",158500
+"Teleostei","Zoarcidae","Lycodes","Animalia","Perciformes","Chordata","Lycodes reticulatus",127112
+"Asteroidea","Asteriidae","Leptasterias","Animalia","Forcipulatida","Echinodermata","Leptasterias (Hexasterias) polaris",125154
+"Teleostei","Pleuronectidae","Hippoglossus","Animalia","Pleuronectiformes","Chordata","Hippoglossus hippoglossus",127138
+"Teleostei","Pleuronectidae","Myzopsetta","Animalia","Pleuronectiformes","Chordata","Myzopsetta ferruginea",1571969
+"Teleostei","Cottidae","Myoxocephalus","Animalia","Perciformes","Chordata","Myoxocephalus octodecemspinosus",159520
+"Teleostei","Agonidae","Leptagonus","Animalia","Perciformes","Chordata","Leptagonus decagonus",127191
+"Teleostei","Stichaeidae","Leptoclinus","Animalia","Perciformes","Chordata","Leptoclinus maculatus",127072
+"Malacostraca","Cancridae","Cancer","Animalia","Decapoda","Arthropoda","Cancer irroratus",158057
+"Echinoidea","Strongylocentrotidae","Strongylocentrotus","Animalia","Camarodonta","Echinodermata",NA,123390
+"Teleostei","Cottidae","Triglops","Animalia","Perciformes","Chordata","Triglops murrayi",127205
+"Malacostraca","Crangonidae","Argis","Animalia","Decapoda","Arthropoda","Argis dentata",107550
+"Thecostraca",NA,NA,"Animalia",NA,"Arthropoda",NA,1082
+"Teleostei","Anarhichadidae","Anarhichas","Animalia","Perciformes","Chordata","Anarhichas minor",126759
+"Malacostraca","Cancridae","Cancer","Animalia","Decapoda","Arthropoda","Cancer borealis",158056
+"Teleostei","Cottidae","Artediellus","Animalia","Perciformes","Chordata","Artediellus atlanticus",127193
+"Teleostei","Scomberesocidae","Scomberesox","Animalia","Beloniformes","Chordata","Scomberesox saurus",126392
+"Teleostei","Zoarcidae","Lycodes","Animalia","Perciformes","Chordata","Lycodes pallidus",127110
+"Polychaeta","Aphroditidae","Aphrodita","Animalia","Phyllodocida","Annelida","Aphrodita hastata",157181
+"Malacostraca","Pasiphaeidae","Pasiphaea","Animalia","Decapoda","Arthropoda","Pasiphaea multidentata",107676
+"Teleostei","Cottidae","Artediellus","Animalia","Perciformes","Chordata","Artediellus uncinatus",127195
+"Gastropoda",NA,NA,"Animalia","Nudibranchia","Mollusca",NA,1762
+"Malacostraca",NA,NA,"Animalia","Decapoda","Arthropoda",NA,1130
+"Teleostei","Cottidae","Artediellus","Animalia","Perciformes","Chordata",NA,126147
+"Asteroidea","Pterasteridae","Pteraster","Animalia","Velatida","Echinodermata","Pteraster militaris",124147
+"Bivalvia","Pectinidae","Placopecten","Animalia","Pectinida","Mollusca","Placopecten magellanicus",156972
+"Asteroidea","Asteriidae","Asterias","Animalia","Forcipulatida","Echinodermata","Asterias rubens",123776
+"Teleostei","Stichaeidae","Lumpenus","Animalia","Perciformes","Chordata","Lumpenus lampretaeformis",154675
+"Asteroidea","Asteriidae","Asterias","Animalia","Forcipulatida","Echinodermata",NA,123219
+"Malacostraca","Leptanthuridae","Calathura","Animalia","Isopoda","Arthropoda","Calathura brachiata",118497
+"Teleostei","Hemitripteridae","Hemitripterus","Animalia","Perciformes","Chordata","Hemitripterus americanus",159518
+"Elasmobranchii","Rajidae","Leucoraja","Animalia","Rajiformes","Chordata","Leucoraja ocellata",158553
+"Teleostei","Alosidae","Alosa","Animalia","Clupeiformes","Chordata","Alosa pseudoharengus",158669
+"Holothuroidea","Caudinidae","Caudina","Animalia","Molpadida","Echinodermata","Caudina arenata",152559
+"Teleostei","Cottidae","Icelus","Animalia","Perciformes","Chordata","Icelus bicornis",127199
+"Malacostraca","Crangonidae","Sclerocrangon","Animalia","Decapoda","Arthropoda","Sclerocrangon boreas",107568
+"Holothuroidea","Cucumariidae","Cucumaria","Animalia","Dendrochirotida","Echinodermata","Cucumaria frondosa",124612
+"Hexactinellida","Rossellidae","Vazella","Animalia","Lyssacinosida","Porifera","Vazella pourtalesii",172121
+"Malacostraca","Thoridae","Lebbeus","Animalia","Decapoda","Arthropoda","Lebbeus polaris",107521
+"Teleostei","Zoarcidae","Lycodes","Animalia","Perciformes","Chordata","Lycodes lavalaei",127107
+"Teleostei","Cottidae","Gymnocanthus","Animalia","Perciformes","Chordata","Gymnocanthus tricuspis",127198
+"Teleostei","Gadidae","Melanogrammus","Animalia","Gadiformes","Chordata","Melanogrammus aeglefinus",126437
+"Ophiuroidea","Ophiuridae","Ophiura","Animalia","Ophiurida","Echinodermata","Ophiura sarsii",124934
+"Anthozoa","Actiniidae","Bolocera","Animalia","Actiniaria","Cnidaria",NA,100698
+"Malacostraca","Pandalidae","Atlantopandalus","Animalia","Decapoda","Arthropoda","Atlantopandalus propinqvus",158351
+"Ascidiacea","Pyuridae","Halocynthia","Animalia","Stolidobranchia","Chordata","Halocynthia pyriformis",103828
+"Anthozoa","Hormathiidae","Hormathia","Animalia","Actiniaria","Cnidaria",NA,100757
+"Gymnolaemata","Flustridae","Flustra","Animalia","Cheilostomatida","Bryozoa","Flustra foliacea",111367
+"Teleostei","Gadidae","Pollachius","Animalia","Gadiformes","Chordata","Pollachius virens",126441
+"Teleostei","Zoarcidae","Lycodes","Animalia","Perciformes","Chordata","Lycodes terraenovae",127117
+"Myxini","Myxinidae","Myxine","Animalia","Myxiniformes","Chordata","Myxine limosa",271309
