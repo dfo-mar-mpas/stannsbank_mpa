@@ -373,7 +373,7 @@
                   theme(strip.background = element_rect(fill="white"),
                         legend.position = "bottom")+
                   stat_smooth(data=num_df,aes(x=year,y=num_stand,col=location),lwd=2)+
-                  facet_wrap(~minID,ncol=2,scales="free_y")+
+                  facet_wrap(~minID,ncol=2)+
                   labs(col="",x="",y=expression(paste("Count per set / Max count per set")))
                 
     ggsave("output/CrabSurvey/CatchNumber_inside-outside.png",p_number_a,height=8,width=6,units="in",dpi=300)
