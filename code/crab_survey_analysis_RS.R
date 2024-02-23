@@ -60,11 +60,11 @@
       dplyr::select(name,geometry)
 
 # fish taxonomy metadata -----------
-fishcodes <- read.csv("data/CrabSurvey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
+    fishcodes <- read.csv("data/CrabSurvey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
 
 # Crab survey location metadata ---------------
-stns<-read.csv("data/CrabSurvey/StationInfo.csv",header = T)
-colnames(stns)<-c("STATION", "Enhanced", "Inside")
+    stns<-read.csv("data/CrabSurvey/StationInfo.csv",header = T)
+    colnames(stns)<-c("STATION", "Enhanced", "Inside")
 
 #Crab Survey data ----------
 
@@ -164,7 +164,7 @@ colnames(stns)<-c("STATION", "Enhanced", "Inside")
       group_by(trawlID)%>%
       summarise(geometry=st_union(geometry)%>%st_centroid())%>%
       ungroup()%>%
-      mutate(inside=as.logical(st_intersects(.,sab, sparse=TRUE)))
+      mutate(inside=as.logical(st_intersects(.,sab, sparse=TRUE))) #this doesn't work
 
 #Load fish morphology data -----------
 
@@ -408,5 +408,41 @@ colnames(stns)<-c("STATION", "Enhanced", "Inside")
     
 #### DIET ANALYSIS --------------
     
-      
+    diet_data <- read.csv("data/CrabSurvey/MPA.Diet.SnowCrabSurvey.Feb.2024.csv")%>%
+                 filter(SLATDD>45) #filter to just SAB
+    
+    #there is a concerning amount of missing data .... 
+    missing_prey <- setdiff(diet_data$PREYSPECCD,fishcodes$SPECCD_ID)
+    message(paste(round((1-(dim(diet_df)[1]/dim(diet_data)[1])),4)*100,"% missing data based on unidentified PREYSPECCD."))
+    
+    diet_df <- diet_data%>%
+               rename(SPECCD_ID = PREYSPECCD,
+                      PRED = SPEC)%>%
+               left_join(.,fishcodes)%>%
+               rename(prey = SPEC,
+                      prey_comm = COMM,
+                      prey_speccd_id = SPECCD_ID,
+                      prey_aphia = APHIA_ID,
+                      SPECCD_ID = PRED)%>%
+               left_join(.,fishcodes)%>%
+               rename(pred = SPEC,
+                      pred_comm = COMM,
+                      pred_speccd_id = SPECCD_ID,
+                      pred_aphia = APHIA_ID)%>%
+              rename(TRIP = MISSION)%>%
+              mutate(TRIP_SET = paste(TRIP,SETNO,sep="_"))%>%
+              left_join(.,arsw%>%mutate(TRIP_SET = paste(TRIP,SET,sep="_"))%>%select(-TRIP),by="TRIP_SET")%>%
+              st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong)
+    
+    #I have no idea why the mutate(inside=as.logical(st_intersects(.,sab_nozones, sparse=TRUE))) doesn't work!!
+    tt <- st_intersection(diet_df,sab_nozones)
+    missing_stations <- setdiff(diet_df$TRIP_STATION,tt$TRIP_STATION)
+    
+    diet_df <- diet_df%>%
+               mutate(location = ifelse(TRIP_STATION %in%missing_stations,"outside","inside"))
+    
+    
+    ## diet richness ~ location x year
+    
+    
                   
