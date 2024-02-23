@@ -343,18 +343,9 @@
     
     ##catch number per set
     
-    freq_sp <- catchdat_stand%>%
-               filter(minID != "Actiniaria")%>% #sea anemones are captures but not really a species ae can tell a story around 
-               group_by(minID)%>%
-               summarise(count=n())%>%
-               ungroup()%>%
-               arrange(-count)%>%
-               slice(1:10)%>%
-               pull(minID)%>%
-               c(.,"Anarhichas lupus","Merluccius bilinearis")
-    
     num_df <- catchdat_stand%>%
-              filter(minID %in% freq_sp,
+              mutate(spec = ifelse(SPEC == "SEBASTES","SEBASTES SP.",SPEC))%>%
+              filter(spec %in% target_sp$spec,
                      station %in% stns$STATION)%>%
               mutate(station=as.integer(STATION))%>%
               group_by(location,station,minID)%>%
@@ -362,28 +353,31 @@
               ungroup()%>%
               data.frame()
       
-      
     p_number_a <- ggplot()+
                   geom_vline(xintercept = 2017,lty=2)+
                   geom_line(data=num_df,aes(x=year,y=number,col=location,group=station),lty=2,lwd=0.25,alpha=0.5)+
                   geom_point(data=num_df,aes(x=year,y=number,col=location,group=station),size=2,alpha=0.55)+
                   theme_bw()+
+                  theme(strip.background = element_rect(fill="white"),
+                        legend.position = "bottom")+
                   stat_smooth(data=num_df,aes(x=year,y=number,col=location),lwd=2,se=FALSE)+
                   scale_y_log10()+
-                  facet_wrap(~minID,nrow=3,scales="free_y")+
-                  labs(col="",x="Year",y="Count per set");p_number_a
+                  facet_wrap(~minID,ncol=2,scales="free_y")+
+                  labs(col="",x="",y="Count per set")
                 
     p_number_b <- ggplot()+
                   geom_vline(xintercept = 2017,lty=2)+
                   geom_line(data=num_df,aes(x=year,y=num_stand,col=location,group=station),lty=2,lwd=0.25,alpha=0.5)+
                   geom_point(data=num_df,aes(x=year,y=num_stand,col=location,group=station),size=2,alpha=0.55)+
                   theme_bw()+
+                  theme(strip.background = element_rect(fill="white"),
+                        legend.position = "bottom")+
                   stat_smooth(data=num_df,aes(x=year,y=num_stand,col=location),lwd=2)+
-                  facet_wrap(~minID,nrow=3,scales="free_y")+
-                  labs(col="",x="Year",y=expression(paste("Count per set / Max count per set")));p_number_b
+                  facet_wrap(~minID,ncol=2,scales="free_y")+
+                  labs(col="",x="",y=expression(paste("Count per set / Max count per set")))
                 
-    ggsave("output/CrabSurvey/CatchNumber_inside-outside.png",p_number_a)
-    ggsave("output/CrabSurvey/CatchNumber_inside-outside_standardized.png",p_number_b)
+    ggsave("output/CrabSurvey/CatchNumber_inside-outside.png",p_number_a,height=8,width=6,units="in",dpi=300)
+    ggsave("output/CrabSurvey/CatchNumber_inside-outside_standardized.png",p_number_b,height=8,width=6,units="in",dpi=300)
     
     ##catch weight per set
     
