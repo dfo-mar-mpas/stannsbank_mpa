@@ -86,8 +86,8 @@ basemap_atlantic <- rbind(ne_states(country = "Canada",returnclass = "sf")%>%
   st_intersection(.,bioregion_box)
 
 #load high resolution bathymetry (50m) from multibeam 
-sab_bathy <- raster("data/Bathymetry/bathy50/w001001.adf", RAT=FALSE)%>%
-  projectRaster(.,crs=latlong)
+sab_bathy <- raster::raster("data/Bathymetry/bathy50/w001001.adf", RAT=FALSE)%>%
+  raster::projectRaster(.,crs=latlong)
 
 sab_benthoscape <- read_sf("data/Shapefiles/benthoscape.shp")%>%
   st_transform(latlong)%>%
@@ -101,8 +101,8 @@ sab_benthoscape <- read_sf("data/Shapefiles/benthoscape.shp")%>%
          class = gsub("F - ","",class))
 
 #load bathymetry 
-ras <- raster("data/Bathymetry/sab_dem.tif") %>%
-  projectRaster(.,crs=latlong)
+ras <- raster::raster("data/Bathymetry/sab_dem.tif") %>%
+  raster::projectRaster(.,crs=latlong)
 rasproj <- proj4string(ras)
 
 #bathymetry comparison
