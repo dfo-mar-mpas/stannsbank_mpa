@@ -259,7 +259,7 @@
                     legend.position = "bottom")+
                stat_smooth(data=plot_df,aes(x=year,y=med,col=location),lwd=2,se=FALSE)+
                facet_wrap(~species2,ncol=2,scales="free_y")+
-               labs(col="",x="Year",y="Median recorded size");p_med_a
+               labs(col="",x="",y="Median recorded size")
     
     p_med_b <- ggplot()+
                geom_vline(xintercept = 2017,lty=2)+
@@ -269,7 +269,7 @@
                theme(strip.background = element_rect(fill="white"),
                     legend.position = "bottom")+
                facet_wrap(~species2,nrow=3,scales="free_y")+
-               labs(col="",x="Year",y="Median recorded size");p_med_b
+               labs(col="",x="",y="Median recorded size")
     
     ggsave("output/CrabSurvey/MedianLength_inside-outside_wSmooth.png",p_med_a,height=8,width=6,units="in",dpi=300)
     ggsave("output/CrabSurvey/MedianLength_inside-outside.png",p_med_b,height=8,width=6,units="in",dpi=300)
@@ -284,7 +284,7 @@
                         legend.position = "bottom")+
                    stat_smooth(data=plot_df,aes(x=year,y=bigfish,col=location),lwd=2,se=FALSE)+
                    facet_wrap(~species2,ncol=2,scales="free_y")+
-                   labs(col="",x="Year",y="90th percentile size");p_bigfish_a
+                   labs(col="",x="",y="90th percentile size")
     
     p_bigfish_b <- ggplot()+
                    geom_vline(xintercept = 2017,lty=2)+
@@ -294,7 +294,7 @@
                    theme(strip.background = element_rect(fill="white"),
                         legend.position = "bottom")+
                    facet_wrap(~species2,ncol=2,scales="free_y")+
-                   labs(col="",x="Year",y="90th percentile size");p_bigfish_b
+                   labs(col="",x="",y="90th percentile size")
       
     ggsave("output/CrabSurvey/LargeFish_inside-outside_wSmooth.png",p_bigfish_a,height=8,width=6,units="in",dpi=300)
     ggsave("output/CrabSurvey/LargeFish_inside-outside.png",p_bigfish_b,height=8,width=6,units="in",dpi=300)    
