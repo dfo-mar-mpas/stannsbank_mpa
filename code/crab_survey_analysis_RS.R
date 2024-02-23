@@ -7,8 +7,9 @@
     library(RODBC)
     library(ggpubr)
     library(tidyr)
+    library(vegan)
 
-#### global options---------
+#### Global options---------
     sf_use_s2 = FALSE
     
 ### Target species ---------
@@ -18,8 +19,7 @@
                             common=c("Atlantic wolffish","White hake","American plaice",
                                      "Witch flounder","Snow crab","Atlantic cod",
                                      "Redfish sp","Thorny skate"))
-    
-#### function -----
+#### Functions -----
     
     capitalize_first <- function(text) { #from ChatGPT!
       words <- strsplit(text, " ")[[1]] 
@@ -66,6 +66,28 @@
     novsco <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Coastline/NS_coastline_project_Erase1.shp")%>%st_transform(latlong)%>%
       mutate(name="Nova Scotia")%>%
       dplyr::select(name,geometry)
+    
+    #benthoscape
+    benthoscape_classes <- data.frame(Assigned_c=c("A - Mud",
+                                                   "Asp - Mud and seapens",
+                                                   "B - Gravelly sand/mud <50% cobblles/gravel",
+                                                   "C - Till >50% cobbles/gravel",
+                                                   "D - Till with coraline algae",
+                                                   "E - Gravel with crinoids",
+                                                   "F - Sand with Sand dollars"),
+                                      classn=c("Mud", #simplified names
+                                               "Mud-Seapens",
+                                               "Gravel-mud",
+                                               "Till-gravel",
+                                               "Till-coraline algae",
+                                               "Gravel-crinoids",
+                                               "Sand-SandDollars"))
+    
+    
+    sab_benthoscape <- read_sf("data/Shapefiles/benthoscape.shp")%>%
+                        st_transform(latlong)%>%
+                        st_make_valid()%>%
+                        left_join(.,benthoscape_classes)
 
 # fish taxonomy metadata -----------
     #fishcodes <- read.csv("data/CrabSurvey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
@@ -175,7 +197,7 @@
       ungroup()%>%
       mutate(inside=as.logical(st_intersects(.,sab, sparse=TRUE))) #this doesn't work
 
-#Load fish morphology data -----------
+##### Fish morphology analysis -----------
 
     #Load the full fish morph data and then subset
     load("data/CrabSurvey/FishMorph.RData")
@@ -423,7 +445,7 @@
     ggsave("output/CrabSurvey/CatchNumber_inside-outside.png",p_weight_a)
     ggsave("output/CrabSurvey/CatchNumber_inside-outside_standardized.png",p_weight_b)
     
-#### DIET ANALYSIS --------------
+##### Diet analysis --------------
     
     diet_data <- read.csv("data/CrabSurvey/MPA.Diet.SnowCrabSurvey.Feb.2024.csv")%>%
                  filter(SLATDD>45) #filter to just SAB
@@ -447,7 +469,7 @@
               rename(TRIP = MISSION)%>%
               mutate(TRIP_SET = paste(TRIP,SETNO,sep="_"))%>%
               left_join(.,arsw%>%mutate(TRIP_SET = paste(TRIP,SET,sep="_"))%>%select(-TRIP),by="TRIP_SET")%>%
-              st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong)%>%
+              st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong,remove=FALSE)%>%
               mutate(inside=as.logical(st_intersects(.,sab_nozones, sparse=FALSE)),
                      location=ifelse(inside,"Inside","Outside"),
                      prey=ifelse(prey %in% c("TEUTHOIDEA O."),"LOLIGINIDAE,OMMASTREPHIDAE F.",prey), #fix a double count for squid
@@ -531,3 +553,39 @@
     
     ggsave("output/CrabSurvey/diet_fullness.png",p_diet_fullness,height=8,width=6,units="in",dpi=300)    
                   
+    
+##### NMDS analysis (diet) ------------------
+    
+    
+    diet_nmds_env <- diet_df%>%
+                     filter(!non_species)%>%
+                     st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong,remove=FALSE)%>%
+                     group_by(STATION)%>%
+                     summarise(geometry=st_union(geometry)%>%st_centroid())%>% #get a consensus station location
+                     ungroup()%>%
+                     left_join(.,diet_df%>%distinct(STATION,.keep_all = TRUE)%>%select(location,TRIP_SET,TRIP_STATION,STATION))%>%
+                     st_intersection(.,sab_benthoscape%>%dplyr::select(classn,geometry))%>%
+                     rbind(.,diet_df%>% #coordinate in the top right is just adjacent the mud-seapens shelf break. TO get replication we will assign this one manually. 
+                             filter(!non_species)%>%
+                             st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong,remove=FALSE)%>%
+                             group_by(STATION)%>%
+                             summarise(geometry=st_union(geometry)%>%st_centroid())%>% #get a consensus station location
+                             ungroup()%>%
+                             left_join(.,diet_df%>%distinct(STATION,.keep_all = TRUE)%>%
+                                         select(location,TRIP_SET,TRIP_STATION,STATION))%>%
+                             mutate(lat=st_coordinates(.)[,2])%>%
+                             arrange(-lat)%>%
+                             slice(2)%>%
+                             mutate(classn="Mud-Seapens")%>%
+                             select(STATION,location,TRIP_SET,TRIP_STATION,classn,geometry))
+    
+    
+    diet_nmds_df <- diet_df%>%
+                    filter(!non_species)%>%
+                    group_by(pred,year,location)%>%
+                    st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong,remove=FALSE)%>%
+                    mutate(inside=as.logical(st_intersects(.,sab_nozones, sparse=TRUE)))
+                           
+                    
+    
+    
