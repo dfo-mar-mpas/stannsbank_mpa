@@ -213,8 +213,6 @@
                   mutate(species2 = capitalize_first(tolower(species2)))%>% #clean up the ugly all caps species
                   data.frame()
     
-
-    
     bigfish_df <- fishmorph_df%>%
                   mutate(station=as.integer(STATION))%>%
                   filter(station %in% stns$STATION, 
@@ -241,53 +239,65 @@
                mutate(enoughyears = ifelse(length(unique(year))>2,TRUE,FALSE),
                       prepost = ifelse(length(intersect(unique(year),2015:2016))>0 & length(intersect(unique(year),2017:2023))>0,TRUE,FALSE))%>%
                ungroup()%>%
+               mutate(species2 = ifelse(species2=="Redfish unseparated","Redfish sp",species2))%>% #to match target sp
                data.frame()
     
     
-    plot_df <- plotftr%>%filter(inboth & enoughyears & prepost)
+    plot_df <- plotftr%>%
+               filter(inboth & enoughyears & prepost,
+                      species2 %in% target_sp$common)
+               
      
     
     #Median size tracked over time with smooth
     p_med_a <- ggplot()+
-      geom_vline(xintercept = 2017,lty=2)+
-      geom_line(data=plot_df,aes(x=year,y=med,col=location,group=station),lty=2,lwd=0.25,alpha=0.5)+
-      geom_point(data=plot_df,aes(x=year,y=med,col=location,group=station),size=2,alpha=0.5)+
-      theme_bw()+
-      stat_smooth(data=plot_df,aes(x=year,y=med,col=location),lwd=2,se=FALSE)+
-      facet_wrap(~species2,nrow=3,scales="free_y")+
-      labs(col="",x="Year",y="Median recorded size");p_med_a
+               geom_vline(xintercept = 2017,lty=2)+
+               geom_line(data=plot_df,aes(x=year,y=med,col=location,group=station),lty=2,lwd=0.25,alpha=0.5)+
+               geom_point(data=plot_df,aes(x=year,y=med,col=location,group=station),size=2,alpha=0.5)+
+               theme_bw()+
+               theme(strip.background = element_rect(fill="white"),
+                    legend.position = "bottom")+
+               stat_smooth(data=plot_df,aes(x=year,y=med,col=location),lwd=2,se=FALSE)+
+               facet_wrap(~species2,ncol=2,scales="free_y")+
+               labs(col="",x="Year",y="Median recorded size");p_med_a
     
     p_med_b <- ggplot()+
-      geom_vline(xintercept = 2017,lty=2)+
-      geom_line(data=plot_df,aes(x=year,y=med,col=location,group=station),lwd=0.5)+
-      geom_point(data=plot_df,aes(x=year,y=med,col=location,group=station),size=2)+
-      theme_bw()+
-      facet_wrap(~species2,nrow=3,scales="free_y")+
-      labs(col="",x="Year",y="Median recorded size");p_med_b
+               geom_vline(xintercept = 2017,lty=2)+
+               geom_line(data=plot_df,aes(x=year,y=med,col=location,group=station),lwd=0.5)+
+               geom_point(data=plot_df,aes(x=year,y=med,col=location,group=station),size=2)+
+               theme_bw()+
+               theme(strip.background = element_rect(fill="white"),
+                    legend.position = "bottom")+
+               facet_wrap(~species2,nrow=3,scales="free_y")+
+               labs(col="",x="Year",y="Median recorded size");p_med_b
     
-    ggsave("output/CrabSurvey/MedianLength_inside-outside_wSmooth.png",p_med_a)
-    ggsave("output/CrabSurvey/MedianLength_inside-outside.png",p_med_b)
+    ggsave("output/CrabSurvey/MedianLength_inside-outside_wSmooth.png",p_med_a,height=8,width=6,units="in",dpi=300)
+    ggsave("output/CrabSurvey/MedianLength_inside-outside.png",p_med_b,height=8,width=6,units="in",dpi=300)
     
     #90th percentile size tracked over time with smooth
     p_bigfish_a <- ggplot()+
-      geom_vline(xintercept = 2017,lty=2)+
-      geom_line(data=plot_df,aes(x=year,y=bigfish,col=location,group=station),lty=2,lwd=0.25,alpha=0.5)+
-      geom_point(data=plot_df,aes(x=year,y=bigfish,col=location,group=station),size=2,alpha=0.55)+
-      theme_bw()+
-      stat_smooth(data=plot_df,aes(x=year,y=bigfish,col=location),lwd=2,se=FALSE)+
-      facet_wrap(~species2,nrow=3,scales="free_y")+
-      labs(col="",x="Year",y="90th percentile size");p_bigfish_a
+                   geom_vline(xintercept = 2017,lty=2)+
+                   geom_line(data=plot_df,aes(x=year,y=bigfish,col=location,group=station),lty=2,lwd=0.25,alpha=0.5)+
+                   geom_point(data=plot_df,aes(x=year,y=bigfish,col=location,group=station),size=2,alpha=0.55)+
+                   theme_bw()+
+                   theme(strip.background = element_rect(fill="white"),
+                        legend.position = "bottom")+
+                   stat_smooth(data=plot_df,aes(x=year,y=bigfish,col=location),lwd=2,se=FALSE)+
+                   facet_wrap(~species2,ncol=2,scales="free_y")+
+                   labs(col="",x="Year",y="90th percentile size");p_bigfish_a
     
     p_bigfish_b <- ggplot()+
-      geom_vline(xintercept = 2017,lty=2)+
-      geom_line(data=plot_df,aes(x=year,y=bigfish,col=location,group=station),lwd=0.5)+
-      geom_point(data=plot_df,aes(x=year,y=bigfish,col=location,group=station),size=2)+
-      theme_bw()+
-      facet_wrap(~species2,nrow=3,scales="free_y")+
-      labs(col="",x="Year",y="90th percentile size");p_bigfish_b
+                   geom_vline(xintercept = 2017,lty=2)+
+                   geom_line(data=plot_df,aes(x=year,y=bigfish,col=location,group=station),lwd=0.5)+
+                   geom_point(data=plot_df,aes(x=year,y=bigfish,col=location,group=station),size=2)+
+                   theme_bw()+
+                   theme(strip.background = element_rect(fill="white"),
+                        legend.position = "bottom")+
+                   facet_wrap(~species2,ncol=2,scales="free_y")+
+                   labs(col="",x="Year",y="90th percentile size");p_bigfish_b
       
-    ggsave("output/CrabSurvey/LargeFish_inside-outside_wSmooth.png",p_bigfish_a)
-    ggsave("output/CrabSurvey/LargeFish_inside-outside.png",p_bigfish_b)    
+    ggsave("output/CrabSurvey/LargeFish_inside-outside_wSmooth.png",p_bigfish_a,height=8,width=6,units="in",dpi=300)
+    ggsave("output/CrabSurvey/LargeFish_inside-outside.png",p_bigfish_b,height=8,width=6,units="in",dpi=300)    
     
     
 ##### Catch changes within stations --------------
@@ -441,7 +451,7 @@
               left_join(.,arsw%>%mutate(TRIP_SET = paste(TRIP,SET,sep="_"))%>%select(-TRIP),by="TRIP_SET")%>%
               st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong)%>%
               mutate(inside=as.logical(st_intersects(.,sab_nozones, sparse=FALSE)),
-                     location=ifelse(inside,"inside","outside"),
+                     location=ifelse(inside,"Inside","Outside"),
                      prey=ifelse(prey %in% c("TEUTHOIDEA O."),"LOLIGINIDAE,OMMASTREPHIDAE F.",prey), #fix a double count for squid
                      prey_comm=ifelse(prey_speccd_id == 4501,"SQUID (NS)",prey_comm),
                      prey_speccd_id=ifelse(prey_speccd_id == 4501,4514,prey_speccd_id),
