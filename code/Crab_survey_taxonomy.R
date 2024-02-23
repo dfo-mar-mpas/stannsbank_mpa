@@ -55,6 +55,8 @@ for(i in 1:nrow(tax_df)){
     
   }
   
+  temp3$species_filter <- tax_df[i,"species"] # this is for linking back in the original code
+  
   tax_list <- rbind(tax_list,temp3)
   
 }
