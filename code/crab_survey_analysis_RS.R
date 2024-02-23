@@ -60,7 +60,9 @@
       dplyr::select(name,geometry)
 
 # fish taxonomy metadata -----------
-    fishcodes <- read.csv("data/CrabSurvey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
+    #fishcodes <- read.csv("data/CrabSurvey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
+    load("data/CrabSurvey/GROUNDFISH.GSSPECIES.RData")#this is a pull by Mike McMahon that has the missing data items 
+    fishcodes <- GSSPECIES%>%rename(SPECCD_ID = CODE); rm(GSSPECIES)# keep the code the same
 
 # Crab survey location metadata ---------------
     stns<-read.csv("data/CrabSurvey/StationInfo.csv",header = T)
@@ -79,7 +81,6 @@
                 left_join(arsw, catchdat, by = "TRIP_STATION", relationship = "many-to-many", keep = F)%>%
                 dplyr::select(-grep(".y",names(.)))%>% #get rid of the duplicate names
                 rename_with(~str_remove(., '.x'))
-
 
     #standardize the data
     ggplot()+
@@ -411,38 +412,65 @@
     diet_data <- read.csv("data/CrabSurvey/MPA.Diet.SnowCrabSurvey.Feb.2024.csv")%>%
                  filter(SLATDD>45) #filter to just SAB
     
-    #there is a concerning amount of missing data .... 
-    missing_prey <- setdiff(diet_data$PREYSPECCD,fishcodes$SPECCD_ID)
-    message(paste(round((1-(dim(diet_df)[1]/dim(diet_data)[1])),4)*100,"% missing data based on unidentified PREYSPECCD."))
+    #There are some non-animal based things in the diet that can be flagged
+    problem_things <- c(1099,2507,9500,9100,9000,7000,9001,3199,9700,4310,1180,4501,9620,9003,4223,2010,9002,2901,3031,9600)
+    non_animal_prey <- c(9100,9000,9700,9600,9620)
     
     diet_df <- diet_data%>%
                rename(SPECCD_ID = PREYSPECCD,
                       PRED = SPEC)%>%
-               left_join(.,fishcodes)%>%
+               left_join(.,fishcodes%>%select(SPEC,COMM, SPECCD_ID))%>%
                rename(prey = SPEC,
                       prey_comm = COMM,
                       prey_speccd_id = SPECCD_ID,
-                      prey_aphia = APHIA_ID,
                       SPECCD_ID = PRED)%>%
-               left_join(.,fishcodes)%>%
+               left_join(.,fishcodes%>%select(SPEC,COMM, SPECCD_ID))%>%
                rename(pred = SPEC,
                       pred_comm = COMM,
-                      pred_speccd_id = SPECCD_ID,
-                      pred_aphia = APHIA_ID)%>%
+                      pred_speccd_id = SPECCD_ID)%>%
               rename(TRIP = MISSION)%>%
               mutate(TRIP_SET = paste(TRIP,SETNO,sep="_"))%>%
               left_join(.,arsw%>%mutate(TRIP_SET = paste(TRIP,SET,sep="_"))%>%select(-TRIP),by="TRIP_SET")%>%
-              st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong)
+              st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong)%>%
+              mutate(inside=as.logical(st_intersects(.,sab_nozones, sparse=FALSE)),
+                     location=ifelse(inside,"inside","outside"),
+                     prey=ifelse(prey %in% c("TEUTHOIDEA O."),"LOLIGINIDAE,OMMASTREPHIDAE F.",prey), #fix a double count for squid
+                     prey_comm=ifelse(prey_speccd_id == 4501,"SQUID (NS)",prey_comm),
+                     prey_speccd_id=ifelse(prey_speccd_id == 4501,4514,prey_speccd_id),
+                     non_animal_prey=prey_speccd_id %in% non_animal_prey,
+                     non_species=prey_speccd_id %in% problem_things,
+                     non_species=ifelse(is.na(prey_speccd_id),TRUE,non_species))%>%
+               data.frame()%>%
+               select(-geometry)
     
-    #I have no idea why the mutate(inside=as.logical(st_intersects(.,sab_nozones, sparse=TRUE))) doesn't work!!
-    tt <- st_intersection(diet_df,sab_nozones)
-    missing_stations <- setdiff(diet_df$TRIP_STATION,tt$TRIP_STATION)
+        ## diet richness ~ location x year
     
-    diet_df <- diet_df%>%
-               mutate(location = ifelse(TRIP_STATION %in%missing_stations,"outside","inside"))
+    diet_richness <- diet_df%>%
+                     group_by(pred,Year,location)%>%
+                     summarise(rich = length(unique(prey_speccd_id)))%>%
+                     ungroup()%>%
+                     group_by(pred)%>%
+                     mutate(rich_stand = rich/max(rich))%>% #this standardizes the richness so that average species trends can be shown
+                     ungroup()%>%
+                     data.frame()
     
+    p_diet_richness_stand <- ggplot()+
+                             geom_vline(xintercept = 2017,lty=2)+
+                             geom_point(data=diet_richness,aes(x=Year,y=rich_stand,col=location,group=pred))+
+                             stat_smooth(data=diet_richness,aes(x=Year,y=rich_stand,col=location))+
+                             theme_bw()+
+                             labs(x="",y="Standardized diet compositional richness",col="");p_diet_richness_stand
     
-    ## diet richness ~ location x year
-    
+    diet_rich <- diet_df%>%
+                 group_by(pred,Year,location,TRIP_STATION)%>%
+                 summarise(rich = length(unique(prey_speccd_id)))%>%
+                 ungroup()%>%
+                 group_by(pred,Year,location)%>%
+                 summarise(mean_rich=mean(rich,na.rm=T),
+                           sd_rich=sd(rich,na.rm=T))%>%
+                 ungroup()%>%
+                 data.frame()
+              
+      
     
                   
