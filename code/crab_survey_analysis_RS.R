@@ -11,6 +11,14 @@
 #### global options---------
     sf_use_s2 = FALSE
     
+### Target species ---------
+    target_sp <- data.frame(spec=c("ANARHICHAS LUPUS", "UROPHYCIS TENUIS", "HIPPOGLOSSOIDES PLATESSOIDES",
+                                   "GLYPTOCEPHALUS CYNOGLOSSUS", "CHIONOECETES OPILIO", "GADUS MORHUA", 
+                                   "SEBASTES SP.", "AMBLYRAJA RADIATA"),
+                            common=c("Atlantic wolffish","White hake","American plaice",
+                                     "Witch flounder","Snow crab","Atlantic cod",
+                                     "Redfish sp","Thorny skate"))
+    
 #### function -----
     
     capitalize_first <- function(text) { #from ChatGPT!
@@ -462,6 +470,8 @@
                              labs(x="",y="Standardized diet compositional richness",col="");p_diet_richness_stand
     
     diet_rich <- diet_df%>%
+                 filter(pred %in% target_sp$spec,
+                        !non_species)%>% #take out the non-species elements
                  group_by(pred,Year,location,TRIP_STATION)%>%
                  summarise(rich = length(unique(prey_speccd_id)))%>%
                  ungroup()%>%
@@ -469,8 +479,47 @@
                  summarise(mean_rich=mean(rich,na.rm=T),
                            sd_rich=sd(rich,na.rm=T))%>%
                  ungroup()%>%
-                 data.frame()
+                 data.frame()%>%
+                 left_join(.,target_sp%>%rename(pred=spec))
               
-      
+    p_diet_richness <- ggplot(data=diet_rich,aes(x=Year,y=mean_rich,col=location))+
+                        geom_vline(xintercept = 2017,lty=2)+
+                        geom_line(lwd=0.25,alpha=0.25)+
+                        geom_linerange(aes(ymin=mean_rich-sd_rich,ymax=mean_rich+sd_rich))+
+                        geom_point(size=2, position = position_jitter(width = 0.1))+
+                        facet_wrap(~common,ncol=2,scales="free_y")+
+                        theme_bw()+
+                        theme(strip.background = element_rect(fill="white"),
+                              legend.position = "bottom")+
+                        labs(x="",y=bquote(bar(x) ~ " diet richness ± sd"),col="");p_diet_richness
     
+    ggsave("output/CrabSurvey/diet_richness.png",p_diet_richness,height=8,width=6,units="in",dpi=300)  
+      
+    #diet fullness
+    
+    diet_fullness <- diet_df%>%
+                      filter(pred %in% target_sp$spec)%>%
+                      group_by(pred,Year,location,TRIP_STATION)%>%
+                      summarise(full = mean(FULLNESS,na.rm=T)/4)%>%
+                      ungroup()%>%
+                      group_by(pred,Year,location)%>%
+                      summarise(mean_full=mean(full,na.rm=T),
+                                sd_full=sd(full,na.rm=T))%>%
+                      ungroup()%>%
+                      data.frame()%>%
+                      left_join(.,target_sp%>%rename(pred=spec))
+    
+    p_diet_fullness <- ggplot(data=diet_fullness,aes(x=Year,y=mean_full,col=location))+
+                       geom_vline(xintercept = 2017,lty=2)+
+                       geom_line(lwd=0.25,alpha=0.25)+
+                       geom_linerange(aes(ymin=mean_full-sd_full,ymax=mean_full+sd_full))+
+                       geom_point(size=2, position = position_jitter(width = 0.1))+
+                       facet_wrap(~common,ncol=2)+
+                       theme_bw()+
+                       theme(strip.background = element_rect(fill="white"),
+                             legend.position = "bottom")+
+                       scale_y_continuous(labels=scales::percent_format(),breaks=c(0,0.5,1))+
+                       labs(x="",y=bquote(bar(x) ~ " diet fullness ± sd"),col="");p_diet_fullness
+    
+    ggsave("output/CrabSurvey/diet_fullness.png",p_diet_fullness,height=8,width=6,units="in",dpi=300)    
                   
