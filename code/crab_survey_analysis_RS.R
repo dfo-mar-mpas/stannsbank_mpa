@@ -330,26 +330,6 @@ colnames(stns)<-c("STATION", "Enhanced", "Inside")
                pull(minID)%>%
                c(.,"Anarhichas lupus","Merluccius bilinearis")
     
-    # num_df <- catchdat_stand%>%
-    #           filter(minID %in% freq_sp)%>%
-    #           group_by(minID,year,location)%>%
-    #           summarise(number_ave = mean(number,na.rm=T))%>%
-    #           ungroup()%>%
-    #           spread(location,number_ave)%>%
-    #           group_by(minID,year)%>%
-    #           summarise(diff=Inside-Outside)%>%
-    #           ungroup()%>%
-    #           data.frame()%>%
-    #           filter(!is.na(diff))
-    # 
-    # num_comp <- ggplot(data=num_df,aes(x=year,y=diff,group=species_filter))+
-    #             #geom_line()+
-    #             stat_smooth(data=num_df,aes(x=year,y=diff))+
-    #             geom_vline(xintercept = 2017,lty=2)+
-    #             #scale_y_continuous(trans=weird)+
-    #             theme_bw();num_comp #looks like shit!!
-    #                      
-              
     num_df <- catchdat_stand%>%
               filter(minID %in% freq_sp,
                      station %in% stns$STATION)%>%
@@ -382,6 +362,49 @@ colnames(stns)<-c("STATION", "Enhanced", "Inside")
     ggsave("output/CrabSurvey/CatchNumber_inside-outside.png",p_number_a)
     ggsave("output/CrabSurvey/CatchNumber_inside-outside_standardized.png",p_number_b)
     
+    ##catch weight per set
+    
+    weight_sp <- catchdat_stand%>%
+                 filter(station %in% stns$STATION,
+                        !is.na(minID))%>%
+                 group_by(minID)%>%
+                 summarise(obs_cnt = n())%>%
+                 ungroup()%>%
+                 arrange(-obs_cnt)%>%
+                 data.frame()%>%
+                 slice(1:20)%>%
+                 pull(minID)%>%
+                 c(.,"Anarhichas lupus")
+    
+    weight_df <- catchdat_stand%>%
+                 filter(minID %in% weight_sp)%>%
+                 mutate(station=as.integer(STATION))%>%
+                 group_by(location,station,minID)%>%
+                 mutate(weight_stand = weight/max(weight,na.rm=T))%>%
+                 ungroup()%>%
+                 data.frame()
+    
+    p_weight_a <- ggplot()+
+                  geom_vline(xintercept = 2017,lty=2)+
+                  geom_line(data=weight_df,aes(x=year,y=weight,col=location,group=station),lty=2,lwd=0.25,alpha=0.5)+
+                  geom_point(data=weight_df,aes(x=year,y=weight,col=location,group=station),size=2,alpha=0.55)+
+                  theme_bw()+
+                  stat_smooth(data=weight_df,aes(x=year,y=weight,col=location),lwd=2,se=FALSE)+
+                  scale_y_log10()+
+                  facet_wrap(~minID,nrow=3,scales="free_y")+
+                  labs(col="",x="Year",y="Biomass per set (kg)");p_weight_a
+    
+    p_weight_b <- ggplot()+
+                  geom_vline(xintercept = 2017,lty=2)+
+                  geom_line(data=weight_df,aes(x=year,y=weight_stand,col=location,group=station),lty=2,lwd=0.25,alpha=0.5)+
+                  geom_point(data=weight_df,aes(x=year,y=weight_stand,col=location,group=station),size=2,alpha=0.55)+
+                  theme_bw()+
+                  stat_smooth(data=weight_df,aes(x=year,y=weight_stand,col=location),lwd=2,se=FALSE)+
+                  facet_wrap(~minID,ncol=6,scales="free_y")+
+                  labs(col="",x="Year",y=expression(paste("Biomass per set / Max count per set")));p_weight_b
+    
+    ggsave("output/CrabSurvey/CatchNumber_inside-outside.png",p_weight_a)
+    ggsave("output/CrabSurvey/CatchNumber_inside-outside_standardized.png",p_weight_b)
     
 #### DIET ANALYSIS --------------
     
