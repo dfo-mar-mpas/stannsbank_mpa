@@ -5,6 +5,7 @@ library(tidyr)
 library(tibble)
 library(taxize)
 library(RCurl)
+library(worrms)
 
 #load functions -----------
 
@@ -26,7 +27,7 @@ PhyloNames <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
 
 tax_list <- data.frame()
 
-for(i in 74:nrow(tax_df)){
+for(i in 1:nrow(tax_df)){
   
   sp=tax_df[i,"species"]%>%tolower()
   
@@ -58,4 +59,26 @@ for(i in 74:nrow(tax_df)){
   
 }
 
+#Now get the 'common' names for each
+
+tax_list$common <- NA
+
+for(i in 1:nrow(tax_list)){
+  
+  sp=tax_list[i,"Species"]%>%tolower()
+  
+  message(paste0("Working on ",sp," ",i," of ",nrow(tax_list)))
+
+  if(!is.na(tax_list[i,"Species"])){
+    
+    comm_name <- sci2comm(tax_list[i,"Species"])%>%as.character()
+    
+    if(comm_name == "character(0)"){comm_name = NA}
+    
+    tax_list[i,"common"] <- comm_name
+  
+  }
+}
+
+#save the output 
 write.csv(tax_list,"output/crab_taxa_clean.csv",row.names = FALSE)
