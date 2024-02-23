@@ -318,24 +318,28 @@
                  data.frame()
                 
     p_richness_a <- ggplot()+
-      geom_vline(xintercept = 2017,lty=2)+
-      geom_line(data=biodiv_df,aes(x=year,y=richness,group=station,col=location),lty=2,lwd=0.25)+
-      geom_point(data=biodiv_df,aes(x=year,y=richness,group=station,col=location),size=2,alpha=0.5)+
-      theme_bw()+
-      labs(col="",x="Year",y="Richness per station")+
-      theme(legend.position = "bottom");p_richness_a
+                    geom_vline(xintercept = 2017,lty=2)+
+                    geom_line(data=biodiv_df,aes(x=year,y=richness,group=station,col=location),lty=2,lwd=0.25)+
+                    geom_point(data=biodiv_df,aes(x=year,y=richness,group=station,col=location),size=2,alpha=0.5)+
+                    theme_bw()+
+                    theme(strip.background = element_rect(fill="white"),
+                          legend.position = "bottom")+
+                    labs(col="",x="",y="Richness per station")+
+                    theme(legend.position = "bottom")
     
     p_richness_b <- ggplot()+
-      geom_vline(xintercept = 2017,lty=2)+
-      geom_line(data=biodiv_df,aes(x=year,y=richness,group=station,col=location),lty=2,lwd=0.25,alpha=0.5)+
-      geom_point(data=biodiv_df,aes(x=year,y=richness,group=station,col=location),size=2,alpha=0.5)+
-      stat_smooth(data=biodiv_df,aes(x=year,y=richness,col=location),lwd=2)+
-      theme_bw()+
-      labs(col="",x="Year",y="Richness per station")+
-      theme(legend.position = "bottom");p_richness_b
+                    geom_vline(xintercept = 2017,lty=2)+
+                    geom_line(data=biodiv_df,aes(x=year,y=richness,group=station,col=location),lty=2,lwd=0.25,alpha=0.5)+
+                    geom_point(data=biodiv_df,aes(x=year,y=richness,group=station,col=location),size=2,alpha=0.5)+
+                    stat_smooth(data=biodiv_df,aes(x=year,y=richness,col=location),lwd=2)+
+                    theme_bw()+
+                    theme(strip.background = element_rect(fill="white"),
+                          legend.position = "bottom")+
+                    labs(col="",x="",y="Richness per station")+
+                    theme(legend.position = "bottom")
     
-    ggsave("output/CrabSurvey/Biodiversity_inside-outside.png",p_richness_a)
-    ggsave("output/CrabSurvey/Biodiversity_inside-outside_wSmooth.png",p_richness_b)
+    ggsave("output/CrabSurvey/Biodiversity_inside-outside.png",p_richness_a,height=8,width=6,units="in",dpi=300)
+    ggsave("output/CrabSurvey/Biodiversity_inside-outside_wSmooth.png",p_richness_b,height=8,width=6,units="in",dpi=300)
     
     ##catch number per set
     
