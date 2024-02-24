@@ -8,6 +8,9 @@
     library(ggpubr)
     library(tidyr)
     library(vegan)
+    library(marmap)
+    library(stars)
+    library(tibble)
 
 #### Global options---------
     sf_use_s2 = FALSE
@@ -88,6 +91,16 @@
                         st_transform(latlong)%>%
                         st_make_valid()%>%
                         left_join(.,benthoscape_classes)
+    
+    #load bathymetry
+    bbsab <- st_bbox(sab_nozones)
+    
+    noaabathy <- getNOAA.bathy(bbsab[1]-1,bbsab[3]+1,bbsab[2]+1,bbsab[4]-1,resolution = 0.25,keep=T) %>%
+                 fortify.bathy() %>%
+                 st_as_stars() %>%
+                 st_set_crs(4326)%>%
+                 st_transform(latlong)
+    
 
 # fish taxonomy metadata -----------
     #fishcodes <- read.csv("data/CrabSurvey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
@@ -146,9 +159,9 @@
     ggplot()+geom_sf(data=mpas)+geom_sf(data=catchdat_sf) #all up by the MPA
     
 #Save output for taxonomic cleaning -- run Crab_survey_taxonomy.R to get the full cleaned list
-    write.csv(catchdat_stand%>%
-                select(COMM,SPEC,species_filter)%>%
-                distinct(species_filter,.keep_all=TRUE),"output/taxonomic_raw.csv",row.names=FALSE)
+    # write.csv(catchdat_stand%>%
+    #             select(COMM,SPEC,species_filter)%>%
+    #             distinct(species_filter,.keep_all=TRUE),"output/taxonomic_raw.csv",row.names=FALSE)
     
 #load the cleaned taxonomy
     PhyloNames <- c("Kingdom","Phylum","Class","Order","Family","Genus","Species")
@@ -195,7 +208,7 @@
       group_by(trawlID)%>%
       summarise(geometry=st_union(geometry)%>%st_centroid())%>%
       ungroup()%>%
-      mutate(inside=as.logical(st_intersects(.,sab, sparse=TRUE))) #this doesn't work
+      mutate(inside=as.logical(st_intersects(.,sab, sparse=FALSE))) 
 
 ##### Fish morphology analysis -----------
 
@@ -556,7 +569,7 @@
     
 ##### NMDS analysis (diet) ------------------
     
-    
+    #get the environmental covariates for each station. 
     diet_nmds_env <- diet_df%>%
                      filter(!non_species)%>%
                      st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong,remove=FALSE)%>%
@@ -577,14 +590,144 @@
                              arrange(-lat)%>%
                              slice(2)%>%
                              mutate(classn="Mud-Seapens")%>%
-                             select(STATION,location,TRIP_SET,TRIP_STATION,classn,geometry))
+                             select(STATION,location,TRIP_SET,TRIP_STATION,classn,geometry))%>%
+                     select(STATION,location,classn,geometry)%>%
+                     st_join(noaabathy %>% st_as_sf()) # add in the bathymetry 
+    
     
     
     diet_nmds_df <- diet_df%>%
-                    filter(!non_species)%>%
-                    group_by(pred,year,location)%>%
-                    st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong,remove=FALSE)%>%
-                    mutate(inside=as.logical(st_intersects(.,sab_nozones, sparse=TRUE)))
+                    filter(!non_species,
+                           pred %in% target_sp$spec)%>%
+                    mutate(ID = paste(location,Year,sep="_"))%>%
+                    group_by(pred,ID)%>%
+                    do(unique(.[,"prey"]))%>%#this is the prey based aggregated into 'inside' and 'outside' the MPA - note there is a difference in effort here. 
+                    ungroup()%>%
+                    as.data.frame()%>%
+                    spread()
+    
+    diet_nmds_df <- diet_df%>%
+                    filter(!non_species,
+                          pred %in% target_sp$spec)%>%
+                    group_by(pred,location,Year,prey)%>%
+                    summarise(prey_weight=mean(PWT,na.rm=T))%>%
+                    ungroup()
+    
+    diet_nmds_list <- list()
+    
+    #dummy dataframes to hold the outputs
+    nmds_list <- list()
+    nmds_pa_list <- list()
+    nmds_species_list <- list()
+    nmds_data <- NULL
+   
+    
+    #run the nmds analyses per species. 
+    for(i in 1:length(unique(diet_nmds_df$pred))){
+      
+      sp <- unique(diet_nmds_df$pred)[i] #species of the nmds
+      
+      clusters <- ifelse(sp == "ANARHICHAS LUPUS",2,ifelse(sp=="SEBASTES SP.",3,5)) # note that there are few data points for wolffish and Sebastes
+      
+      message(paste0("Working on ",sp," ",i, " of ",length(unique(diet_nmds_df$pred)))) #progress message
+      
+      #create the nmds sample by species data.frame - standardize
+      
+      nmds_df <- diet_nmds_df%>%
+                 filter(pred==sp)%>%
+                 mutate(id = paste(location,Year,sep="_"))
+      
+      nmds_temp <- diet_nmds_df%>% #if wolffish it returns an issue
+                   filter(pred==sp)%>%
+                   mutate(id = paste(location,Year,sep="_"))%>%
+                   select(id,prey,prey_weight)%>%
+                   spread(prey,prey_weight,fill=0)%>%
+                   column_to_rownames('id')%>%
+                   mutate(tot = rowSums(.,na.rm=T))%>%
+                   filter(tot>0)%>% #filter out any zero catches
+                   select(-tot)%>%
+                   decostand(method = "total")%>%
+                   metaMDS(.,k=clusters)
+      
+      nmds_temp_pa <- diet_nmds_df%>% #presence-absence - diet composition 
+                      filter(pred==sp)%>%
+                      mutate(id = paste(location,Year,sep="_"))%>% #this converts to binary - technically the condition isn't needed since there is a value for each, but keep it in there in case
+                      select(id,prey,prey_weight)%>%
+                      spread(prey,prey_weight,fill=0)%>%
+                      column_to_rownames('id')%>%
+                      mutate(tot = rowSums(.,na.rm=T))%>%
+                      filter(tot>0)%>% #filter out any zero catches
+                      select(-tot)%>%
+                      decostand(method = "total")%>%
+                      dist(., method="binary")%>%
+                      metaMDS(.,k=clusters)
+        
+      #data processing
+      data.scores <- as.data.frame(scores(nmds_temp,"sites"))%>%
+                     mutate(id=rownames(.),
+                            method="bray",
+                            stress=round(nmds_temp$stress,3))%>%
+                     separate(id,c("location","year"),sep="_")%>%
+                     rbind(.,
+                           as.data.frame(scores(nmds_temp_pa,"sites"))%>%
+                             mutate(id=rownames(.),
+                                    method="pa",
+                                    stress=round(nmds_temp_pa$stress,3))%>%
+                             separate(id,c("location","year"),sep="_"))%>%
+                    select(NMDS1,NMDS2,location,year,method,stress)
+      
+      species.scores <- as.data.frame(scores(nmds_temp,"species"))%>%
+                        mutate(method="bray")%>%
+                        rbind(.,
+                              as.data.frame(scores(nmds_temp_pa,"species"))%>%
+                                mutate(method="pa"))
+      
+      #looped outputs
+      nmds_data <- rbind(nmds_data,data.scores)
+      nmds_species_list[[sp]] <- species.scores
+      nmds_list[[sp]] <- nmds_temp
+      nmds_temp_pa[[sp]] <- nmds_temp_pa
+      
+      rm(data.scores,species.scores,nmds_temp,nmds_temp_pa,nmds_df) #clean up 
+      
+    }
+    
+    
+    
+    
+    
+    hull.data <- data.scores %>%
+      group_by(location,method) %>%
+      slice(chull(x=NMDS1,y=NMDS2))
+    
+    #loop outputs
+    
+    
+    
+    ggplot() +
+      geom_polygon(data=hull.data,aes(x=NMDS1,y=NMDS2,fill=location),alpha=0.30) + # add the hulls
+      #geom_point(data=data.scores,aes(text=ID,x=NMDS1,y=NMDS2,shape=location,colour=year),size=3) +
+      scale_colour_brewer(palette = "Paired") +
+      coord_equal()+
+      scale_shape_manual(values=c(15,7,18,16,10,8,17))+
+      geom_text(aes(x=Inf,y=-Inf,hjust=1.05,vjust=-0.5,label=paste("Stress =",round(nmds_temp$stress,3),"k =",nmds_temp$ndim)))+
+      theme_bw()+
+      theme(axis.text.x=element_blank(),
+            axis.ticks.x=element_blank(),
+            axis.text.y=element_blank(),
+            axis.ticks.y=element_blank(),
+            panel.grid.major = element_blank(),
+            panel.grid.minor = element_blank(),
+            text=element_text(size=18))+
+      facet_wrap(~method,ncol=2)
+    
+    
+    spread(prey,prey_weight,fill=NA)
+        
+    
+    
+                    
+                
                            
                     
     
