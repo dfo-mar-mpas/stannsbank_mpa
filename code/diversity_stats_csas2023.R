@@ -7,7 +7,7 @@ library(BiodiversityR)
 library(vegan)
 library(iNEXT)
 
-load("data/2023CrabSurveyDat.RData")
+load("data/CrabSurvey/2023CrabSurveyDat.RData")
 
 
 #stole some code from Ryan "2022_Workshop_Plots.R" script
@@ -16,15 +16,20 @@ head(data1)
 data1$LONGITUDE <- data1$LONGITUDE*-1 #check if this needs to be done depending on what data image you're loading
 #Add inside vs outside
 tt<-MPATOWS %>% filter(LATITUDE>45.1) #this gets us just the SAB tows that are 'enhanced' stations 
-data2 <- data1 %>% mutate(enhanced=as.logical(data1$STATION.x %in% unique(as.integer(tt$STATION)))) %>% replace(is.na(.),FALSE)
+data2 <- data1 %>% mutate(enhanced=as.logical(data1$STATION.x %in% unique(as.integer(tt$STATION))), Year=format(as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y")) %>% replace(is.na(.),FALSE)
 #data2$LONGITUDE <- data1$LONGITUDE
 #data2$LATITUDE <- data1$LATITUDE
+data2<-merge(data2, stns, by.x="STATION.x", by.y="STATION", all.x=T)
+centroids <- st_centroid(sabshape)
+centroids$X <- st_coordinates(centroids)[,1]
+centroids$Y <- st_coordinates(centroids)[,2]
 
-  
+
 ggplot()+
   geom_sf(data=novsco, fill=gray(.9),size=0)+
   geom_sf(data=sab_benthoscape,aes(fill=class),lwd=0.25)+
   geom_sf(data=sabshape,colour="blue", fill=NA, linewidth=1)+
+  #geom_text(data=centroids, aes(x=X, y=Y, label=Id),nudge_x = -0.019, nudge_y = -0.008, size=5, fontface="bold")+
   #geom_sf(data=gully2, colour="red", fill=NA)+
   coord_sf(xlim=c(-60.5, -58.3), ylim=c(45.25,47.1), expand=F)+
   geom_point(data=data2, aes(x=LONGITUDE, y=LATITUDE, colour=Inside, shape=enhanced, size=enhanced))+
@@ -35,45 +40,47 @@ ggplot()+
   theme(panel.background = element_rect(fill="lightcyan1"), axis.text.x=element_text(size=12), axis.text.y=element_text(size=12), axis.title = element_text(size=16), legend.text = element_text(size=10), legend.position = "right")
   #ggrepel::geom_label_repel(data=data2, mapping=aes(x=LONGITUDE, y=LATITUDE, label=STATION.x),max.overlaps=2000)
 
-ggsave(filename = "SurveyStationsMap2023.png",plot = last_plot(), device = "png", path = "output/CrabSurvey/", width = 16, height=10, units="in", dpi=600)
+ggsave(filename = "SurveyStationsMap2023_NoZONES.png",plot = last_plot(), device = "png", path = "output/CrabSurvey/", width = 14, height=12, units="in", dpi=600)
 
 #Get depths for each station from the dem 
 data2$depth <- raster::extract(ras, data.frame(data2$LONGITUDE, data2$LATITUDE))
+data2 <- data2 %>% mutate(location=ifelse(Inside,"Inside","Outside"))
 #richness
 rich_df <- data2%>%
   data.frame()%>%
-  group_by(year,STATION.x)%>%
+  group_by(Year,STATION.x)%>%
   summarise(nspecies = length(unique(SPEC)))%>%
   ungroup()%>%
   left_join(.,data2%>%
               data.frame()%>%
-              mutate(id=paste(year,STATION.x,sep="_"))%>%
+              mutate(id=paste(Year,STATION.x,sep="_"))%>%
               distinct(id,.keep_all=T)%>%
-              dplyr::select(STATION.x, LONGITUDE,LATITUDE, year, Inside, depth))%>%
+              dplyr::select(STATION.x, LONGITUDE,LATITUDE, Year, location, depth))%>%
   mutate(station=paste("ST",STATION.x,sep="_"),
          strata=ifelse(depth>150,">150m","<150m"),
-         year_strat=ifelse(year>2018,"2019-2023","2015-2018"))
+         year_strat=ifelse(Year>2018,"2019-2023","2015-2018"))
 
 
-sab_rich_depth <- ggplot(rich_df%>%filter(nspecies>9),aes(x=depth, y=nspecies, col=Inside, group=Inside))+
-  geom_point(size=2)+
+sab_rich_depth <- ggplot(rich_df%>%filter(nspecies>9),aes(x=depth, y=nspecies, col=location, group=location))+
+  geom_point(size=3)+
   #facet_wrap(vars(year), nrow=2)+
   stat_smooth(method="lm")+
-  scale_colour_manual(labels=c("Outside","Inside"), values=c("red","blue"))+
+  #scale_colour_manual(labels=c("Outside","Inside"), values=c("red","blue"))+
   theme_bw()+
   labs(x="Depth (m)",y="Richness",col="")+
-  theme(legend.position = "bottom")
+  theme(strip.background = element_rect(fill="white"),
+        legend.position = "bottom", text=element_text(size=20))
 sab_rich_depth
-ggsave("output/CrabSurvey/richness_by_depth.png",sab_rich_depth,height = 8,width=8,units="in",dpi=600)
+ggsave("output/CrabSurvey/richness_by_depth.png",sab_rich_depth,height = 8,width=10,units="in",dpi=500)
 
 
 rich_count <- rich_df%>%
   group_by(STATION.x)%>%
   summarise(nyears=n(),
-            minyear=min(year),
-            maxyear=max(year))
+            minyear=min(Year),
+            maxyear=max(Year))
 
-rich_mod <- lmer(nspecies ~ Inside + (1 + Inside | STATION.x),data=rich_df)
+rich_mod <- glmer(nspecies ~ location + (1 + location | STATION.x),data=rich_df, family=poisson(link="log"))
 # Linear mixed model fit by REML ['lmerMod']
 # Formula: nspecies ~ Inside + (1 + Inside | STATION.x)
 # Data: rich_df
@@ -88,26 +95,27 @@ rich_mod <- lmer(nspecies ~ Inside + (1 + Inside | STATION.x),data=rich_df)
 #   (Intercept)   InsideTRUE  
 # 18.3430       0.4695  
 
-ggplot(rich_df,aes(x=year,y=nspecies,group=STATION.x))+
+ggplot(rich_df,aes(x=Year,y=nspecies,group=STATION.x))+
   geom_point()+
   stat_smooth(method="lm",se=FALSE)+
   theme_bw()+
   labs(x="Year",y="Richness",col="")+
-  facet_grid(~Inside)
+  facet_grid(~location)
 
 #very-very preliminary - no actual stats.   
-richness_plot <- ggplot(rich_df,aes(x=year,y=nspecies))+
+richness_plot <- ggplot(rich_df,aes(x=Year,y=nspecies))+
   geom_line(aes(col=STATION.x,group=STATION.x))+
   geom_point(size=2,aes(col=STATION.x))+
-  stat_smooth(method="lm",aes(group=Inside))+
+  stat_smooth(method="lm",aes(group=location))+
   theme_bw()+
   labs(x="Year",y="Richness",col="")+
-  facet_grid(~Inside)+
-  theme(legend.position="none")
+  facet_grid(~location)+
+  theme(strip.background = element_rect(fill="white"),
+         legend.position = "none")
 richness_plot
-ggsave("output/CrabSurvey/SAB_crabsurvey_richness_by_year.png",richness_plot,height = 8,width=6,units="in",dpi=300)
+ggsave("output/CrabSurvey/SAB_crabsurvey_richness_by_year.png",richness_plot,height = 8,width=10,units="in",dpi=400)
 
-sab_rich_depth_strata <- ggplot(rich_df,aes(x=Inside,y=nspecies,fill=Inside))+
+sab_rich_depth_strata <- ggplot(rich_df,aes(x=location,y=nspecies,fill=location))+
   geom_boxplot()+
   geom_jitter()+
   facet_grid(~strata)+
@@ -115,19 +123,19 @@ sab_rich_depth_strata <- ggplot(rich_df,aes(x=Inside,y=nspecies,fill=Inside))+
   labs(x="",y="Richness")+
   theme(legend.position="none")
 
-ggsave("output/CrabSurvey/Richness_by_depthstrata.png",sab_rich_depth_strata ,height = 8,width=6,units="in",dpi=300)
+ggsave("output/CrabSurvey/Richness_by_depthstrata.png",sab_rich_depth_strata ,height = 8,width=6,units="in",dpi=400)
 
 
 ###This part doesn't work yet with my TRUE-FALSE for inside-outside the MPA - fix this later
 inside_outside <- rich_df%>%
-  group_by(year,Inside,strata)%>%
+  group_by(Year,location,strata)%>%
   summarise(mean=mean(nspecies,na.rm=T))%>%
   ungroup()%>%
-  spread(Inside,mean)%>%
+  spread(location,mean)%>%
   mutate(diff=TRUE-FALSE)
 
 
-inside_outside_plot <- ggplot(inside_outside,aes(x=year,y=diff,group=strata,col=strata))+
+inside_outside_plot <- ggplot(inside_outside,aes(x=Year,y=diff,group=strata,col=strata))+
   geom_line()+
   geom_point(size=2)+
   geom_hline(yintercept = 0,lty=2)+
@@ -166,32 +174,4 @@ data4 <- data3 %>% group_by(SPEC) %>%
 data5<-as.matrix(data4[,4:length(colnames(data4))])
 rownames(data5) <- paste(data4$STATION.x, data4$year, sep="_")
 
-sabnmds <- metaMDS(data5, distance = "bray", k=2)
-
-
-specdat_2015 <- data4 %>% dplyr::filter(year==2015)
-specdat_2016 <- data4 %>% dplyr::filter(year==2016)
-specdat_2017 <- data4 %>% dplyr::filter(year==2017)
-specdat_2018 <- data4 %>% dplyr::filter(year==2018)
-specdat_2019 <- data4 %>% dplyr::filter(year==2019)
-specdat_2021 <- data4 %>% dplyr::filter(year==2021)
-specdat_2022 <- data4 %>% dplyr::filter(year==2022)
-specdat_2023 <- data4 %>% dplyr::filter(year==2023)
-list.dfs<-list(specdat_2015, specdat_2016, specdat_2017, specdat_2018, specdat_2019, specdat_2021, specdat_2022, specdat_2023)
-for (i in 1:length(list.dfs)){
-metaMDS(as.matrix[i],distance = "bray", k = 2)
-}
-
-divdat <- iNEXT(data4, datatype = "abundance")
-
-
-
-ggiNEXT(sad_data, type = 1, facet.var = "Year")
-# Type 1: Chao1 richness estimator
-# Type 2: Bootstrap-based richness estimator
-# Type 3: Sample-size-based rarefaction/extrapolation
-# Type 4: Sample-size-based extrapolation for incomplete sampling
-
-
-#Power analyses - looking at how many trawl sets it takes to achieve high statistical power to determine biodiversity/richness (and abundance or biomass of some species?)
-
+#sabnmds <- metaMDS(data5, distance = "bray", k=2)

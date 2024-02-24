@@ -184,11 +184,12 @@ fishmorph3 <- fishmorph3[!(is.na(fishmorph3$FISH_WEIGHT) | fishmorph3$FISH_WEIGH
 fishmorph3$STATION<-as.integer(fishmorph3$STATION)
 
 fishmorph4 <-merge(fishmorph3, stns, by="STATION", all.x=T)
+fishmorph4 <- fishmorph4 %>% mutate(location=ifelse(Inside,"Inside","Outside")) #make this consistent with Ryan's code
 
-ggplot(fishmorph4 %>% filter(EST_NUM_CAUGHT > 2), aes(x = Year, y = log(FISH_LENGTH), fill=Inside)) +
+ggplot(fishmorph4 %>% filter(EST_NUM_CAUGHT > 2), aes(x = Year, y = log(FISH_LENGTH), fill=location)) +
   geom_boxplot(outlier.shape = NA) +
   facet_wrap(vars(COMM),nrow=4, scales="free_y")+
-  scale_fill_manual(labels=c("Outside","Inside"), values=c("red","blue"))+
+  #scale_fill_manual(labels=c("Outside","Inside"))+
   labs(x = "Year",
        y = "Log(Length)") +
   theme_minimal()+
@@ -198,15 +199,6 @@ ggplot(fishmorph4 %>% filter(EST_NUM_CAUGHT > 2), aes(x = Year, y = log(FISH_LEN
 
 ggsave(filename = "output/CrabSurvey/CrabSurvey_SAB_FishLengths.png",plot = last_plot(),device = "png",width = 12, height=10, units = "in",dpi = 500, bg = "white")
 
-ggplot(fishmorph4 %>% filter(EST_NUM_CAUGHT > 20), aes(x = Year, y = FISH_LENGTH, fill=Inside)) +
-  #geom_errorbar(width=0.1)+
-  geom_boxplot() +
-  facet_wrap(vars(COMM),nrow=5, scales="free_y")+
-  labs(x = "Species",
-       y = "Length") +
-  theme_minimal()+
-  theme(axis.text.x =  element_text(angle=90),strip.text.x = element_text(size = 8))#+
-#stat_compare_means(position = "jitter")
 
 #Show just snow crab sizes over time
 
@@ -235,10 +227,10 @@ ggplot(sc_summary, aes(x = Year, y = mean_width, group=1)) +
 ggsave(filename = "SnowCrab_MeanSize.png",plot = last_plot(),path="output/CrabSurvey/",device = "png",width = 10, height=6, units = "in",dpi = 600, bg = "white")
 
 # Create boxplots for fish weights by species
-ggplot(fishmorph4 %>% filter(EST_NUM_CAUGHT>2), aes(x = Year, y = FISH_WEIGHT, fill=Inside)) +
+ggplot(fishmorph4 %>% filter(EST_NUM_CAUGHT>2), aes(x = Year, y = FISH_WEIGHT, fill=location)) +
   facet_wrap(vars(COMM),nrow=5, scales="free_y")+
   geom_boxplot() +
-  scale_fill_manual(labels=c("Outside","Inside"), values=c("red","blue"))+
+  #scale_fill_manual(labels=c("Outside","Inside"), values=c("red","blue"))+
   labs(x = "Year",
        y = "Weight") +
   theme_minimal()+
