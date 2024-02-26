@@ -11,6 +11,10 @@
     library(marmap)
     library(stars)
     library(tibble)
+    library(ggrepel)
+    library(patchwork)
+    library(viridis)
+    library(ggnewscale)
 
 #### Global options---------
     sf_use_s2 = FALSE
@@ -615,12 +619,11 @@
     
     diet_nmds_list <- list()
     
-    #dummy dataframes to hold the outputs
+    #dummy dataframes to hold the outputs -- can be loaded after first run with load("output/CrabSurvey/diet_nmds_analysis.RData")
     nmds_list <- list()
     nmds_pa_list <- list()
     nmds_species_list <- list()
     nmds_data <- NULL
-   
     
     #run the nmds analyses per species. 
     for(i in 1:length(unique(diet_nmds_df$pred))){
@@ -674,13 +677,15 @@
                                     method="pa",
                                     stress=round(nmds_temp_pa$stress,3))%>%
                              separate(id,c("location","year"),sep="_"))%>%
-                    select(NMDS1,NMDS2,location,year,method,stress)
+                    select(NMDS1,NMDS2,location,year,method,stress)%>%
+                    mutate(year=as.numeric(year),pred=sp)
       
       species.scores <- as.data.frame(scores(nmds_temp,"species"))%>%
                         mutate(method="bray")%>%
                         rbind(.,
                               as.data.frame(scores(nmds_temp_pa,"species"))%>%
-                                mutate(method="pa"))
+                                mutate(method="pa"))%>%
+                        mutate(pred=sp)
       
       #looped outputs
       nmds_data <- rbind(nmds_data,data.scores)
@@ -692,38 +697,154 @@
       
     }
     
+    save(nmds_data,nmds_species_list,nmds_list,file="output/CrabSurvey/diet_nmds_analysis.RData")# interim save. 
+  
+  #Assemble the convex hull data for plotting    
+    hull_data <- nmds_data%>%
+                 group_by(pred,location,method)%>%
+                 slice(chull(x=NMDS1,y=NMDS2))%>%
+                 rename(spec=pred)%>%
+                 left_join(.,target_sp)%>%
+                 filter(spec !="ANARHICHAS LUPUS") #wolffish do not have enough 'outside' recoreds to make a hull
+
+    #Convex hull plots of diet
+    nmds_plot_bray <- ggplot(data=hull_data%>%filter(method=="bray"))+
+                      geom_polygon(aes(x=NMDS1,y=NMDS2,fill=location),alpha=0.30)+
+                      labs(fill="")+
+                      new_scale_fill()+
+                      geom_point(aes(x=NMDS1,y=NMDS2,shape=location,fill=year),size=3)+
+                      scale_shape_manual(values=c(21,23),guide="none")+
+                      theme_bw()+
+                      theme(axis.text.x=element_blank(),
+                            axis.ticks.x=element_blank(),
+                            axis.text.y=element_blank(),
+                            axis.ticks.y=element_blank(),
+                            panel.grid.major = element_blank(),
+                            panel.grid.minor = element_blank(),
+                            legend.position = "bottom",
+                            strip.background = element_rect(fill="white"))+
+                      facet_wrap(~common,ncol=2,scales="free")+
+                      labs(shape="",fill="",col="Sample year")+
+                      scale_fill_viridis()
+    
+    nmds_plot_pa <- ggplot(data=hull_data%>%filter(method=="pa"))+
+                    geom_polygon(aes(x=NMDS1,y=NMDS2,fill=location),alpha=0.30)+
+                    labs(fill="")+
+                    new_scale_fill()+
+                    geom_point(aes(x=NMDS1,y=NMDS2,shape=location,fill=year),size=3)+
+                    scale_shape_manual(values=c(21,23),guide="none")+
+                    theme_bw()+
+                    theme(axis.text.x=element_blank(),
+                          axis.ticks.x=element_blank(),
+                          axis.text.y=element_blank(),
+                          axis.ticks.y=element_blank(),
+                          panel.grid.major = element_blank(),
+                          panel.grid.minor = element_blank(),
+                          legend.position = "bottom",
+                          strip.background = element_rect(fill="white"))+
+                    facet_wrap(~common,ncol=2,scales="free")+
+                    labs(shape="",fill="",col="Sample year")+
+                    scale_fill_viridis()
+    
+    #save plots
+    ggsave("output/CrabSurvey/diet_hull_bray.png",nmds_plot_bray,height=6,width=6,units="in",dpi=300)
+    ggsave("output/CrabSurvey/diet_hull_pa.png",nmds_plot_pa,height=6,width=6,units="in",dpi=300)
+    
+     ##Assemble yearly progression plots --- 
+     plot_sp <- unique(hull.data$common)%>%sort()
+     
+     for(i in c("bray","pa")){
+       
+       for(j in target_sp$common){
+         
+         temp_plotdf <- hull_data%>%
+                        filter(common==j,
+                               method==i)%>%
+                        arrange(location,year)%>%
+                        data.frame()
+         
+         #set up common range limits for the axes
+         
+         range_offset <- 0.05 # this is the % buffer to add to the plot
+         
+         nmds1_range <- range(temp_plotdf$NMDS1)
+         nmds1_offset <- (nmds1_range[2]-abs(nmds1_range[1]))*range_offset
+         nmds1_range[1] <- nmds1_range[1] - nmds1_offset
+         nmds1_range[2] <- nmds1_range[2] + nmds1_offset
+         
+         nmds2_range <- range(temp_plotdf$NMDS2)
+         nmds2_offset <- (nmds2_range[2]-abs(nmds2_range[1]))*range_offset
+         nmds2_range[1] <- nmds2_range[1] - nmds2_offset
+         nmds2_range[2] <- nmds2_range[2] + nmds2_offset
+     
+    
+    p1 <- ggplot(data=temp_plotdf%>%filter(location=="Inside"),aes(x=NMDS1,y=NMDS2,group=location))+
+          geom_segment(aes(xend=c(tail(NMDS1, n=-1), NA),yend=c(tail(NMDS2, n=-1), NA),group=location),
+          arrow=arrow(length=unit(0.25,"cm"),type="closed"),lty=3)+
+          geom_point(aes(fill=year),size=3,shape=21)+
+          geom_point(aes(fill=year),data=temp_plotdf%>%filter(location=="Inside",year==max(year)),size=5,shape=21)+
+          geom_text_repel(aes(label=year))+
+          scale_x_continuous(limits=nmds1_range)+
+          scale_y_continuous(limits=nmds2_range)+
+          theme_bw()+
+          facet_grid(common~location)+
+          theme(axis.text.x=element_blank(),
+                axis.ticks.x=element_blank(),
+                axis.text.y=element_blank(),
+                axis.ticks.y=element_blank(),
+                strip.background.y = element_blank(),
+                strip.text.y = element_blank(),
+                axis.title = element_blank(),
+                panel.grid.major = element_blank(),
+                panel.grid.minor = element_blank(),
+                text=element_text(size=18),
+                strip.background.x = element_rect(fill="white"),
+                legend.position = "none")+
+          labs(fill="")
+    
+    p2 <- ggplot(data=temp_plotdf%>%filter(location=="Outside"),aes(x=NMDS1,y=NMDS2,group=location))+
+          geom_segment(aes(xend=c(tail(NMDS1, n=-1), NA),yend=c(tail(NMDS2, n=-1), NA),group=location),
+                       arrow=arrow(length=unit(0.25,"cm"),type="closed"),lty=3)+
+          geom_point(aes(fill=year),size=3,shape=21)+
+          geom_point(aes(fill=year),data=temp_plotdf%>%filter(location=="Outside",year==max(year)),size=5,shape=21)+
+          geom_text_repel(aes(label=year))+
+          scale_x_continuous(limits=nmds1_range)+
+          scale_y_continuous(limits=nmds2_range)+
+          theme_bw()+
+          facet_grid(common~location)+
+          theme(axis.text.x=element_blank(),
+                axis.ticks.x=element_blank(),
+                axis.text.y=element_blank(),
+                axis.ticks.y=element_blank(),
+                axis.title = element_blank(),
+                panel.grid.major = element_blank(),
+                panel.grid.minor = element_blank(),
+                text=element_text(size=18),
+                strip.background = element_rect(fill="white"),
+                legend.position = "none")+
+          labs(fill="")
+      
+      
+      #some hard coding based on on a set diet species list based on the focal species for the power analysis. 
+      if(j != "American plaice") {p3 <- p1+theme(strip.background.x = element_blank(),strip.text.x = element_blank()) + 
+                                        p2+theme(strip.background.x = element_blank(),strip.text.x = element_blank()) + plot_layout(ncol=2)}
+    
+      if(j == "American plaice") {p3 <- p1 + p2 + plot_layout(ncol=2)}
+      
+      assign(paste0(gsub(" ","_",j),"_plot"),p3)
+    
+       } #end j loop (species)
+       
+       group_plot <- American_plaice_plot / Atlantic_cod_plot / Redfish_sp_plot / Thorny_skate_plot / White_hake_plot / Witch_flounder_plot 
+       
+       ggsave(paste0("output/CrabSurvey/diet_year_",i,".png"),group_plot,height=12,width=7,units="in",dpi=300)
+       
+       rm(group_plot,American_plaice_plot,Atlantic_cod_plot,Redfish_sp_plot,Thorny_skate_plot,White_hake_plot,Witch_flounder_plot) #clean up ws
+       
+     } #end i loop (method)
     
     
-    
-    
-    hull.data <- data.scores %>%
-      group_by(location,method) %>%
-      slice(chull(x=NMDS1,y=NMDS2))
-    
-    #loop outputs
-    
-    
-    
-    ggplot() +
-      geom_polygon(data=hull.data,aes(x=NMDS1,y=NMDS2,fill=location),alpha=0.30) + # add the hulls
-      #geom_point(data=data.scores,aes(text=ID,x=NMDS1,y=NMDS2,shape=location,colour=year),size=3) +
-      scale_colour_brewer(palette = "Paired") +
-      coord_equal()+
-      scale_shape_manual(values=c(15,7,18,16,10,8,17))+
-      geom_text(aes(x=Inf,y=-Inf,hjust=1.05,vjust=-0.5,label=paste("Stress =",round(nmds_temp$stress,3),"k =",nmds_temp$ndim)))+
-      theme_bw()+
-      theme(axis.text.x=element_blank(),
-            axis.ticks.x=element_blank(),
-            axis.text.y=element_blank(),
-            axis.ticks.y=element_blank(),
-            panel.grid.major = element_blank(),
-            panel.grid.minor = element_blank(),
-            text=element_text(size=18))+
-      facet_wrap(~method,ncol=2)
-    
-    
-    spread(prey,prey_weight,fill=NA)
-        
+
     
     
                     
