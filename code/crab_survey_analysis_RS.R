@@ -574,17 +574,6 @@
     
 ##### NMDS analysis (diet) ------------------
     
-    
-    diet_nmds_df <- diet_df%>%
-                    filter(!non_species,
-                           pred %in% target_sp$spec)%>%
-                    mutate(ID = paste(location,Year,sep="_"))%>%
-                    group_by(pred,ID)%>%
-                    do(unique(.[,"prey"]))%>%#this is the prey based aggregated into 'inside' and 'outside' the MPA - note there is a difference in effort here. 
-                    ungroup()%>%
-                    as.data.frame()%>%
-                    spread()
-    
     diet_nmds_df <- diet_df%>%
                     filter(!non_species,
                           pred %in% target_sp$spec)%>%
@@ -920,6 +909,105 @@
      
      ggsave("output/CrabSurvey/benthoscape_diet_richness_all.png",bentho_richness2,width=5,height=5,units="in",dpi=300)
      
+     
+##### benthoscape nmds -----
+     
+     benthodiet_nmds_bray <- diet_df%>%
+                           filter(!non_species,
+                                  STATION %in% diet_nmds_env$STATION)%>%
+                           left_join(.,diet_nmds_env%>%select(-location))%>%
+                           group_by(pred,classn,prey)%>%
+                           summarise(prey_weight=mean(PWT,na.rm=T))%>%
+                           ungroup()%>%
+                           mutate(id = paste(pred,classn,sep="_"))%>%
+                           select(id,prey,prey_weight)%>%
+                           spread(prey,prey_weight,fill=0)%>%
+                           column_to_rownames('id')%>%
+                           mutate(tot = rowSums(.,na.rm=T))%>%
+                           filter(tot>0)%>% #filter out any zero catches
+                           select(-tot)%>%
+                           decostand(method = "total")%>%
+                           metaMDS(.,k=5)
+     
+     benthodiet_nmds_pa <- diet_df%>%
+                           filter(!non_species,
+                                  STATION %in% diet_nmds_env$STATION)%>%
+                           left_join(.,diet_nmds_env%>%select(-location))%>%
+                           group_by(pred,classn,prey)%>%
+                           summarise(prey_weight=mean(PWT,na.rm=T))%>%
+                           ungroup()%>%
+                           mutate(id = paste(pred,classn,sep="_"))%>%
+                           select(id,prey,prey_weight)%>%
+                           spread(prey,prey_weight,fill=0)%>%
+                           column_to_rownames('id')%>%
+                           mutate(tot = rowSums(.,na.rm=T))%>%
+                           filter(tot>0)%>% #filter out any zero catches
+                           select(-tot)%>%
+                           decostand(method = "total")%>%
+                           dist(., method="binary")%>%
+                           metaMDS(.,k=clusters)
+     
+     bentho_data_scores <- as.data.frame(scores(benthodiet_nmds_bray,"sites"))%>%
+                           mutate(id=rownames(.),
+                                  method="bray",
+                                  stress=round(benthodiet_nmds_bray$stress,3))%>%
+                           separate(id,c("pred","classn"),sep="_")%>%
+                           rbind(.,
+                                 as.data.frame(scores(benthodiet_nmds_pa,"sites"))%>%
+                                   mutate(id=rownames(.),
+                                          method="pa",
+                                          stress=round(benthodiet_nmds_pa$stress,3))%>%
+                                   separate(id,c("pred","classn"),sep="_"))%>%
+                           select(NMDS1,NMDS2,pred,classn,method,stress)
+     
+     hull_data_bentho <- bentho_data_scores%>%
+                         group_by(classn,method)%>%
+                         slice(chull(x=NMDS1,y=NMDS2))
+     
+     
+     
+     #Convex hull plots of diet
+      p1_bray <- ggplot(data=hull_data_bentho%>%filter(method=="bray"))+
+                 geom_polygon(aes(x=NMDS1,y=NMDS2,fill=classn),alpha=0.30,col="black",lwd=0.1)+
+                 geom_point(aes(x=NMDS1,y=NMDS2,fill=classn),shape=21,size=2)+
+                 theme_bw()+
+                 theme(axis.text.x=element_blank(),
+                       axis.ticks.x=element_blank(),
+                       axis.text.y=element_blank(),
+                       axis.ticks.y=element_blank(),
+                       panel.grid.major = element_blank(),
+                       panel.grid.minor = element_blank(),
+                       legend.position = "none",
+                       strip.background = element_rect(fill="white"))+
+                 labs(shape="",fill="",col="Sample year",title="Bray-Curtis")+
+                 geom_text(aes(x=Inf,y=-Inf,hjust=1.05,vjust=-0.5,label=paste("Stress =",round(benthodiet_nmds_bray$stress,3),"k =",benthodiet_nmds_bray$ndim)))+
+                 scale_fill_viridis(discrete=TRUE)
+      
+      p1_pa <- ggplot(data=hull_data_bentho%>%filter(method=="pa"))+
+                geom_polygon(aes(x=NMDS1,y=NMDS2,fill=classn),alpha=0.30,col="black",lwd=0.1)+
+                geom_point(aes(x=NMDS1,y=NMDS2,fill=classn),shape=21,size=2)+
+                theme_bw()+
+                theme(axis.text.x=element_blank(),
+                      axis.ticks.x=element_blank(),
+                      axis.text.y=element_blank(),
+                      axis.ticks.y=element_blank(),
+                      panel.grid.major = element_blank(),
+                      panel.grid.minor = element_blank(),
+                      legend.position = "right",
+                      strip.background = element_rect(fill="white"))+
+                labs(shape="",fill="",col="Sample year",title="Euclidean")+
+                geom_text(aes(x=Inf,y=-Inf,hjust=1.05,vjust=-0.5,label=paste("Stress =",round(benthodiet_nmds_pa$stress,3),"k =",benthodiet_nmds_pa$ndim)))+
+                scale_fill_viridis(discrete=TRUE)
+      
+      p1_combo <- p1_bray + p1_pa + plot_layout(ncol=2)
+                     
+      
+      ggsave("output/CrabSurvey/Benthoscape_nmds_comp.png",p1_combo,width=7,height=5,units="in",dpi=300)
+      
+      
+      #now pool the species and repliation by  year
+      
+  
                     
     
     
