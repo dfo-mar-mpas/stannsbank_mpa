@@ -1,5 +1,5 @@
 #Get the fish species code from ANDES - these get updated from time to time so may need to replace this csv eventually
-fishcodes <- read.csv("R:/Science/CESD/HES_MPAGroup/Data/Crab Survey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
+fishcodes <- read.csv("data/CrabSurvey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
 
 
 catchdat <- read.csv("data/CrabSurvey/SABMPA2023export.csv", header = T) 
@@ -28,7 +28,7 @@ utm <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84
 
 
 #basemap of Nova Scotia
-novsco <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Coastline/NS_coastline_project_Erase1.shp")%>%st_transform(latlong)%>%
+novsco <- read_sf("data/Shapefiles/NS_coastline_project_Erase1.shp")%>%st_transform(latlong)%>%
   mutate(name="Nova Scotia")%>%
   dplyr::select(name,geometry)
 
