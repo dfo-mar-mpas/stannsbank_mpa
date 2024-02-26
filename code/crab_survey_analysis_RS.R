@@ -15,6 +15,7 @@
     library(patchwork)
     library(viridis)
     library(ggnewscale)
+    library(ggridges)
 
 #### Global options---------
     sf_use_s2 = FALSE
@@ -573,32 +574,6 @@
     
 ##### NMDS analysis (diet) ------------------
     
-    #get the environmental covariates for each station. 
-    diet_nmds_env <- diet_df%>%
-                     filter(!non_species)%>%
-                     st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong,remove=FALSE)%>%
-                     group_by(STATION)%>%
-                     summarise(geometry=st_union(geometry)%>%st_centroid())%>% #get a consensus station location
-                     ungroup()%>%
-                     left_join(.,diet_df%>%distinct(STATION,.keep_all = TRUE)%>%select(location,TRIP_SET,TRIP_STATION,STATION))%>%
-                     st_intersection(.,sab_benthoscape%>%dplyr::select(classn,geometry))%>%
-                     rbind(.,diet_df%>% #coordinate in the top right is just adjacent the mud-seapens shelf break. TO get replication we will assign this one manually. 
-                             filter(!non_species)%>%
-                             st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong,remove=FALSE)%>%
-                             group_by(STATION)%>%
-                             summarise(geometry=st_union(geometry)%>%st_centroid())%>% #get a consensus station location
-                             ungroup()%>%
-                             left_join(.,diet_df%>%distinct(STATION,.keep_all = TRUE)%>%
-                                         select(location,TRIP_SET,TRIP_STATION,STATION))%>%
-                             mutate(lat=st_coordinates(.)[,2])%>%
-                             arrange(-lat)%>%
-                             slice(2)%>%
-                             mutate(classn="Mud-Seapens")%>%
-                             select(STATION,location,TRIP_SET,TRIP_STATION,classn,geometry))%>%
-                     select(STATION,location,classn,geometry)%>%
-                     st_join(noaabathy %>% st_as_sf()) # add in the bathymetry 
-    
-    
     
     diet_nmds_df <- diet_df%>%
                     filter(!non_species,
@@ -845,11 +820,106 @@
     
     
 
-    
-    
-                    
+### diet ~ benthoscape ----
+     
+     
+     #get the environmental covariates for each station. 
+      diet_nmds_env <- diet_df%>%
+                       filter(!non_species)%>%
+                       st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong,remove=FALSE)%>%
+                       group_by(STATION)%>%
+                       summarise(geometry=st_union(geometry)%>%st_centroid())%>% #get a consensus station location
+                       ungroup()%>%
+                       left_join(.,diet_df%>%distinct(STATION,.keep_all = TRUE)%>%select(location,TRIP_SET,TRIP_STATION,STATION))%>%
+                       st_intersection(.,sab_benthoscape%>%dplyr::select(classn,geometry))%>%
+                       rbind(.,diet_df%>% #coordinate in the top right is just adjacent the mud-seapens shelf break. TO get replication we will assign this one manually. 
+                               filter(!non_species)%>%
+                               st_as_sf(coords=c("SLONGDD","SLATDD"),crs=latlong,remove=FALSE)%>%
+                               group_by(STATION)%>%
+                               summarise(geometry=st_union(geometry)%>%st_centroid())%>% #get a consensus station location
+                               ungroup()%>%
+                               left_join(.,diet_df%>%distinct(STATION,.keep_all = TRUE)%>%
+                                           select(location,TRIP_SET,TRIP_STATION,STATION))%>%
+                               mutate(lat=st_coordinates(.)[,2])%>%
+                               arrange(-lat)%>%
+                               slice(2)%>%
+                               mutate(classn="Mud-Seapens")%>%
+                               select(STATION,location,TRIP_SET,TRIP_STATION,classn,geometry))%>%
+                       select(STATION,location,classn,geometry)%>%
+                       st_join(noaabathy %>% st_as_sf())%>% # add in the bathymetry 
+                       data.frame()%>%
+                       select(-geometry)
                 
+     diet_benthoscape <- diet_df%>%
+                         filter(!non_species,
+                                pred %in% target_sp$spec,
+                                STATION %in% diet_nmds_env$STATION)%>%
+                         left_join(.,diet_nmds_env%>%select(-location))%>%
+                         left_join(.,target_sp%>%rename(pred=spec))%>%
+                         group_by(common,classn)%>%
+                         summarise(diet_rich = length(unique(prey)))%>%
+                         ungroup()%>%
+                         group_by(common)%>%
+                         mutate(diet_rich_stand = diet_rich/max(diet_rich))%>%
+                         ungroup()%>%
+                         data.frame()
+                      
+     #focal species analysis
+     
+         #Simple boxplot
+         # ggplot(data=diet_benthoscape,aes(x=classn,y=diet_rich))+
+         #    geom_jitter()+
+         #    geom_boxplot(alpha=0.5)+
+         #    theme_bw()+
+         #    labs(x="",y="Diet richness")
+         # 
+     
+     bentho_richness <- ggplot(data=diet_benthoscape,aes(x=common,y=diet_rich,fill=classn))+
+                       geom_bar(position = "dodge", stat = "identity",col="black")+
+                       theme_bw()+
+                       facet_wrap(~common,nrow=1,scales="free_x")+
+                       scale_y_continuous(expand= expansion(mult = c(0, .05)))+
+                       scale_fill_viridis(discrete=TRUE)+
+                       theme(legend.position = "bottom",
+                             axis.text.x=element_blank(),
+                             strip.background = element_rect(fill="white"))+
+                       labs(x="",y="Diet richness",fill="")
+     
+     ggsave("output/CrabSurvey/benthoscape_diet_richness.png",bentho_richness,width=8,height=5,units="in",dpi=300)
+     
+     #comparison of all species by benthoscape class
+     diet_benthoscape_all <- diet_df%>%
+                           filter(!non_species,
+                                  #pred %in% target_sp$spec,
+                                  STATION %in% diet_nmds_env$STATION)%>%
+                           left_join(.,diet_nmds_env%>%select(-location))%>%
+       
+                           group_by(pred,classn)%>%
+                           summarise(diet_rich = length(unique(prey)),
+                                     pred_size = mean(FLEN,na.rm=T),
+                                     pred_mass = mean(FWT,na.rm=T),
+                                     pred_full = mean(FULLNESS,na.rm=T))%>%
+                           ungroup()%>%
                            
+                           group_by(pred)%>%
+                           mutate(diet_rich_stand = diet_rich/max(diet_rich))%>%
+                           ungroup()%>%
+                           
+                           group_by(classn)%>%
+                           mutate(num_pred = length(unique(pred)))%>%
+                           ungroup()%>%
+                           data.frame()
+     
+     bentho_richness2 <- ggplot(data=diet_benthoscape_all,aes(x=classn,y=diet_rich,fill=num_pred))+
+                         geom_point(position = position_jitter(),aes(size=pred_mass),alpha=0.5,shape=21,fill="grey30",col="black",show.legend = FALSE)+
+                         geom_boxplot(alpha=0.5)+
+                         theme_bw()+
+                         labs(x="",y="Diet richness",fill="Predator richness")+
+                         scale_fill_viridis()+
+                         theme(legend.position = "bottom")
+     
+     ggsave("output/CrabSurvey/benthoscape_diet_richness_all.png",bentho_richness2,width=5,height=5,units="in",dpi=300)
+     
                     
     
     
