@@ -1111,7 +1111,133 @@
       #save plot
       ggsave("output/CrabSurvey/Benthoscape_nmds_comp_all.png",p1_combo_all,width=7,height=5,units="in",dpi=300)
       
-  
-                    
-    
-    
+      
+      ##By individual sdm (no pooling) - have to fill in the sparse matrix to make this work 
+      
+      prey_sp_list <- diet_df%>%filter(!non_species,STATION %in% diet_nmds_env$STATION)%>%pull(prey)%>%unique() # list of species to populate the sparse matrix (all prey items amongst stations)
+      
+      #assemble the nmds dataset - where each row is a species and each column is all prey items consumed. 
+     diet_nmds_indv1 <- diet_df%>%
+                        filter(!non_species,
+                               STATION %in% diet_nmds_env$STATION)%>%
+                        left_join(.,diet_nmds_env%>%select(-location))%>%
+                        select(PRED_SEQ,prey,PWT,classn,pred)
+     
+     diet_nmds_indv2 <- diet_nmds_indv1%>%
+                        group_by(PRED_SEQ)%>%
+                        complete(prey=prey_sp_list)%>%
+                        ungroup()%>%
+                        select(-c(classn,pred))%>%#because the 'complete' populates with NAs along with PWT
+                        left_join(.,diet_nmds_indv1%>%distinct(PRED_SEQ,.keep_all=TRUE)%>%select(PRED_SEQ,pred,classn)) 
+     
+     diet_nmds_indv <- diet_nmds_indv2%>%
+                       group_by(PRED_SEQ,prey)%>%
+                       summarise(PWT = sum(PWT,na.rm=T))%>% # some stomachs have two weights for two of a prey item
+                       ungroup()%>%
+                       left_join(.,diet_nmds_indv2%>%select(PRED_SEQ,pred,classn)%>%distinct(PRED_SEQ,.keep_all=TRUE))%>%
+                       mutate(id = paste(pred,PRED_SEQ,classn,sep="_"))%>%
+                       select(-c(classn,PRED_SEQ,pred))%>%
+                       spread(prey,PWT,fill=0)%>%
+                       column_to_rownames('id')%>%
+                       mutate(tot = rowSums(.,na.rm=T))%>%
+                       filter(tot>0)%>% #filter out any zero catches
+                       select(-tot)%>%
+                       decostand(method = "total")
+     
+     
+     #run the metaMDS using bray (prey weight, weighted) and euclidean (PA) - takes time for each 
+     diet_nmds_indv_bray <- diet_nmds_indv%>%
+                            metaMDS(.,k=5)
+     
+     diet_nmds_indv_pa <- diet_nmds_indv%>%
+                         dist(., method="binary")%>%
+                         metaMDS(.,k=5)
+     
+     bentho_data_scores_indv <- as.data.frame(scores(diet_nmds_indv_bray,"sites"))%>%
+                               mutate(id=rownames(.),
+                                      method="bray",
+                                      stress=round(diet_nmds_indv_bray$stress,3))%>%
+                               separate(id,c("pred","PRED_SEQ","classn"),sep="_")%>%
+                               rbind(.,
+                                     as.data.frame(scores(diet_nmds_indv_pa,"sites"))%>%
+                                       mutate(id=rownames(.),
+                                              method="pa",
+                                              stress=round(diet_nmds_indv_pa$stress,3))%>%
+                                       separate(id,c("pred","PRED_SEQ","classn"),sep="_"))%>%
+                               select(NMDS1,NMDS2,pred,PRED_SEQ,classn,method,stress)
+     
+     #get convex hulls for each 
+     hull_data_bentho_indv <- bentho_data_scores_indv %>%
+                              group_by(classn,method)%>%
+                              slice(chull(x=NMDS1,y=NMDS2))
+     
+     hull_data_bentho_indv_pred <- bentho_data_scores_indv %>%
+                                   group_by(pred,method)%>%
+                                   slice(chull(x=NMDS1,y=NMDS2))
+     
+     #plot it up
+     pa_all_indv <- ggplot(data=hull_data_bentho_indv%>%filter(method=="pa"))+
+                     geom_polygon(aes(x=NMDS1,y=NMDS2,fill=classn),alpha=0.30,col="black",lwd=0.1)+
+                     geom_point(aes(x=NMDS1,y=NMDS2,fill=classn),shape=21,size=2)+
+                     theme_bw()+
+                     theme(axis.text.x=element_blank(),
+                           axis.ticks.x=element_blank(),
+                           axis.text.y=element_blank(),
+                           axis.ticks.y=element_blank(),
+                           panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(),
+                           legend.position = "right",
+                           strip.background = element_rect(fill="white"))+
+                     labs(shape="",fill="",col="Sample year",title="Euclidean")+
+                     geom_text(aes(x=Inf,y=-Inf,hjust=1.05,vjust=-0.5,label=paste("Stress =",round(diet_nmds_indv_pa$stress,3),"k =",diet_nmds_indv_pa$ndim)))+
+                     scale_fill_viridis(discrete=TRUE)
+     
+     bray_all_indv <- ggplot(data=hull_data_bentho_indv%>%filter(method=="bray"))+
+                     geom_polygon(aes(x=NMDS1,y=NMDS2,fill=classn),alpha=0.30,col="black",lwd=0.1)+
+                     geom_point(aes(x=NMDS1,y=NMDS2,fill=classn),shape=21,size=2)+
+                     theme_bw()+
+                     theme(axis.text.x=element_blank(),
+                           axis.ticks.x=element_blank(),
+                           axis.text.y=element_blank(),
+                           axis.ticks.y=element_blank(),
+                           panel.grid.major = element_blank(),
+                           panel.grid.minor = element_blank(),
+                           legend.position = "right",
+                           strip.background = element_rect(fill="white"))+
+                     labs(shape="",fill="",col="Sample year",title="Bray-Curtis")+
+                     geom_text(aes(x=Inf,y=-Inf,hjust=1.05,vjust=-0.5,label=paste("Stress =",round(diet_nmds_indv_bray$stress,3),"k =",diet_nmds_indv_bray$ndim)))+
+                     scale_fill_viridis(discrete=TRUE)
+     
+     #combine using patchwork
+     indv_combo_all <- bray_all_indv + pa_all_indv + plot_layout(ncol=2)
+     
+     #save plot
+     ggsave("output/CrabSurvey/Benthoscape_nmds_comp_indv.png",indv_combo_all,width=7,height=5,units="in",dpi=300)
+     
+     
+     ##investigate year of year changes by target species 
+     
+     predyr_mean <- bentho_data_scores_indv %>%
+                    filter(pred %in% target_sp$spec)%>%
+                    left_join(.,diet_df%>%select(PRED_SEQ,Year)%>%distinct(PRED_SEQ,.keep_all=TRUE)%>%mutate(PRED_SEQ = as.character(PRED_SEQ)))%>%
+                    group_by(pred,Year,method)%>%
+                    summarise(NMDS1_sd=sd(NMDS1),
+                              NMDS2_sd=sd(NMDS2),
+                              NMDS1=mean(NMDS1),
+                              NMDS2=mean(NMDS2))%>%
+                    ungroup()%>%
+                    data.frame()
+     
+     predyr_df <- bentho_data_scores_indv %>%
+                  filter(pred %in% target_sp$spec)%>%
+                  left_join(.,diet_df%>%select(PRED_SEQ,Year)%>%distinct(PRED_SEQ,.keep_all=TRUE)%>%mutate(PRED_SEQ = as.character(PRED_SEQ)))%>%
+                  data.frame()
+     
+     
+     ggplot(data=predyr_df%>%filter(method=="bray",pred=="GADUS MORHUA"),aes(x=NMDS1,y=NMDS2,fill=Year))+
+       # geom_segment(aes(xend=c(tail(NMDS1, n=-1), NA),yend=c(tail(NMDS2, n=-1), NA)),
+       #              arrow=arrow(length=unit(0.25,"cm"),type="closed"),lty=3)+
+       geom_point(shape=21,size=2,col="black")+
+       theme_bw()+
+       facet_wrap(~pred,ncol=2,scales="free")
+       
