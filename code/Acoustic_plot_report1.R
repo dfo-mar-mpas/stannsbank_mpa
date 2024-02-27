@@ -12,6 +12,7 @@ library(stars)
 library(ggrepel)
 library(worrms)
 library(patchwork)
+library(raster)
 
 s2_as_sf = FALSE
 
@@ -58,20 +59,22 @@ basemap_inset <- rbind(
                   )
 
 #bathymetry 
-bbsab <- st_bbox(sab)
-
-noaabathy <- getNOAA.bathy(bbsab[1]-1,bbsab[3]+1,bbsab[2]+1,bbsab[4]-1,resolution = 0.25,keep=T) %>%
-              fortify.bathy() %>%
-              st_as_stars() %>%
-              st_set_crs(4326)%>%
-              st_transform(latlong)
+    bbsab <- st_bbox(sab)
+    
+    noaabathy <- getNOAA.bathy(bbsab[1]-1,bbsab[3]+1,bbsab[2]+1,bbsab[4]-1,resolution = 0.25,keep=T)
+    
+    sab_bathy <- noaabathy%>%
+      fortify.bathy() %>%
+      st_as_stars() %>%
+      st_set_crs(4326)%>%
+      st_transform(latlong)
+    
+    load('data/Bathymetry/250m_stars_object.RData')
+    dem_sab <- raster("data/Bathymetry/sab_dem.tif")
 
 #load coastline and make basemap ------
 coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
 
-#load the reciever coordinates
-recievers <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
-             st_as_sf(coords=c("long","lat"),crs=latlong)
 
 #download OTN data --  
 
@@ -98,7 +101,8 @@ recievers <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
                   st_as_sf(coords=c("stn_long","stn_lat"),crs=latlong)%>%
                   mutate(year=year(deploy_date),
                          array = ifelse(year<2021,"2015-2020","2020-2024"))%>%
-                  filter(year>2014) #just within the SAB window
+                  filter(year>2014)%>%#just within the SAB window
+                  
   
   url <- "https://gisp.dfo-mpo.gc.ca/arcgis/rest/services/FGP/Oceans_Act_Marine_Protected_Areas/MapServer/0"
   
@@ -144,12 +148,12 @@ recievers <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
                    array = ifelse(year<2021,"2015-2020","2020-2024"))%>% #only need unique locations
             distinct(id,.keep_all=TRUE)%>%
             st_as_sf(coords=c("RELEASE_LONGITUDE","RELEASE_LATITUDE"),crs=latlong)%>%
-            select(common,year,array,geometry)%>%
+            dplyr::select(common,year,array,geometry)%>%
             rbind(.,geoserver_tag_releases%>% #add the snow crab data
                     filter(common == "Snow crab")%>%
                     rename(year=yearcollected)%>%
                     mutate(array = ifelse(year<2021,"2015-2020","2020-2024"))%>%
-                    select(common,year,array,geometry))
+                    dplyr::select(common,year,array,geometry))
   
  #bounding area for the primary plot----------
       bounding_area <- sab%>%
@@ -178,11 +182,16 @@ recievers <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
       
 #make primary map
       
-      load('data/Bathymetry/250m_stars_object.RData')
-      
       recievers_sf <- otn_stations%>%
-                     filter(collectioncode=="SABMPA")%>%
-                     mutate(array = ifelse(year<2021,"2015-2020","2020-2024"))
+                      filter(collectioncode=="SABMPA")%>%
+                      mutate(array = ifelse(year<2021,"2015-2020","2020-2024"),
+                             lon = st_coordinates(.)[,1],
+                             lat = st_coordinates(.)[,2])%>%
+                      st_transform(proj4string(dem_sab))%>%
+                      mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))#extract depth
+      
+      write.csv(recievers_sf%>%data.frame()%>%dplyr::select(-geometry),file="data/Acoustic/Acoustic_Stations.csv",row.names=FALSE)
+      
       
       primary_plot <- ggplot()+
                       geom_sf(data=shelfbreak,col="grey20",lty=2,fill=NA)+
