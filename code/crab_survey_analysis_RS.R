@@ -1,4 +1,4 @@
-#load libraries
+##### Load libraries ----------
     library(sf)
     library(stringr)
     library(dplyr)
@@ -17,20 +17,20 @@
     library(ggnewscale)
     library(ggridges)
 
-#### Global options---------
+##### Global options---------
     sf_use_s2 = FALSE
     
-#### Source function ------
+##### Source function ------
     source("code/Species_Summaries_Function.R")
     
-### Target species ---------
+##### Target species ---------
     target_sp <- data.frame(spec=c("ANARHICHAS LUPUS", "UROPHYCIS TENUIS", "HIPPOGLOSSOIDES PLATESSOIDES",
                                    "GLYPTOCEPHALUS CYNOGLOSSUS", "CHIONOECETES OPILIO", "GADUS MORHUA", 
                                    "SEBASTES SP.", "AMBLYRAJA RADIATA"),
                             common=c("Atlantic wolffish","White hake","American plaice",
                                      "Witch flounder","Snow crab","Atlantic cod",
                                      "Redfish sp","Thorny skate"))
-#### Functions -----
+##### Functions -----
     
     capitalize_first <- function(text) { #from ChatGPT!
       words <- strsplit(text, " ")[[1]] 
@@ -47,11 +47,11 @@
                 domain = c(1e-100, Inf))
     }
 
-#projections -----------
+##### Projections -----------
     latlong <- "+init=epsg:4326 +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0"
     utm <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84=0,0,0"
 
-#load polygons -----------
+##### Load polygons -----------
     sab <- read_sf("data/Shapefiles/SAB_boundary_zones_2017.shp")%>%
       st_transform(latlong)%>%
       mutate(name="St Anns Bank")
@@ -110,16 +110,16 @@
                  st_transform(latlong)
     
 
-# fish taxonomy metadata -----------
+##### Fish taxonomy metadata -----------
     #fishcodes <- read.csv("data/CrabSurvey/GROUNDFISH_GSSPECIES_ANDES_20230901.csv")
     load("data/CrabSurvey/GROUNDFISH.GSSPECIES.RData")#this is a pull by Mike McMahon that has the missing data items 
     fishcodes <- GSSPECIES%>%rename(SPECCD_ID = CODE); rm(GSSPECIES)# keep the code the same
 
-# Crab survey location metadata ---------------
+##### Crab survey location metadata ---------------
     stns<-read.csv("data/CrabSurvey/StationInfo.csv",header = T)
     colnames(stns)<-c("STATION", "Enhanced", "Inside")
 
-#Crab Survey data ----------
+##### Crab Survey data ----------
 
     #Load area swept data
     arsw <- read.csv("data/CrabSurvey/sabmpa_area_swept.csv", header = T)
@@ -196,7 +196,7 @@
                       rowwise()%>%
                       mutate(common = capitalize_first(tolower(common)))
 
-#Format the crab data ---------
+##### Format the crab data ---------
     load("data/CrabSurvey/OldData/MPATOWS.RDATA") #load this one so we can make a map of the Gully and SAB stations, this is only the enhanced stations
     
     MPATOWS <- MPATOWS%>%subset(., select = which(!duplicated(names(.))))
@@ -347,7 +347,7 @@
     ggsave("output/CrabSurvey/LargeFish_inside-outside_wSmooth.png",p_bigfish_a,height=8,width=6,units="in",dpi=300)
     ggsave("output/CrabSurvey/LargeFish_inside-outside.png",p_bigfish_b,height=8,width=6,units="in",dpi=300)    
 
-#### target species trends -------------
+##### Target species trends -------------
     
   for(i in target_sp$common){
     sum_plot <- summary_plot_fun(i,stns,catchdat_stand,fishmorph_df)
@@ -825,7 +825,7 @@
     
     
 
-### diet ~ benthoscape ----
+##### Diet ~ benthoscape ----
      
      
      #get the environmental covariates for each station. 
@@ -926,7 +926,7 @@
      ggsave("output/CrabSurvey/benthoscape_diet_richness_all.png",bentho_richness2,width=5,height=5,units="in",dpi=300)
      
      
-##### benthoscape nmds -----
+##### Benthoscape nmds -----
      
      benthodiet_nmds_bray <- diet_df%>%
                            filter(!non_species,
@@ -1257,3 +1257,174 @@
        theme_bw()+
        facet_wrap(~pred,ncol=2,scales="free")
        
+
+##### Crab Survey NMDS ~ year ---------
+     
+     
+     ## comined catch composition by year ~ inside/outside
+     crab_nmds <- catchdat_stand%>%
+                  mutate(year=year(as.POSIXct(BOARD_DATE)),
+                         SPEC2 = case_when(SPEC == "ANTHOZOA C." ~ "ANTHOZOA", #fixing the genus taxonomic ids that only have one Sp
+                                           SPEC == "SCLEROCRANGON SP." ~ "SCLEROCRANGON BOREAS", #only one Sclerocrangon species so assign generic there
+                                           SPEC == "ASTERIAS SP." ~ "ASTERIAS RUBENS", #only one ASTERIAS species
+                                           SPEC == "STRONGYLOCENTROTUS SP." ~ "STRONGYLOCENTROTUS DROEBACHIENSIS",
+                                           TRUE ~ SPEC))
+     
+     crab_survey_sp <- crab_nmds%>%
+                       pull(SPEC2)%>%
+                       unique()%>%
+                       sort()
+     
+     crab_nmds_df <- crab_nmds%>%
+                      group_by(location,year,SPEC2)%>%
+                      summarise(var = mean(weight,na.rm=T))%>%
+                      ungroup()%>%
+                      mutate(id = paste(location,year,sep="_"))%>%
+                      select(id,SPEC2,var)%>%
+                      spread(SPEC2,var,fill=0)%>%
+                      column_to_rownames('id')%>%
+                      mutate(tot = rowSums(.,na.rm=T))%>%
+                      filter(tot>0)%>% #filter out any zero catches
+                      select(-tot)%>%
+                      decostand(method = "total")
+     
+     crab_nmds_bray <- crab_nmds_df%>%
+                       metaMDS(.,k=5)
+     
+     crab_nmds_pa <- crab_nmds_df%>%
+                     dist(., method="binary")%>%
+                     metaMDS(.,k=5)
+     
+     crab_data_scores <- as.data.frame(scores(crab_nmds_bray,"sites"))%>%
+                         mutate(id=rownames(.),
+                                method="Bray-Curtis",
+                                stress=round(crab_nmds_bray$stress,3))%>%
+                         separate(id,c("location","year"),sep="_")%>%
+                        rbind(.,
+                              as.data.frame(scores(crab_nmds_pa,"sites"))%>%
+                                mutate(id=rownames(.),
+                                       method="Euclidean",
+                                       stress=round(crab_nmds_pa$stress,3))%>%
+                                separate(id,c("location","year"),sep="_"))
+     
+     crab_hull_data <- crab_data_scores%>%
+                        group_by(method,location)%>%
+                        slice(chull(x=NMDS1,y=NMDS2))
+     
+     crab_stress_lab <- crab_data_scores%>%
+                        distinct(method,.keep_all=TRUE)%>%
+                        mutate(label=paste0("Stress = ",unique(stress)," k = 5"))%>%
+                        select(method,label)
+     
+     
+     #grouped plot
+     p1_crab_nmds <- ggplot()+
+       geom_polygon(aes(x=NMDS1,y=NMDS2,fill=location),data=crab_hull_data,alpha=0.30)+
+       labs(fill="")+
+       new_scale_fill()+
+       geom_point(aes(x=NMDS1,y=NMDS2,shape=location,fill=as.numeric(year)),data=crab_data_scores,size=3)+
+       scale_shape_manual(values=c(21,23),guide="none")+
+       geom_text(aes(x=Inf,y=-Inf,label=label,hjust=1.05,vjust=-0.5),data=crab_stress_lab)+
+       facet_wrap(~method,ncol=2,scales="free")+
+       theme_bw()+
+       theme(axis.text.x=element_blank(),
+             axis.ticks.x=element_blank(),
+             axis.text.y=element_blank(),
+             axis.ticks.y=element_blank(),
+             panel.grid.major = element_blank(),
+             panel.grid.minor = element_blank(),
+             legend.position = "bottom",
+             strip.background = element_rect(fill="white"))+
+       labs(shape="",fill="",col="Sample year")+
+       scale_fill_viridis()
+     
+     ggsave("output/CrabSurvey/CrabSurvey_nmds_location_grouped.png",p1_crab_nmds,height=6,width=6,units="in",dpi=300)
+     
+     #catch ~ year inside/outside all stations
+     
+     crab_nmds_df_all <- crab_nmds%>%
+                         group_by(location,STATION,year,SPEC2)%>%
+                           summarise(var = mean(weight,na.rm=T))%>%
+                           ungroup()%>%
+                           mutate(id = paste(STATION,location,year,sep="_"))%>%
+                           select(id,SPEC2,var)%>%
+                           spread(SPEC2,var,fill=0)%>%
+                           column_to_rownames('id')%>%
+                           mutate(tot = rowSums(.,na.rm=T))%>%
+                           filter(tot>0)%>% #filter out any zero catches
+                           select(-tot)%>%
+                           decostand(method = "total")
+     
+     crab_nmds_bray_all <- crab_nmds_df_all%>%
+                           metaMDS(.,k=5)
+     
+     crab_nmds_pa_all <- crab_nmds_df_all%>%
+                         dist(., method="binary")%>%
+                         metaMDS(.,k=5)
+     
+     crab_data_scores_all <- as.data.frame(scores(crab_nmds_bray_all,"sites"))%>%
+                             mutate(id=rownames(.),
+                                    method="Bray-Curtis",
+                                    stress=round(crab_nmds_bray_all$stress,3))%>%
+                             separate(id,c("station","location","year"),sep="_")%>%
+                             rbind(.,
+                                   as.data.frame(scores(crab_nmds_pa_all,"sites"))%>%
+                                     mutate(id=rownames(.),
+                                            method="Euclidean",
+                                            stress=round(crab_nmds_pa_all$stress,3))%>%
+                                     separate(id,c("station","location","year"),sep="_"))
+     
+     crab_hull_data_all <- crab_data_scores_all%>%
+                           group_by(method,location,year)%>%
+                           slice(chull(x=NMDS1,y=NMDS2))
+     
+     crab_stress_lab_all <- crab_data_scores_all%>%
+                         distinct(method,.keep_all=TRUE)%>%
+                         mutate(label=paste0("Stress = ",unique(stress)," k = 5"))%>%
+                         select(method,label)
+     
+                  p_all_bray <- ggplot()+
+                               geom_polygon(aes(x=NMDS1,y=NMDS2,fill=location),
+                                            data=crab_hull_data_all%>%filter(method=="Bray-Curtis"),alpha=0.30,col="grey20",lwd=0.25,lty=2)+
+                               labs(fill="")+
+                               geom_point(aes(x=NMDS1,y=NMDS2,shape=location),
+                                          data=crab_data_scores_all%>%filter(method=="Bray-Curtis"),size=1,show.legend = FALSE)+
+                               facet_wrap(~year,ncol=2)+
+                               theme_bw()+
+                               theme(axis.text.x=element_blank(),
+                                     axis.ticks.x=element_blank(),
+                                     axis.text.y=element_blank(),
+                                     axis.ticks.y=element_blank(),
+                                     panel.grid.major = element_blank(),
+                                     panel.grid.minor = element_blank(),
+                                     legend.position = "bottom",
+                                     strip.background = element_rect(fill="white"))+
+                               labs(shape="",fill="",col="Sample year",
+                                    title=paste(crab_stress_lab_all%>%filter(method=="Bray-Curtis")%>%select(method,label),collapse=": "))
+                  
+                  p_all_pa <- ggplot()+
+                              geom_polygon(aes(x=NMDS1,y=NMDS2,fill=location),
+                                           data=crab_hull_data_all%>%filter(method=="Euclidean"),alpha=0.30,col="grey20",lwd=0.25,lty=2)+
+                              labs(fill="")+
+                              geom_point(aes(x=NMDS1,y=NMDS2,shape=location),
+                                         data=crab_data_scores_all%>%filter(method=="Euclidean"),size=1,,show.legend = FALSE)+
+                              facet_wrap(~year,ncol=2)+
+                              theme_bw()+
+                              theme(axis.text.x=element_blank(),
+                                    axis.ticks.x=element_blank(),
+                                    axis.text.y=element_blank(),
+                                    axis.ticks.y=element_blank(),
+                                    panel.grid.major = element_blank(),
+                                    panel.grid.minor = element_blank(),
+                                    legend.position = "bottom",
+                                    strip.background = element_rect(fill="white"))+
+                              labs(shape="",fill="",col="Sample year",
+                                   title=paste(crab_stress_lab_all%>%filter(method=="Euclidean")%>%select(method,label),collapse=": "))
+                  
+             crab_combo_all <- p_all_bray + p_all_pa + plot_layout(guides = "collect") & theme(legend.position = "bottom")
+             
+             ggsave("output/CrabSurvey/CrabSurvey_nmds_all.png",crab_combo_all,width=8,height=5,units="in",dpi=300)
+                   
+     
+                         
+     
