@@ -13,6 +13,13 @@ library(RODBC)
 library(ggpubr)
 library(tidyr)
 
+#Note, some objects in this script and others are shared between the following scripts used to generate the figures in the tech report: 
+#crab_survey_extract_updated.R
+#CrabSurvey_SpeciesMaps.R
+#diversity_stats_csas2023.R
+#2022_Workshop_Plots.R 
+#and a bunch of scripts Ryan wrote 
+
 
 #### 0. set projections and options
 sf_use_s2 = FALSE

@@ -126,22 +126,23 @@ values(b1)[!ind] <- NA #masks out the non polygon raster values
 ##make it a plot
 stars_dem <- ras%>%
              projectRaster(.,crs=latlong)%>%
-             crop(.,extent(sab_nozones))%>%
-             mask(.,sab_nozones%>%as_Spatial())%>%
+             #crop(.,extent(sab_nozones))%>%
+             #mask(.,sab_nozones%>%as_Spatial())%>%
              st_as_stars()
 
 sab_depth_plot <- ggplot()+
   geom_stars(data=stars_dem)+
-  geom_sf(data=basemap_atlantic)+
-  geom_sf(data=sab,fill=NA)+
-  coord_sf(xlim=plotlims[c(1,3)],ylim=plotlims[c(2,4)])+
+  geom_sf(data=novsco)+
+  geom_sf(data=sab,fill=NA,linewidth=1.25,colour="blue")+
+  #coord_sf(xlim=plotlims[c(1,3)],ylim=plotlims[c(2,4)])+
+  coord_sf(xlim=c(-60, -58.2), ylim=c(45.6,46.5), expand=F)+
   theme_bw()+
   scale_fill_viridis(option="A",direction = -1,na.value="transparent")+
   labs(x="",y="",fill="Depth (m)")+
-  theme(axis.text = element_blank(),
-        legend.position = "bottom")
+  theme(#axis.text = element_blank(),
+        legend.position = "bottom", text=element_text(size=15), legend.key.width = unit(1.5, "cm"))
 
-ggsave("output/sab_bathymetry_plot.png",sab_depth_plot,width=8,height=7,units="in",dpi=600)
+ggsave("output/sab_bathymetry_plot_NJ.png",sab_depth_plot,width=8,height=7,units="in",dpi=600)
 
 sab_depth_ridge_plot <- ggplot(sab_bathy_values,aes(x=depth,y=1,fill=stat(x)))+
   geom_density_ridges_gradient(scale=3,size=0.3,rel_min_height=0.001)+
