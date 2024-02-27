@@ -20,6 +20,9 @@
 #### Global options---------
     sf_use_s2 = FALSE
     
+#### Source function ------
+    source("code/Species_Summaries_Function.R")
+    
 ### Target species ---------
     target_sp <- data.frame(spec=c("ANARHICHAS LUPUS", "UROPHYCIS TENUIS", "HIPPOGLOSSOIDES PLATESSOIDES",
                                    "GLYPTOCEPHALUS CYNOGLOSSUS", "CHIONOECETES OPILIO", "GADUS MORHUA", 
@@ -188,7 +191,10 @@
     }
     
 #link in the taxonomy data
-    catchdat_stand <- catchdat_stand%>%left_join(.,crab_tax_clean)
+    catchdat_stand <- catchdat_stand%>%
+                      left_join(.,crab_tax_clean)%>%
+                      rowwise()%>%
+                      mutate(common = capitalize_first(tolower(common)))
 
 #Format the crab data ---------
     load("data/CrabSurvey/OldData/MPATOWS.RDATA") #load this one so we can make a map of the Gully and SAB stations, this is only the enhanced stations
@@ -226,26 +232,28 @@
                          !(is.na(FISH_LENGTH)), 
                          FISH_LENGTH!="")%>%
                   mutate(year=as.numeric(format(as.Date(BOARD_DATE, tryFormats = c("%Y-%m-%d", "%Y/%m/%d")),"%Y")),
-                         species = case_when(COMM == "YELLOWTAIL FLOUNDER; LIMANDA" ~ "Yellowtail",
-                                          COMM=="YELLOWTAIL FLOUNDER; LIMANDA"~"Yellowtail",
+                         species = case_when(COMM == "YELLOWTAIL FLOUNDER" ~ "Yellowtail",
                                           COMM=="TURBOT,GREENLAND HALIBUT"~"Greenland halibut",
+                                          COMM
                                           COMM=="MONKFISH,GOOSEFISH,ANGLER"~"Anglerfish",
-                                          COMM=="HERRING ATLANTIC"~"Atlantic herring",
-                                          COMM=="EELPOUT,NEWFOUNDLAND; INCL LYCODES ATLANTICUS; TERRAENOVA"~"Atlantic eelpout",
-                                          COMM=="LONGFIN HAKE; UROPHYCIS"~"Longfin hake",
-                                          COMM=="SNOW CRAB  QUEEN; INCL CHIONOECETES SP"~"Snow crab",
-                                          COMM=="SNAKE BLENNY; LUMPRETAEFORMIS"~"Snake Blenny",
+                                          COMM=="HERRING(ATLANTIC)"~"Atlantic herring",
+                                          COMM=="EELPOUT,NEWFOUNDLAND"~"Atlantic eelpout",
+                                          COMM=="LONGFIN HAKE"~"Longfin hake",
+                                          COMM=="SNOW CRAB (QUEEN)"~"Snow crab",
+                                          COMM=="4-LINE SNAKE BLENNY"~"Snake Blenny",
+                                          COMM=="SNAKE BLENNY"~"Snake Blenny",
                                           COMM=="SNOWFLAKE HOOKEAR SCULPIN"~"Snowflake Sculpin",
                                           COMM=="HOOKEAR SCULPIN,ATL."~"Hookear sculpin",
-                                          COMM=="SHORTTAILED EELPOUT VAHL"~"Lycodes sp.",
-                                          COMM=="RIBBED SCULPIN; PINGELI"~"Ribbed sculpin",
+                                          COMM=="HOOKEAR SCULPIN (NS)"~"Hookear sculpin",
+                                          COMM=="SHORTTAILED EELPOUT(VAHL)"~"Lycodes sp.",
+                                          COMM=="RIBBED SCULPIN"~"Ribbed sculpin",
                                           COMM=="STRIPED ATLANTIC WOLFFISH"~"Atlantic wolffish",
-                                          COMM=="COD ATLANTIC"~"Atlantic cod",
+                                          COMM=="COD(ATLANTIC)"~"Atlantic cod",
                                           TRUE ~ NA), #these are the subset in the original plot
                         species2 = case_when(COMM!=species~species,
                                              COMM=="DAUBED SHANNY; LUMPENUS"~"Daubed shanny", #other ones to fix
-                                             COMM=="WHITE BARRACUDINA; NOTOLEPIS RISSOI"~"White barracudina",
-                                             COMM=="LITTLE SKATE; ERINACEA"~"Little skate",
+                                             COMM=="WHITE BARRACUDINA"~"White barracudina",
+                                             COMM=="LITTLE SKATE"~"Little skate",
                                              COMM=="SEASNAIL UNIDENTIFIED"~"Seasnail",
                                              COMM=="BRILL/WINDOWPANE"~"Windowpane flounder",
                                           TRUE ~ COMM))%>%
@@ -339,83 +347,14 @@
     ggsave("output/CrabSurvey/LargeFish_inside-outside_wSmooth.png",p_bigfish_a,height=8,width=6,units="in",dpi=300)
     ggsave("output/CrabSurvey/LargeFish_inside-outside.png",p_bigfish_b,height=8,width=6,units="in",dpi=300)    
 
-#### wolfish trends -------------
+#### target species trends -------------
     
-    #note that wolfish is sampled just inside the MPA
-    wf_crab_df <- catchdat_stand%>%
-                  filter(aphiaID == 126758)%>%
-                  mutate(year=year(as.POSIXct(BOARD_DATE)),
-                         dataset = "catch")%>%
-                  select(station,type,location,number,weight,year,dataset)%>%
-                  filter(location=="Inside")%>%
-                  group_by
-    
-    wf_size <- fishmorph_df%>%
-                mutate(station=as.integer(STATION))%>%
-                filter(station %in% stns$STATION,
-                       species == "Atlantic wolffish")%>%
-                left_join(.,stns%>%rename(station=STATION))%>%
-                mutate(dataset="length",
-                       location = ifelse(Inside,"Inside","Outside"),
-                       type = ifelse(Enhanced,"Enhanced","Standard"))
-    
-    wf_stations <- wf_size%>%
-                    group_by(station,year)%>%
-                    summarise(med=median(FISH_LENGTH,na.rm=T),
-                              mn=mean(FISH_LENGTH,na.rm=T),
-                              sd=sd(FISH_LENGTH,na.rm=T),
-                              bigfish = quantile(FISH_LENGTH,0.9))%>%
-                    ungroup()
-    
-    
-    
-    
-    wf_size_plot <- ggplot()+
-                    geom_vline(xintercept = 2017,lty=2)+
-                    geom_line(aes(x=year,y=mn,group=factor(station),col=factor(station)),data=wf_stations,lwd=0.25,alpha=0.25)+
-                    geom_linerange(aes(x=year,y=mn,group=factor(station),col=factor(station),ymin=mn-sd,ymax=mn+sd),data=wf_stations)+
-                    geom_point(aes(x=year,y=mn,group=factor(station),col=factor(station)),data=wf_stations,size=2)+
-                    theme_bw()+
-                    scale_x_continuous(limits=c(2015,2023))+
-                    theme(legend.position = "none")+
-                    labs(y=bquote(bar(x) ~ " size (cm) ± sd"),x="",title="a)")+
-                    stat_smooth(data=wf_stations,aes(x=year,y=mn),method="lm")
-    
-    wf_size_big_plot <- ggplot()+
-                        geom_vline(xintercept = 2017,lty=2)+
-                        geom_line(aes(x=year,y=bigfish,group=factor(station),col=factor(station)),data=wf_stations,lwd=0.25,alpha=0.25)+
-                        geom_point(aes(x=year,y=bigfish,group=factor(station),col=factor(station)),data=wf_stations,size=2)+
-                        theme_bw()+
-                        scale_x_continuous(limits=c(2015,2023))+
-                        theme(legend.position = "none")+
-                        labs(y="90th percentile size (cm)",x="",title="b)")+
-                        stat_smooth(data=wf_stations,aes(x=year,y=bigfish),method="lm")
-    
-    wf_catch_plot <- ggplot()+
-                     geom_vline(xintercept = 2017,lty=2)+
-                     geom_line(aes(x=year,y=number,group=factor(station),col=factor(station)),data=wf_crab_df,lwd=0.25,alpha=0.25)+
-                     geom_point(aes(x=year,y=number,group=factor(station),col=factor(station)),data=wf_crab_df,size=2)+
-                     theme_bw()+
-                     scale_x_continuous(limits=c(2015,2023))+
-                     theme(legend.position = "none",)+
-                     labs(y="Number",x="",title="c)")+
-                     stat_smooth(data=wf_crab_df,aes(x=year,y=number),method="lm")
-    
-    wf_biomass_plot <- ggplot()+
-                        geom_vline(xintercept = 2017,lty=2)+
-                        geom_line(aes(x=year,y=weight,group=factor(station),col=factor(station)),data=wf_crab_df,lwd=0.25,alpha=0.25)+
-                        geom_point(aes(x=year,y=weight,group=factor(station),col=factor(station)),data=wf_crab_df,size=2)+
-                        theme_bw()+
-                        scale_x_continuous(limits=c(2015,2023))+
-                        theme(legend.position = "none")+
-                        labs(y="Biomass (kg)",x="",title="d)")+
-                        stat_smooth(data=wf_crab_df,aes(x=year,y=weight),method="lm")
-    
-    wf_combo_plot <- (wf_size_plot+wf_size_big_plot)/(wf_catch_plot+wf_biomass_plot)
+  for(i in target_sp$common){
+    sum_plot <- summary_plot_fun(i,stns,catchdat_stand,fishmorph_df)
+    ggsave(paste0("output/CrabSurvey/",gsub(" ","_",i),"_summary.png"),sum_plot,height=8,width=6,units="in",dpi=300)
+  }  
                      
-  ggsave("output/CrabSurvey/Wolffish_Summary.png",wf_combo_plot,height=10,width=6,units="in",dpi=300)
-    
-    
+ 
     
 ##### Catch changes within stations --------------
     
