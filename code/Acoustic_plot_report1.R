@@ -10,6 +10,8 @@ library(arcpullr)
 library(marmap)
 library(stars)
 library(ggrepel)
+library(worrms)
+library(patchwork)
 
 s2_as_sf = FALSE
 
@@ -94,7 +96,8 @@ recievers <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
                   filter(stn_lat >= proj_lat_low & stn_lat <= proj_lat_upp &# Filter stations based on latitude and longitude bounds
                            stn_long >= proj_long_low & stn_long <= proj_long_upp)%>%
                   st_as_sf(coords=c("stn_long","stn_lat"),crs=latlong)%>%
-                  mutate(year=year(deploy_date))%>%
+                  mutate(year=year(deploy_date),
+                         array = ifelse(year<2021,"2015-2020","2020-2024"))%>%
                   filter(year>2014) #just within the SAB window
   
   url <- "https://gisp.dfo-mpo.gc.ca/arcgis/rest/services/FGP/Oceans_Act_Marine_Protected_Areas/MapServer/0"
@@ -107,7 +110,47 @@ recievers <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
             ymax=proj_lat_upp)%>%
     st_transform(latlong)
     
-
+## OTN tag deployment locations ---------
+  tag_url <- 'https://members.oceantrack.org/geoserver/otn/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=otn:animals&outputFormat=csv'
+  
+  geoserver_tag_releases <- readr::read_csv(tag_url, guess_max = 13579) %>%
+                            filter(collectioncode == "SABMPA")%>%
+                            mutate(id = paste(abs(longitude),latitude,sep="_"))%>%
+                            distinct(id,.keep_all=TRUE)%>%
+                            st_as_sf(coords=c("longitude","latitude"),crs=latlong)
+  
+  tag_tax <- data.frame(aphiaid = unique(geoserver_tag_releases$aphiaid))%>%
+             rowwise()%>%
+             mutate(sp=wm_id2name(aphiaid))%>%
+             data.frame()%>%
+             mutate(common=case_when(sp == "Amblyraja radiata" ~ "Thorny skate",
+                                     sp == "Anarhichas lupus" ~ "Atlantic wolffish",
+                                     sp == "Chionoecetes opilio" ~ "Snow crab",
+                                     sp == "Gadus morhua" ~ "Atlantic cod",
+                                     sp == "Hippoglossus hippoglossus" ~ "Atlantic halibut",
+                                     sp == "Myoxocephalus scorpius" ~ "Shorthorn sculpin"))
+  
+  geoserver_tag_releases <- geoserver_tag_releases%>%left_join(.,tag_tax)
+  
+  #some of the geoserver extracts are missing information. Use this csv instead
+  tag_df <- read.csv("data/Acoustic/SABMPA_tagrelease_Dec2023.csv")%>%
+            rename(common=COMMON_NAME_E)%>%
+            mutate(id = paste(abs(RELEASE_LONGITUDE),RELEASE_LATITUDE,common,sep="_"),
+                   year=year(as.POSIXct(UTC_RELEASE_DATE_TIME)),
+                   common=case_when(common == "ATLANTIC COD" ~ "Atlantic cod",
+                                    common == "ATLANTIC HALIBUT" ~ "Atlantic halibut",
+                                    common == "Atlantic Striped wolffish" ~ "Atlantic wolffish",
+                                    TRUE ~ common),
+                   array = ifelse(year<2021,"2015-2020","2020-2024"))%>% #only need unique locations
+            distinct(id,.keep_all=TRUE)%>%
+            st_as_sf(coords=c("RELEASE_LONGITUDE","RELEASE_LATITUDE"),crs=latlong)%>%
+            select(common,year,array,geometry)%>%
+            rbind(.,geoserver_tag_releases%>% #add the snow crab data
+                    filter(common == "Snow crab")%>%
+                    rename(year=yearcollected)%>%
+                    mutate(array = ifelse(year<2021,"2015-2020","2020-2024"))%>%
+                    select(common,year,array,geometry))
+  
  #bounding area for the primary plot----------
       bounding_area <- sab%>%
         st_transform(utm)%>%
@@ -147,6 +190,7 @@ recievers <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
                       geom_sf(data=basemap)+
                       geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
                       geom_sf(data=recievers_sf,aes(fill=array),shape=21)+
+                      geom_sf(data=geoserver_tag_releases,col="red")+
                       theme_bw()+
                       theme(legend.position = "bottom")+
                       guides(shape = guide_legend(override.aes = list(size=6)))+
@@ -193,4 +237,48 @@ recievers <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
                     theme(axis.text=element_blank())
       
       ggsave("output/Acoustic/inset_plot.png",inset_plot,height=6,width=6,units="in",dpi=300)
+      
+      #tag map
+      plot_list <- NULL
+      
+      for(i in unique(tag_df$common)){
         
+        array_df <- tag_df%>%filter(common == i)%>%pull(array)%>%unique()
+        
+        for(j in array_df){
+        
+        temp_tag <- tag_df%>%filter(common == i,array==j)
+        
+                        p1 <- ggplot()+
+                        geom_sf(data=shelfbreak,col="grey20",lty=2,fill=NA)+
+                        geom_sf(data=otn_stations%>%filter(array==j),size=0.1)+
+                        geom_sf(data=basemap)+
+                        geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
+                        geom_sf(data=recievers_sf%>%filter(array==j),fill="white",shape=21)+
+                        geom_sf(data=temp_tag,fill="coral2",shape=21,size=2)+
+                        geom_text(data=temp_tag%>%slice(1),aes(label=array),x=(-59.9),y=46.5,fontface = "bold",hjust=0)+
+                        theme_bw()+
+                        theme(legend.position = "bottom",
+                              strip.background = element_rect(fill="white"),
+                              axis.text=element_blank(),
+                              axis.title = element_blank())+
+                        labs(fill="")+
+                        coord_sf(expand=0,xlim=plot_boundaries[1:2],ylim=plot_boundaries[3:4])+
+                        facet_wrap(~common)
+                        
+                        assign(paste(gsub(" ","_",i),gsub("-","_",j),"plot",sep="_"),p1)
+                        
+                        plot_list <- c(plot_list,paste(gsub(" ","_",i),gsub("-","_",j),"plot",sep="_"))
+                    
+        } #end array loop
+      } #end common loop
+      
+
+      combo_tag_plot <- (Atlantic_cod_2015_2020_plot + Atlantic_cod_2020_2024_plot)/
+                        (Atlantic_tomcod_2015_2020_plot + Atlantic_tomcod_2020_2024_plot)/
+                        (Atlantic_halibut_2020_2024_plot + Atlantic_wolffish_2015_2020_plot)/
+                        (Shorthorn_Sculpin_2015_2020_plot+Shorthorn_sculpin_2020_2024_plot)/
+                        (Thorny_Skate_2015_2020_plot+Snow_crab_2015_2020_plot)
+      
+      ggsave("output/Acoustic/tagging_plot.png",combo_tag_plot,height=9,width=5,units="in",dpi=300)
+      
