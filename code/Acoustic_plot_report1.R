@@ -13,6 +13,7 @@ library(ggrepel)
 library(worrms)
 library(patchwork)
 library(raster)
+library(rphylopic)
 
 s2_as_sf = FALSE
 
@@ -71,6 +72,20 @@ basemap_inset <- rbind(
     
     load('data/Bathymetry/250m_stars_object.RData')
     dem_sab <- raster("data/Bathymetry/sab_dem.tif")
+    
+## station depth extract ------
+    
+    reciever_depth <- read.csv("data/Acoustic/SAB_deployments_recovered_allFeb2024.csv")%>%
+                      rename(lon=DEPLOY_LONG,lat=DEPLOY_LAT)%>%
+                      dplyr::select(-geometry)%>%
+                      st_as_sf(coords=c("lon","lat"),crs=latlong)%>%
+                      st_transform(proj4string(dem_sab))%>%
+                      mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))%>%#extract depth
+                      st_transform(latlong)%>%
+                      data.frame()%>%
+                      dplyr::select(-geometry)
+                      
+    write.csv(reciever_depth,file="data/Acoustic/Acoustic_Stations.csv",row.names=FALSE)
 
 #load coastline and make basemap ------
 coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
@@ -182,15 +197,19 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       
 #make primary map
       
+      
+      
+      
+      
       recievers_sf <- otn_stations%>%
                       filter(collectioncode=="SABMPA")%>%
                       mutate(array = ifelse(year<2021,"2015-2020","2020-2024"),
                              lon = st_coordinates(.)[,1],
                              lat = st_coordinates(.)[,2])%>%
                       st_transform(proj4string(dem_sab))%>%
-                      mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))#extract depth
-      
-      write.csv(recievers_sf%>%data.frame()%>%dplyr::select(-geometry),file="data/Acoustic/Acoustic_Stations.csv",row.names=FALSE)
+                      mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))%>%#extract depth
+                      st_transform(latlong)
+   
       
       
       primary_plot <- ggplot()+
@@ -291,3 +310,91 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       
       ggsave("output/Acoustic/tagging_plot.png",combo_tag_plot,height=9,width=5,units="in",dpi=300)
       
+      
+### Tagging plot --- 
+      
+    tag_df <- read.csv("data/Acoustic/qdet_releaselocs.csv")%>%
+              rename(lon=RELEASE_LONGITUDE,lat=RELEASE_LATITUDE)%>%
+              filter(!is.na(lon))%>%
+              st_as_sf(coords=c("lon","lat"),crs=latlong,remove=FALSE)%>%
+              mutate(group=case_when(Common.Name %in% c("White shark","Shortfin mako","Blue shark","Blue shark/Mako/Bluefin tuna","Porbeagle shark") ~ "Sharks",
+                                     Common.Name %in% c("Atlantic sturgeon","Bluefin tuna")~"Pelagics",
+                                     Common.Name %in% c("Atlantic cod","Snow crab","Atlantic halibut") ~ "Atlantic fisheries",
+                                     Common.Name %in% c("Atlantic salmon","American eel") ~ "Diadramous",
+                                     Common.Name %in% c("Grey seal","Leatherback turtle") ~ "Large pelagics",
+                                     TRUE ~ NA))
+    
+    tag_bound <- tag_df%>%
+                 st_bbox()%>%
+                 st_as_sfc()%>%
+                 st_buffer(0.5)%>% #0.5 degree buffer
+                 st_bbox()
+    
+    tag_df_sp <- data.frame(sp = unique(tag_df$Common.Name))%>%
+                 mutate(search=case_when(sp == "Atlantic salmon"~"Salmo trutta", #closest match in phylopic
+                                         sp == "Atlantic halibut" ~"Hippoglossoides platessoides", #closest match in phylopic
+                                         sp == "Leatherback turtle"~"Dermochelys coriacea",
+                                         sp == "Porbeagle shark"~"Lamna nasus",
+                                         sp == "Snow crab"~"Pugettia quadridens", #closest I could find on phylopic
+                                         sp == "Blue shark/Mako/Bluefin tuna" ~ "Isurus oxyrinchus", #general shark pic for this species group
+                                         TRUE ~sp))%>%
+                 rowwise()%>%
+                 mutate(uid = get_uuid(search),
+                        sp = ifelse(sp == "Blue shark/Mako/Bluefin tuna",gsub("/","-",sp),sp))%>%
+                 data.frame()
+    
+    for(i in 1:nrow(tag_df_sp)){
+      
+      
+      temp <- get_phylopic(tag_df_sp[i,"uid"],height=256)
+      
+      assign(gsub(" ","_",tag_df_sp[i,"sp"]),temp)
+      
+      
+    }
+    
+    global_basemap <- ne_states()
+    
+    
+    for(i in unique(tag_df$group)){
+      
+      temp <- tag_df%>%
+              filter(group == i)
+      
+      temp_bound <- tag_df%>%
+                    st_bbox()%>%
+                    st_as_sfc()%>%
+                    st_buffer(0.5)%>%
+                    st_bbox()
+      
+      temp_plot <- ggplot()+
+        geom_sf(data=global_basemap)+
+        geom_sf(data=sab)+
+        geom_sf(data=temp,aes(col=Common.Name),size=3)+
+        coord_sf(expand=0,xlim=temp_bound[c(1,3)],ylim=temp_bound[c(2,4)])+
+        theme_bw()
+        
+      assign(paste0("plot_",gsub(" ","_",i)),temp_plot)
+      
+    }
+    
+    
+    combo_maps <- (plot_Large_pelagics + plot_Pelagics)/(plot_Atlantic_fisheries+plot_Diadramous)/plot_Sharks
+    
+    ggsave("output/CrabSurvey/test.png",combo_maps,height=8,width=6,units="in",dpi=300)
+    
+    ##make map
+    ggplot()+
+      geom_sf(data=basemap_inset)+
+      geom_sf(data=tag_df,aes(col=Common.Name))+
+      coord_sf(xlim=tag_bound[c(1,3)],ylim=tag_bound[c(2,4)])
+    
+    
+    # four scales
+    
+    
+    
+    
+                 
+    
+    
