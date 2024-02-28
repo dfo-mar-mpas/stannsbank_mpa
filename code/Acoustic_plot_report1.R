@@ -14,6 +14,8 @@ library(worrms)
 library(patchwork)
 library(raster)
 library(rphylopic)
+library(ggspatial)
+library(viridis)
 
 s2_as_sf = FALSE
 
@@ -59,6 +61,9 @@ basemap_inset <- rbind(
                     mutate(country="US")
                   )
 
+global_basemap <- ne_states() #this is a very large scale map
+
+
 #bathymetry 
     bbsab <- st_bbox(sab)
     
@@ -82,6 +87,7 @@ basemap_inset <- rbind(
                       st_transform(proj4string(dem_sab))%>%
                       mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))%>%#extract depth
                       st_transform(latlong)%>%
+                      st_intersection(.,sab_zones%>%dplyr::select(Zone,geometry))%>%
                       data.frame()%>%
                       dplyr::select(-geometry)
                       
@@ -322,7 +328,12 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                                      Common.Name %in% c("Atlantic cod","Snow crab","Atlantic halibut") ~ "Atlantic fisheries",
                                      Common.Name %in% c("Atlantic salmon","American eel") ~ "Diadramous",
                                      Common.Name %in% c("Grey seal","Leatherback turtle") ~ "Large pelagics",
-                                     TRUE ~ NA))
+                                     TRUE ~ NA),
+                     Common.Name = factor(Common.Name,levels=c("American eel","Atlantic cod","Atlantic halibut","Atlantic salmon","Atlantic sturgeon",
+                                                               "Blue shark","Blue shark/Mako/Bluefin tuna","Bluefin tuna","Grey seal","Leatherback turtle",           
+                                                               "Porbeagle shark","Shortfin mako","Snow crab","White shark")))
+              
+      
     
     tag_bound <- tag_df%>%
                  st_bbox()%>%
@@ -343,58 +354,158 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                         sp = ifelse(sp == "Blue shark/Mako/Bluefin tuna",gsub("/","-",sp),sp))%>%
                  data.frame()
     
-    for(i in 1:nrow(tag_df_sp)){
-      
-      
-      temp <- get_phylopic(tag_df_sp[i,"uid"],height=256)
-      
-      assign(gsub(" ","_",tag_df_sp[i,"sp"]),temp)
-      
-      
-    }
-    
-    global_basemap <- ne_states()
     
     
-    for(i in unique(tag_df$group)){
-      
-      temp <- tag_df%>%
-              filter(group == i)
-      
-      temp_bound <- tag_df%>%
-                    st_bbox()%>%
-                    st_as_sfc()%>%
-                    st_buffer(0.5)%>%
-                    st_bbox()
-      
-      temp_plot <- ggplot()+
-        geom_sf(data=global_basemap)+
-        geom_sf(data=sab)+
-        geom_sf(data=temp,aes(col=Common.Name),size=3)+
-        coord_sf(expand=0,xlim=temp_bound[c(1,3)],ylim=temp_bound[c(2,4)])+
-        theme_bw()
-        
-      assign(paste0("plot_",gsub(" ","_",i)),temp_plot)
-      
-    }
+    # five scales
+    
+    scale0 <- sab%>%
+              st_transform(utm)%>%
+              st_buffer(7)%>%
+              st_transform(latlong)%>%
+              st_bbox()
+    
+    scale0_box <- scale0%>%st_as_sfc()%>%st_as_sf()
+    
+    scale0_pts <- tag_df%>%st_intersection(scale0_box)
+    
+    scale0_plot <- ggplot()+
+                    geom_sf(data=shelfbreak,col="grey20",lty=2,fill=NA)+
+                    geom_sf(data=basemap_inset)+
+                    geom_sf(data=sab_zones,fill="cornflowerblue",alpha=0.3)+
+                    geom_sf(data=tag_df,aes(fill=Common.Name),size=3,pch=21)+
+                    coord_sf(expand=0,xlim=scale0[c(1,3)],ylim=scale0[c(2,4)])+
+                    theme_bw()+
+                    annotation_scale(location="br")+
+                    theme(legend.position = "none",
+                          axis.text=element_blank())
     
     
-    combo_maps <- (plot_Large_pelagics + plot_Pelagics)/(plot_Atlantic_fisheries+plot_Diadramous)/plot_Sharks
+    #scale 1 (fine scale)
+    scale1 <- sab%>%
+              st_transform(utm)%>%
+              st_buffer(300)%>%
+              st_transform(latlong)%>%
+              st_bbox()
     
-    ggsave("output/CrabSurvey/test.png",combo_maps,height=8,width=6,units="in",dpi=300)
+    scale1[2] <- 44
     
-    ##make map
+    scale1_box <- scale1%>%st_as_sfc()%>%st_as_sf()
+    
+    scale1_pts <- tag_df%>%
+                  st_intersection(scale1_box)%>%
+                  filter(!animal_id %in% scale0_pts$animal_id)
+    
+    scale1_plot <- ggplot()+
+                    geom_sf(data=basemap_inset)+
+                    geom_sf(data=sab_zones,fill="cornflowerblue",alpha=0.3)+
+                    geom_sf(data=tag_df,aes(fill=Common.Name),size=1,pch=21)+
+                    geom_sf(data=tag_df%>%filter(animal_id %in% scale1_pts$animal_id),aes(fill=Common.Name),size=4,pch=21)+
+                    coord_sf(expand=0,xlim=scale1[c(1,3)],ylim=scale1[c(2,4)])+
+                    theme_bw()+
+                    annotation_scale(location="br")+
+                    theme(legend.position = "none",
+                          axis.text=element_blank())
+    
+    #scale 2 fine-medium scale 
+    scale2 <- sab%>%
+              st_transform(utm)%>%
+              st_buffer(650)%>%
+              st_transform(latlong)%>%
+              st_bbox()
+    
+    scale2_box <- scale2%>%st_as_sfc()%>%st_as_sf()
+    
+    scale2_pts <- tag_df%>%
+                  st_intersection(.,scale2_box)%>%
+                  filter(!animal_id %in% c(scale0_pts$animal_id,scale1_pts$animal_id))
+    
+    scale2_plot <- ggplot()+
+                    geom_sf(data=basemap_inset)+
+                    geom_sf(data=sab_zones,fill="cornflowerblue",alpha=0.3)+
+                    geom_sf(data=tag_df,aes(fill=Common.Name),size=1,pch=21)+
+                    geom_sf(data=tag_df%>%filter(animal_id %in% scale2_pts$animal_id),aes(fill=Common.Name),size=3,pch=21)+
+                    coord_sf(expand=0,xlim=scale2[c(1,3)],ylim=scale2[c(2,4)])+
+                    theme_bw()+
+                    annotation_scale(location="br")+
+                    theme(legend.position = "none",
+                          axis.text=element_blank())
+    
+    #scale 3 medium-large scale
+    scale3 <- sab%>%
+              st_bbox()
+    
+    scale3[c(3,4)] <- scale2[c(3,4)]
+    scale3[3] <- -47
+    scale3[2] <- 38.5
+    scale3[1] <- -78
+    
+    scale3_box <- scale3%>%st_as_sfc()%>%st_as_sf()
+    
+    scale3_pts <- tag_df%>%
+                  st_intersection(.,scale3_box)
+                
+    scale3_plot <- ggplot()+
+                   geom_sf(data=global_basemap)+
+                   geom_sf(data=sab,fill="cornflowerblue",alpha=0.3)+
+                   geom_sf(data=tag_df,aes(fill=Common.Name),size=2,pch=21)+
+                   geom_sf(data=tag_df%>%filter(animal_id %in% scale3_pts$animal_id),aes(fill=Common.Name),size=4,pch=21)+
+                   coord_sf(expand=0,xlim=scale3[c(1,3)],ylim=scale3[c(2,4)])+
+                   theme_bw()+
+                   annotation_scale(location="br")+
+                   theme(legend.position = "none",
+                         axis.text=element_blank())
+    
+    #scale 4 largest
+    scale4 <- sab%>%
+              st_bbox()
+    
+    scale4[c(3,4)] <- scale3[c(3,4)]
+    scale4[2] <- 8
+    scale4[1] <- -85
+    
+    
+    scale4_box <- scale4%>%st_as_sfc()%>%st_as_sf()
+    
+    scale4_pts <- tag_df%>%
+                  st_intersection(.,scale4_box)%>%
+                  filter(!animal_id %in% c(scale0_pts$animal_id,scale1_pts$animal_id,scale2_pts$animal_id,scale3_pts$animal_id))
+    
+    scale4_plot <- ggplot()+
+                  geom_sf(data=global_basemap)+
+                  geom_sf(data=sab,fill="cornflowerblue",alpha=0.3)+
+                  geom_sf(data=tag_df,aes(fill=Common.Name),size=2,pch=21)+
+                  geom_sf(data=tag_df%>%filter(animal_id %in% scale4_pts$animal_id),aes(fill=Common.Name),size=5,pch=21)+
+                  coord_sf(expand=0,xlim=scale4[c(1,3)],ylim=scale4[c(2,4)],label_axes = "-NE")+
+                  theme_bw()+
+                  annotation_scale(location = "br")+
+                  annotation_north_arrow(location = "tr")+
+                  theme(legend.position = "none")
+    
+    #make a legend plot
+    legend_dummy <- ggplot()+
+                    geom_sf(data=tag_df,aes(fill=Common.Name),size=5,pch=21)+
+                    theme_bw()+
+                    labs(fill="")+
+                    coord_sf(expand=0,label_axes = "-NE")
+    
+    #save plot
+    ggsave("output/Acoustic/tagmap_scale0.png",scale0_plot+scale_fill_viridis(discrete=T),height=5,width=5,units="in",dpi=300)
+    ggsave("output/Acoustic/tagmap_scale1.png",scale1_plot+scale_fill_viridis(discrete=T),height=5,width=6,units="in",dpi=300)
+    ggsave("output/Acoustic/tagmap_scale2.png",scale2_plot+scale_fill_viridis(discrete=T),height=6,width=8,units="in",dpi=300)
+    ggsave("output/Acoustic/tagmap_scale3.png",scale3_plot+scale_fill_viridis(discrete=T),height=6,width=10,units="in",dpi=300)
+    ggsave("output/Acoustic/tagmap_scale4.png",scale4_plot+scale_fill_viridis(discrete=T),height=10,width=6,units="in",dpi=300) 
+    ggsave("output/Acoustic/tagmap_legend.png",legend_dummy+scale_fill_viridis(discrete=T),height=5,width=5,units="in",dpi=300)
+    
+    
     ggplot()+
-      geom_sf(data=basemap_inset)+
-      geom_sf(data=tag_df,aes(col=Common.Name))+
-      coord_sf(xlim=tag_bound[c(1,3)],ylim=tag_bound[c(2,4)])
-    
-    
-    # four scales
-    
-    
-    
-    
-                 
+      geom_sf(data=global_basemap)+
+      geom_sf(data=sab,fill="cornflowerblue")+
+      geom_sf(data=scale0_box,fill=NA)+
+      geom_sf(data=scale1_box,fill=NA)+
+      geom_sf(data=scale2_box,fill=NA)+
+      geom_sf(data=scale3_box,fill=NA)+
+      geom_sf(data=tag_df,size=2)+
+      theme_bw()+
+      coord_sf(expand=0,xlim=tag_bound[c(1,3)],ylim=tag_bound[c(2,4)])
     
     
