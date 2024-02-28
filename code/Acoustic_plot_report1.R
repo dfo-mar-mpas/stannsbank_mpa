@@ -16,6 +16,7 @@ library(raster)
 library(rphylopic)
 library(ggspatial)
 library(viridis)
+library(terra)
 
 s2_as_sf = FALSE
 
@@ -460,8 +461,18 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
               st_bbox()
     
     scale4[c(3,4)] <- scale3[c(3,4)]
-    scale4[2] <- 8
+    scale4[2] <- 4
     scale4[1] <- -85
+    
+    #Sab distance circles
+    sab_centre <- sab%>%
+      st_centroid()
+    
+    sab_centre_terra <- sab_centre%>%vect()
+    
+    rings <- NULL
+    
+    for(i in c(100,500,1000,2500,5000)){rings <- rbind(rings,sab_centre_terra%>%buffer(i*1000)%>%st_as_sf())}
     
     
     scale4_box <- scale4%>%st_as_sfc()%>%st_as_sf()
@@ -473,8 +484,9 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     scale4_plot <- ggplot()+
                   geom_sf(data=global_basemap)+
                   geom_sf(data=sab,fill="cornflowerblue",alpha=0.3)+
-                  geom_sf(data=tag_df,aes(fill=Common.Name),size=2,pch=21)+
-                  geom_sf(data=tag_df%>%filter(animal_id %in% scale4_pts$animal_id),aes(fill=Common.Name),size=5,pch=21)+
+                  geom_sf(data=tag_df,aes(fill=Common.Name),size=3,pch=21)+
+                  geom_sf(data=tag_df%>%filter(animal_id %in% scale4_pts$animal_id),aes(fill=Common.Name),size=3,pch=21)+
+                  geom_sf(data=rings,lty=2,lwd=0.5,fill=NA)+
                   coord_sf(expand=0,xlim=scale4[c(1,3)],ylim=scale4[c(2,4)],label_axes = "-NE")+
                   theme_bw()+
                   annotation_scale(location = "br")+
@@ -495,17 +507,6 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     ggsave("output/Acoustic/tagmap_scale3.png",scale3_plot+scale_fill_viridis(discrete=T),height=6,width=10,units="in",dpi=300)
     ggsave("output/Acoustic/tagmap_scale4.png",scale4_plot+scale_fill_viridis(discrete=T),height=10,width=6,units="in",dpi=300) 
     ggsave("output/Acoustic/tagmap_legend.png",legend_dummy+scale_fill_viridis(discrete=T),height=5,width=5,units="in",dpi=300)
-    
-    
-    ggplot()+
-      geom_sf(data=global_basemap)+
-      geom_sf(data=sab,fill="cornflowerblue")+
-      geom_sf(data=scale0_box,fill=NA)+
-      geom_sf(data=scale1_box,fill=NA)+
-      geom_sf(data=scale2_box,fill=NA)+
-      geom_sf(data=scale3_box,fill=NA)+
-      geom_sf(data=tag_df,size=2)+
-      theme_bw()+
-      coord_sf(expand=0,xlim=tag_bound[c(1,3)],ylim=tag_bound[c(2,4)])
+
     
     
