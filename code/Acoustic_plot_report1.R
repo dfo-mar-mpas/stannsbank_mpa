@@ -488,7 +488,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                     labs(fill="")+
                     coord_sf(expand=0,label_axes = "-NE")
     
-    #save plot
+    #save plot - note used Scale 3 and 4 in the end plot to make it simple
     ggsave("output/Acoustic/tagmap_scale0.png",scale0_plot+scale_fill_viridis(discrete=T),height=5,width=5,units="in",dpi=300)
     ggsave("output/Acoustic/tagmap_scale1.png",scale1_plot+scale_fill_viridis(discrete=T),height=5,width=6,units="in",dpi=300)
     ggsave("output/Acoustic/tagmap_scale2.png",scale2_plot+scale_fill_viridis(discrete=T),height=6,width=8,units="in",dpi=300)
