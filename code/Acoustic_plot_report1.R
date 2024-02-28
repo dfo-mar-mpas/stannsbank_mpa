@@ -436,7 +436,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
               st_bbox()
     
     scale3[c(3,4)] <- scale2[c(3,4)]
-    scale3[3] <- -47
+    scale3[3] <- -51
     scale3[2] <- 38.5
     scale3[1] <- -78
     
@@ -461,6 +461,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
               st_bbox()
     
     scale4[c(3,4)] <- scale3[c(3,4)]
+    scale4[3] <- -47
     scale4[2] <- 4
     scale4[1] <- -85
     
