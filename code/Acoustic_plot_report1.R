@@ -28,22 +28,50 @@ utm <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84
 sab_zones <- read_sf("data/Shapefiles/SAB_boundary_zones_2017.shp")%>%
   st_transform(latlong)
 
-sab  <- sab_zones%>%
+sab <- sab_zones%>%
   st_transform(utm)%>%
   st_buffer(0.0025)%>% #this is small buffer that the vertex coordinate rounding issue
   st_union()%>% #gets rid of the zones
   st_transform(latlong)%>%
   st_as_sf()
 
+sab_banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
+
 #load bioregion and get plotting limits----
 bioregion <- read_sf("data/Shapefiles/MaritimesPlanningArea.shp")%>%
              st_transform(latlong)
+
+mar_net <- read_sf("data/Shapefiles/networksites_proposed_OEM_MPA_20220617.shp")%>%
+            st_transform(latlong)
 
 plot_lim <- bioregion%>% #bounding area for the inset (zoom out)
             st_transform(utm)%>%
             st_buffer(50)%>%
             st_transform(latlong)%>%
             st_bbox()
+
+#get the banks
+bank_df <- data.frame(bank=c("Curdo Bank","Scatarie Bank"),
+                      lon=c(-59.598049,-59.213127),
+                      lat=c(45.893003,45.988401))%>%
+            st_as_sf(coords=c("lon","lat"),crs=latlong)
+
+bank_range <- bank_df%>%
+              filter(bank=="Scatarie Bank")%>%
+              st_transform(utm)%>%
+              st_buffer(10)%>%
+              st_transform(latlong)%>%
+              st_bbox()
+
+curdo <- st_read("https://geogratis.gc.ca/services/geoname/en/geonames/CAISM.geojson?expand=feature,concise,generic,province,status,language,provider&exclude=feature.geometry&_gl=1*zk41wn*_ga*Mjk0MjcwMjQ4LjE3MDkyMTk0Nzk.*_ga_C2N57Y7DX5*MTcwOTIxOTQ3OS4xLjEuMTcwOTIxOTQ5OS4wLjAuMA..")
+scatarie
+            
+
+#for inset plot 
+plot_boundaries <- c(c(-60,-58,45.6,46.6)) #for inset plot
+inset_box <- sab%>%st_bbox()
+inset_box[c(1,3,2,4)] <- plot_boundaries     
+inset_box <- inset_box%>%st_as_sfc()%>%st_as_sf()
 
 basemap_inset <- rbind(
                   ne_states(country = "Canada",returnclass = "sf")%>%
@@ -68,18 +96,21 @@ global_basemap <- ne_states() #this is a very large scale map
 #bathymetry 
     bbsab <- st_bbox(sab)
     
-    noaabathy <- getNOAA.bathy(bbsab[1]-1,bbsab[3]+1,bbsab[2]+1,bbsab[4]-1,resolution = 0.25,keep=T)
+    #extract bathymetric data
+    noaabathy_sab <- getNOAA.bathy(bbsab[1]-1,bbsab[3]+1,bbsab[2]+1,bbsab[4]-1,resolution = 0.25,keep=T)
+    noaabathy_region <- getNOAA.bathy(plot_lim[1]-1,plot_lim[3]+1,plot_lim[2]-1,plot_lim[4]+1,resolution = 0.5,keep=T)
     
-    sab_bathy <- noaabathy%>%
-      fortify.bathy() %>%
-      st_as_stars() %>%
-      st_set_crs(4326)%>%
-      st_transform(latlong)
+    #create xyz dataframes that can be used by geom_contour
+    isobath_sab_df <- as.xyz(noaabathy_sab)%>%
+                      rename(lon=1,lat=2,depth=3)
     
-    load('data/Bathymetry/250m_stars_object.RData')
-    dem_sab <- raster("data/Bathymetry/sab_dem.tif")
+    isobath_df <- as.xyz(noaabathy_region)%>%
+                  rename(lon=1,lat=2,depth=3)
     
 ## station depth extract ------
+    
+    #SAB dem
+    dem_sab <- raster("data/Bathymetry/sab_dem.tif")
     
     reciever_depth <- read.csv("data/Acoustic/SAB_deployments_recovered_allFeb2024.csv")%>%
                       rename(lon=DEPLOY_LONG,lat=DEPLOY_LAT)%>%
@@ -92,11 +123,10 @@ global_basemap <- ne_states() #this is a very large scale map
                       data.frame()%>%
                       dplyr::select(-geometry)
                       
-    write.csv(reciever_depth,file="data/Acoustic/Acoustic_Stations.csv",row.names=FALSE)
+    #write.csv(reciever_depth,file="data/Acoustic/Acoustic_Stations.csv",row.names=FALSE)
 
 #load coastline and make basemap ------
 coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
-
 
 #download OTN data --  
 
@@ -123,7 +153,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                   st_as_sf(coords=c("stn_long","stn_lat"),crs=latlong)%>%
                   mutate(year=year(deploy_date),
                          array = ifelse(year<2021,"2015-2020","2020-2024"))%>%
-                  filter(year>2014)%>%#just within the SAB window
+                  filter(year>2014)#just within the SAB window
                   
   
   url <- "https://gisp.dfo-mpo.gc.ca/arcgis/rest/services/FGP/Oceans_Act_Marine_Protected_Areas/MapServer/0"
@@ -195,19 +225,9 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
         st_intersection(bounding_area%>%st_transform(st_crs(coast_hr)))%>%
         st_transform(latlong)%>%
         suppressWarnings()
-      
-      plot_boundaries <- c(c(-60,-58,45.6,46.6))
-      
-      inset_box <- sab%>%st_bbox()
-      inset_box[c(1,3,2,4)] <- plot_boundaries     
-      inset_box <- inset_box%>%st_as_sfc()%>%st_as_sf()
+  
       
 #make primary map
-      
-      
-      
-      
-      
       recievers_sf <- otn_stations%>%
                       filter(collectioncode=="SABMPA")%>%
                       mutate(array = ifelse(year<2021,"2015-2020","2020-2024"),
@@ -216,20 +236,26 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                       st_transform(proj4string(dem_sab))%>%
                       mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))%>%#extract depth
                       st_transform(latlong)
-   
       
+      banks_df <- sab_banks%>%
+                  st_centroid()
+                  
       
       primary_plot <- ggplot()+
-                      geom_sf(data=shelfbreak,col="grey20",lty=2,fill=NA)+
+                      geom_contour(data=isobath_sab_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", size = 0.5)+
+                      geom_sf(data=sab_banks,fill="forestgreen")+
+                      # ggrepel::geom_label_repel(data=sab_banks,aes(label = name, geometry = geometry),
+                      #                           stat = "sf_coordinates",
+                      #                           min.segment.length = 0)+
                       geom_sf(data=otn_stations,size=0.1)+
-                      geom_sf(data=basemap)+
+                      geom_sf(data=coast_hr,fill="grey70")+
                       geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
+                      geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25,lty=3)+
                       geom_sf(data=recievers_sf,aes(fill=array),shape=21)+
-                      geom_sf(data=geoserver_tag_releases,col="red")+
                       theme_bw()+
                       theme(legend.position = "bottom")+
                       guides(shape = guide_legend(override.aes = list(size=6)))+
-                      labs(fill="")+
+                      labs(fill="",x="",y="")+
                       coord_sf(expand=0,xlim=plot_boundaries[1:2],ylim=plot_boundaries[3:4])
       
       ggsave("output/Acoustic/primary_plot.png",primary_plot,height=6,width=6,units="in",dpi=300)
@@ -256,15 +282,27 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                       mutate(lon=st_coordinates(.)[,1],
                              lat=st_coordinates(.)[,2])
       
+      #modified MPA network shapefile
+      mar_net_df <- mar_net%>%
+                    mutate(NAME = case_when(NAME == "St Anns Bank Marine Protected Area" ~ "St. Anns Bank Marine Protected Area", #to match the FGP pull
+                                            NAME == "The Gully Marine Protected Area" ~ "Gully Marine Protected Area",
+                                            TRUE ~ NAME),
+                           TYPE = case_when(NAME %in% c("Corsair/Georges Canyons Conservation Area","Western Emerald Bank Conservation Area",
+                                                        "Emerald Basin Sponge Conservation Area","Sambro Bank Sponge Conservation Area",
+                                                        "Jordan Basin Conservation Area","Eastern Canyons Marine Refuge",
+                                                        "Northeast Channel Coral Conservation Area")~ "MR",
+                                            TRUE ~ TYPE))%>%
+                    filter(!NAME %in% MPAs$NAME_E) #these are plotted as part of the GIS pull, which has zones. 
+      
       inset_plot <- ggplot()+
                     geom_sf(data=bioregion,fill=NA)+
-                    geom_sf(data=otn_stations,size=0.05,pch=3)+
-                    geom_sf(data=basemap_inset)+
-                    geom_sf(data=coast_hr)+
+                    geom_contour(data=isobath_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", size = 0.5)+
+                    geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25,lty=3)+
+                    geom_sf(data=mar_net_df%>%filter(TYPE != "TBD"),fill="grey50",alpha=0.3,lty=3)+
+                    geom_sf(data=otn_stations,size=0.25,pch=20)+
                     geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
-                    geom_sf(data=coast_hr)+
-                    #geom_text_repel(data=inset_labels,aes(label=lab,x=lon,y=lat),nudge_x=0.1,nudge_y=0.1)+
-                    geom_sf(data=otn_stations%>%filter(collectioncode %in% c("HFX","CBS")),col="red")+
+                    geom_sf(data=otn_stations%>%filter(collectioncode %in% c("HFX","CBS")),col="red",size=0.7)+
+                    geom_sf(data=basemap_inset,fill="grey70")+
                     geom_sf(data=inset_box,fill=NA)+ #this is the zoomed out
                     coord_sf(expand=0,xlim=plot_lim[c(1,3)],ylim=plot_lim[c(2,4)])+
                     theme_bw()+
