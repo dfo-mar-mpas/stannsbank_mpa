@@ -63,10 +63,6 @@ bank_range <- bank_df%>%
               st_transform(latlong)%>%
               st_bbox()
 
-curdo <- st_read("https://geogratis.gc.ca/services/geoname/en/geonames/CAISM.geojson?expand=feature,concise,generic,province,status,language,provider&exclude=feature.geometry&_gl=1*zk41wn*_ga*Mjk0MjcwMjQ4LjE3MDkyMTk0Nzk.*_ga_C2N57Y7DX5*MTcwOTIxOTQ3OS4xLjEuMTcwOTIxOTQ5OS4wLjAuMA..")
-scatarie
-            
-
 #for inset plot 
 plot_boundaries <- c(c(-60,-58,45.6,46.6)) #for inset plot
 inset_box <- sab%>%st_bbox()
@@ -98,14 +94,11 @@ global_basemap <- ne_states() #this is a very large scale map
     
     #extract bathymetric data
     noaabathy_sab <- getNOAA.bathy(bbsab[1]-1,bbsab[3]+1,bbsab[2]+1,bbsab[4]-1,resolution = 0.25,keep=T)
-    noaabathy_region <- getNOAA.bathy(plot_lim[1]-1,plot_lim[3]+1,plot_lim[2]-1,plot_lim[4]+1,resolution = 0.5,keep=T)
     
     #create xyz dataframes that can be used by geom_contour
     isobath_sab_df <- as.xyz(noaabathy_sab)%>%
                       rename(lon=1,lat=2,depth=3)
     
-    isobath_df <- as.xyz(noaabathy_region)%>%
-                  rename(lon=1,lat=2,depth=3)
     
 ## station depth extract ------
     
