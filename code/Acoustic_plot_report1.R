@@ -291,7 +291,8 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                     geom_sf(data=bioregion,fill=NA)+
                     geom_contour(data=isobath_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", size = 0.5)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25,lty=3)+
-                    geom_sf(data=mar_net_df%>%filter(TYPE != "TBD"),fill="grey50",alpha=0.3,lty=3)+
+                    geom_sf(data=mar_net_df%>%filter(TYPE == "MR"),fill="grey10",alpha=0.3,lty=3)+
+                    geom_sf(data=mar_net_df%>%filter(TYPE == "AOI"),fill="salmon2",alpha=0.3,lty=3)+
                     geom_sf(data=otn_stations,size=0.25,pch=20)+
                     geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
                     geom_sf(data=otn_stations%>%filter(collectioncode %in% c("HFX","CBS")),col="red",size=0.7)+
