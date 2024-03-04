@@ -820,3 +820,6 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                                        pos_df%>%data.frame()%>%distinct(animal_id,.keep_all=TRUE)%>%dplyr::select(animal_id,sp)))%>%
                      mutate(array = ifelse(year<2021,"2015-2020","2020-2024"))
     
+    
+
+    

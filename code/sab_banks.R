@@ -47,12 +47,10 @@ dem_sab2 <- dem_sab%>%
             projectRaster(.,crs=latlong)
 
 #find the range of the plot
-values(dem_sab2)[values(dem_sab2)>50] <- NA #this seems to make the most sense for the bank's shape 
-values(dem_sab2)[values(dem_sab2)<10] <- NA
 values(dem_sab2) <- values(dem_sab2)*-1
 
 #assemble shape file based on polygon 
-scatarie_bank <- stratFun(dem_sab2,min_depth = -10,max_depth = -50)%>%
+scatarie_bank <- stratFun(dem_sab2,min_depth = -10,max_depth = -55)%>%
                  smoothr::smooth(.,method="chaikin")%>%
                  slice(1)%>% #just the big piece
                  mutate(name="Scatarie Bank")%>%
