@@ -733,8 +733,9 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       
       for(j in target_sp){
         
-        temp_plot_df <- temp_df%>%
-                        filter(sp == j)
+        temp_plot_df <- temp_df%>%filter(sp == j)
+        
+        temp_tracks <- animal_tracks%>%filter(sp==j)
         
         p1 <-  ggplot() +
                 geom_sf(data=sab_zones,fill=NA,lty=2)+
@@ -805,4 +806,17 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     ggsave("output/Acoustic/detectionraster_sharks.png",long_plot1,height=10,width=6,units="in",dpi=300)
     ggsave("output/Acoustic/detectionraster_lg_plegics.png",long_plot2,height=8,width=6,units="in",dpi=300)
    
+    
+    #lines for tracks
+    animal_tracks <- qdets%>%
+                     dplyr::select(year,animal_id,bin_timestamp,geometry)%>%
+                     rbind(.,pos_df%>%dplyr::select(year,animal_id,bin_timestamp,geometry))%>%
+                     arrange(animal_id,bin_timestamp)%>%
+                     group_by(year,animal_id)%>%
+                     arrange(animal_id,bin_timestamp)%>%
+                     summarise(do_union=FALSE)%>%
+                     st_cast("LINESTRING")%>%
+                     left_join(.,rbind(qdets%>%data.frame()%>%distinct(animal_id,.keep_all=TRUE)%>%dplyr::select(animal_id,sp),
+                                       pos_df%>%data.frame()%>%distinct(animal_id,.keep_all=TRUE)%>%dplyr::select(animal_id,sp)))%>%
+                     mutate(array = ifelse(year<2021,"2015-2020","2020-2024"))
     
