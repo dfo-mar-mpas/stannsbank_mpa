@@ -1,0 +1,73 @@
+,animal_id,Common.Name,Project,Project_full,yearcollected,RELEASE_LOCATION,RELEASE_LATITUDE,RELEASE_LONGITUDE
+1,BLUEFIN_TAG_35,Bluefin tuna,TAG,TAG - Tag-A-Giant Foundation: Bluefin Tuna Tracking,2021,"Northumberland Straight and St. Georges Bay, NS",46.053076,-61.907533
+2,WHITE_NY_12,White shark,ACT.NYSHARKS,ACT.NYSHARKS_PROJ129 - New York Juvenile White Shark Study,2023,"Long Island, NY, USA",40.09488,-73.2486
+3,WHITE_CCOCE_11,White shark,FACT.CCOCE,"FACT.CCOCE - Sharks on the shelf, Western North Atlantic Ocean",2022,"NS, Canada OR South Carolina, USA",NA,NA
+4,MAKO_RICSS_1,Shortfin mako,ACT.RICSS,ACT.PROJ130_ACT.RICSS - RIDEM DMF Coastal Shark Tagging Study,2021,"Block Island, New England, USA",41.081236,-71.576333
+5,WHITE_MSRPWS_17,White shark,ACT.MSRPWS,ACT.PROJ179_MSRPWS - Massachusetts White Shark Research Program,2021,"Cape cod, MA or South Carolina",41.34566,-69.618619
+6,WHITE_CCOCE_7,White shark,FACT.CCOCE,"FACT.CCOCE - Sharks on the shelf, Western North Atlantic Ocean",2021,"W. Ironbound I., NS",44.2257,-64.28633333
+7,SALM_ESRF_22,Atlantic salmon,ESRF,ESRF - Atlantic Salmon Offshore Tracking Project,2022,"Morell River, PEI",46.362398,-62.704283
+8,WHITE_CCOCE_3,White shark,FACT.CCOCE,"FACT.CCOCE - Sharks on the shelf, Western North Atlantic Ocean",2021,"Lunenburg, NS",44.22783333,-64.28468333
+9,SALM_PBU_7,Atlantic salmon,PBU,PBU - USGS: Salmon tagging,2022,"Bucksport, Maine, USA.",44.570523,-68.793599
+10,SALM_ESRF_35,Atlantic salmon,ESRF,ESRF - Atlantic Salmon Offshore Tracking Project,2023,"Western Atlantic, Canada",NA,NA
+11,BLUEFIN_BFTTAG_2,Bluefin tuna,BFTTAG,BFTTAG - Bluefin tuna high res multi-beam sonar and tagging,2021,"PEI, Gulf of St. Lawrence",46.612852,-62.157012
+12,BLUESH_NSBS_9,Blue shark,NSBS,NSBS - OTN NS Blue Shark Tracking,2023,"Halifax, NS",44.23497,-63.24841
+13,SALM_MARSS_F10,Atlantic salmon,MARSS,MARSS - Maritimes Atlantic salmon marine survivaln,2022,"East branch, St Marys river, NS",45.255757,-62.073002
+14,BLUEFIN_DFOBFT_2,Bluefin tuna,DFOBFT,DFOBFT - Long-term monitoring of Atlantic Bluefin tuna and Swordfish,2021,"Port Hood, NS",45.92569,-61.64994
+15,SALM_ESRF_28,Atlantic salmon,ESRF,ESRF - Atlantic Salmon Offshore Tracking Project,2022,"West branch, St Marys river, NS",45.255804,-62.063908
+16,SALM_V2LNSSA_4,Atlantic salmon,V2LNSSA,"V2LNSSA - Nova Scotia Salmon Association, Sheet Harbour",2022,"West River, Sheet Harbour,NS",44.958544,-62.617825
+17,SALM_ESRF_26,Atlantic salmon,ESRF,ESRF - Atlantic Salmon Offshore Tracking Project,2022,"LaHave River, NS",44.534224,-64.712359
+18,GSEAL_GSFP_1,Grey seal,GSFP,GSFP - Grey seal foraging pressure,2023,"Magdalen Islands, Gulf of St. Lawrence",47.88175,-61.380374
+19,HAL_MEHAL_2,Atlantic halibut,MEHAL,MEHAL - Maine Atlantic Halibut Tagging,2022,"Gulf of Maine, USA",44.437627,-67.39565
+20,WHITE_CCOCE_5,White shark,FACT.CCOCE,"FACT.CCOCE - Sharks on the shelf, Western North Atlantic Ocean",2022,"W. Ironbound I., NS",44.23663333,-64.27138333
+21,LHBACK_LBTPCR_1,Leatherback turtle,MIGRAMAR.LBTPCR,"MIGRAMAR.LBTPCR - Leatherback Turtle in Pacuare Wildlife Reserve, CR",2019,"Pacuare Wildlife Reserve, Costa Rica",10.18333,-83.243641
+22,SALM_ESRF_13,Atlantic salmon,ESRF,ESRF - Atlantic Salmon Offshore Tracking Project,2021,"St. Mary's river, NS",45.25585,-62.06353
+23,SALM_ESRF_20,Atlantic salmon,ESRF,ESRF - Atlantic Salmon Offshore Tracking Project,2021,"LeHave river, NS",44.534401,-64.712414
+24,WHITE_CCOCE_8,White shark,FACT.CCOCE,"FACT.CCOCE - Sharks on the shelf, Western North Atlantic Ocean",2021,"Scatarie Island, CB, NS",46.03645,-59.69378333
+25,BLUESH_MFSAR_6,Blue shark,MFSAR,MFSAR - Shark Spatial Ecology and life history in NL waters,2019,"Conception Bay 2, NL",47.49826667,-53.1481
+26,SALM_ASF_2,Atlantic salmon,ASF,ASF - Atlantic Salmon Federation Tagging Projects,2017,Gulf of St. Lawrence or Saint Andrews NB,NA,NA
+27,COD_SGS_1,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2017,Southern St.Anns Bank,46.0108,-59.14748333
+28,COD_SGS_7,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2017,Southern St.Anns Bank,46.00335,-59.15628333
+29,PORB_JPBS_4,Porbeagle shark,JPBS,JPBS - DFO: Porbeagle and Blue Sharks,2017,Georges Bank,41.21,-67.38108
+30,SALM_QRPT_2,Atlantic salmon,PBSM,PBSM_QRPT - Quoddy Region Salmon Tracking,2021,"MAGAGUADAVIC BASIN, ST. GEORGE, NB",45.1265,-66.82524
+31,COD_SGS_11,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2017,Southern St.Anns Bank,46.00461667,-59.14621667
+32,CRAB_ZSC_1,Snow crab,ZSC,ZSC - Scotian Shelf Snow Crab Tagging,2019,Scotian Shelf,46.655883,-61.26395
+33,EEL_BQEEL_1,American eel,BQEEL,BQEEL - Bay of Quinte Eel Tracking,2017,"Bay of Quinte, Lake Ontario",44.150834,-77.265379
+34,COD_SGS_9,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2017,Southern St.Anns Bank,46.0148,-59.16958333
+35,SALM_NARR_1,Atlantic salmon,NARR,"NARR - Smolts in the Narraguagus River, Maine U.S.A.",2017,"Milbridge, Narraguagus River, Maine U.S.A.",44.536181,-67.867763
+36,COD_SGS_32,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2017,Southern St.Anns Bank,46.03473333,-59.15408333
+37,COD_SGS_17,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2016,Southern St.Anns Bank,46.00565,-59.1536
+38,BLUEFIN_TAG_60,Atlantic salmon,TNGS,TNGS - Tobique Narrows Generation Station efficiency,2020,"Tobique River, NB",45.983415,-66.718058
+39,EEL_BDLSPG_3,American eel,BDLSPG,BDLSPG - Apoqnmatulti'k - Bras D'Or Lake,2019,"Bras d'Or Lakes, CB",45.933283,-60.62895
+40,WHITE_CCOCE_1,White shark,FACT.CCOCE,"FACT.CCOCE - Sharks on the shelf, Western North Atlantic Ocean",2020,"Hilton Head, South Carolina",32.00025,-80.59483333
+41,COD_SGS_43,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2016,Southern St.Anns Bank,45.99998333,-59.15403333
+42,COD_SGS_13,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2016,Southern St.Anns Bank,46.02516667,-59.18323333
+43,COD_SGS_18,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2016,Southern St.Anns Bank,45.99998333,-59.15168333
+44,BLUESH_MFSAR_7,Blue shark,MFSAR,MFSAR - Shark Spatial Ecology and life history in NL waters,2019,"St. Mary's Bay, NL",46.9065,-53.76555
+45,SALM_MARSS_104,Atlantic salmon,MARSS,MARSS - Maritimes Atlantic salmon marine survivaln,2018,"St Marys river, NS",45.255757,-62.073002
+46,EEL_BDLSPG_2,American eel,BDLSPG,BDLSPG - Apoqnmatulti'k - Bras D'Or Lake,2020,"Amaguadee's Pond, Bras d'Or Lake, CB",45.916931,-60.653694
+47,SALM_ESRF_5,Atlantic salmon,ESRF,ESRF - Atlantic Salmon Offshore Tracking Project,2021,"St. Mary's river, NS",45.25603,-62.07361
+48,PORB_JPBS_1,Porbeagle shark,JPBS,JPBS - DFO: Porbeagle and Blue Sharks,2017,"Emerald Basin, NS",44.402158,-62.801851
+49,BLUEFIN_TAG_1,Bluefin tuna,TAG,TAG - Tag-A-Giant Foundation: Bluefin Tuna Tracking,2015,North Carolina shelf by Hatteras,35.460449,-75.084143
+50,SALM_BDK_2,Atlantic salmon,BDK,BDK - Overwinter Bras dOr Atlantic salmon populations,2015,"Bras d'Or Lakes, CB",46.079643,-60.908239
+51,SALM_PBN_3,Atlantic salmon,PBN,PBN - NOAA Penobscot Salmon Tracking,2015,"Penobscot River, Maine, USA",44.81988,-68.718798
+52,SALM_KNE_1,Atlantic salmon,KNE,KNE - NOAA Kennebec Salmon Tracking,2015,"Kennebec River, Maine, USA",44.531632,-69.642214
+53,COD_SGS_34,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2016,Southern St.Anns Bank,46.03706667,-59.17248333
+54,COD_SGS_36,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2016,East Scotian Shelf,45.145,-60.5796
+55,WHITE_HMSWEA_1,Blue shark/Mako/Bluefin tuna,ACT.HMSWEA,ACT.HMSWEA - INSPIRE/NEAQ - Offshore Wind Telemetry,2022,"Southern New England, USA",39.5439,-73.85777
+56,PORB_MFSAR_1,Porbeagle shark,MFSAR,MFSAR - Shark Spatial Ecology and life history in NL waters,2021,"Hermitage Bay, NL",47.58054,-55.94435
+57,SALM_ESRF_21,Atlantic salmon,ESRF,ESRF - Atlantic Salmon Offshore Tracking Project,2022,"Cascapedia River, Gulf of St. Lawrence",48.306,-65.9422
+58,STURG_QSLR_1,Atlantic sturgeon,QSLR,QSLR - St. Lawrence River Fish Monitoring,2018,Gulf of St. Lawrence,48.580941,-64.203323
+59,WHITE_V2LWSAMP_1,White shark,V2LWSAMP,V2LWSAMP - White Shark Acoustic Monitoring Program,2019,"Kejimkujik Park, NS",43.798987,-64.772998
+60,COD_SGS_29,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2017,East Scotian Shelf,44.5631,-61.5324
+61,COD_SGS_37,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2016,Southern St.Anns Bank,46.03633333,-59.15116667
+62,WHITE_CCOCE_4,White shark,FACT.CCOCE,"FACT.CCOCE - Sharks on the shelf, Western North Atlantic Ocean",2021,"W. Ironbound I., NS",44.22645,-64.27263333
+63,COD_SGS_19,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2016,Southern St.Anns Bank,45.99758333,-59.17366667
+64,COD_SGS_35,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2016,East Scotian Shelf,45.1665,-60.5342
+65,BLUESH_MFSAR_3,Blue shark,MFSAR,MFSAR - Shark Spatial Ecology and life history in NL waters,2016,"Conception Bay 1, NL",47.45967,-53.121317
+66,BLUESH_MFSAR_1,Blue shark,MFSAR,MFSAR - Shark Spatial Ecology and life history in NL waters,2016,"St. Johns, NL",47.589795,-52.624955
+67,COD_SGS_14,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2018,Southern St.Anns Bank,46.02588333,-59.1794
+68,COD_SPI_1,Atlantic cod,SPI,"SPI - Shippagan, NB: Cod tagging",2015,Southern Gulf of St. Lawrence,47.85401,-64.02797
+69,COD_SGS_33,Atlantic cod,SGS,SGS - OTN Canada Sable Island Grey Seal Bioprobes,2017,Southern St.Anns Bank,46.01133333,-59.19533333
+70,SALM_QRPT_1,Atlantic salmon,PBSM,PBSM_QRPT - Quoddy Region Salmon Tracking,2021,"MAGAGUADAVIC BASIN, ST. GEORGE, NB",45.13578,-66.82432
+71,WHITE_CCOCE_6,White shark,FACT.CCOCE,"FACT.CCOCE - Sharks on the shelf, Western North Atlantic Ocean",2020,"W. Ironbound I., NS",44.22715,-64.2861
+72,COD_SPI_2,Atlantic cod,SPI,"SPI - Shippagan, NB: Cod tagging",2016,Southern Gulf of St. Lawrence,47.99706,-64.07156
