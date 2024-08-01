@@ -76,7 +76,7 @@ fishmorphs <- merge(fishmorphs, fishcodes, by.x="SPECCD_ID", by.y="SPECCD_ID", a
 ##########################################################################################################
 #### 2. Make some basic maps of the study areas
 #load MPA polygons
-sabshape <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/StAnnsBank_MPA.shp")%>%
+sabshape <- read_sf("data/Shapefiles/SAB_boundary_zones_2017.shp")%>%
   st_transform(latlong)%>%
   mutate(name="St Anns Bank")
 
@@ -85,7 +85,25 @@ gully <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Gully/Gully_Bound
   mutate(name="Gully MPA")%>%
   dplyr::select(name,geometry)
 
+#load high resolution bathymetry (50m) from multibeam 
+sab_bathy <- raster::raster("data/Bathymetry/bathy50/w001001.adf", RAT=FALSE)%>%
+  raster::projectRaster(.,crs=latlong)
 
+sab_benthoscape <- read_sf("data/Shapefiles/benthoscape.shp")%>%
+  st_transform(latlong)%>%
+  mutate(class = Assigned_c,
+         class = gsub("A - ","",class), #clean up the classification labels
+         class = gsub("Asp - ","",class),
+         class = gsub("B - ","",class),
+         class = gsub("C - ","",class),
+         class = gsub("D - ","",class),
+         class = gsub("E - ","",class),
+         class = gsub("F - ","",class))
+
+#load bathymetry 
+ras <- raster::raster("data/Bathymetry/sab_dem.tif") %>%
+  raster::projectRaster(.,crs=latlong)
+rasproj <- proj4string(ras)
 #basemap of Nova Scotia
 novsco <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Coastline/NS_coastline_project_Erase1.shp")%>%st_transform(latlong)%>%
   mutate(name="Nova Scotia")%>%
@@ -210,7 +228,8 @@ ggsave(filename = "output/CrabSurvey/CrabSurvey_SAB_FishLengths.png",plot = last
 #Show just snow crab sizes over time
 
 sc_summary <- fishmorph4 %>% filter(COMM=="SNOW/QUEEN CRAB") %>%
-  group_by(Year) %>%
+  mutate(Sex=recode(SEXCD_ID, `1`= "Male", `2`="Female")) %>%
+  group_by(Year, Sex) %>%
   summarise(mean_width = mean(FISH_LENGTH, na.rm = TRUE),
             sd_width = sd(FISH_LENGTH, na.rm = TRUE),
             lower.l = mean_width - sd_width,
@@ -218,20 +237,23 @@ sc_summary <- fishmorph4 %>% filter(COMM=="SNOW/QUEEN CRAB") %>%
             mean_weight = mean(FISH_WEIGHT, na.rm = TRUE),
             sd_weight = sd(FISH_WEIGHT, na.rm = TRUE),
             lower.w = mean_weight - sd_weight,
-            upper.w = mean_weight + sd_weight)
+            upper.w = mean_weight + sd_weight) %>%
+  data.frame()
 
 library(rphylopic)
 #crub <- browse_phylopic(name = "Snow Crab")
-ggplot(sc_summary, aes(x = Year, y = mean_width, group=1)) +
+ggplot(sc_summary, aes(x = Year, y = mean_width, group=Sex, color=as.factor(Sex))) +
   geom_point(size=4)+
   geom_errorbar(aes(ymin = lower.l, ymax = upper.l), width=.1)+
-  geom_line() +
+  geom_line()+
+  #geom_line() +
   #geom_ribbon(aes(ymin = lower.l, ymax = upper.l), alpha = 0.2) +
-  labs(x = "Year", y = "Mean Carapace Width (mm)") +
+  labs(x = "Year", y = "Mean Carapace Width (mm)",color="Sex") +
   theme_bw()+
   theme(axis.line=element_line(colour="black"), panel.border = element_blank(),
                                text=element_text(size=18))
-ggsave(filename = "SnowCrab_MeanSize.png",plot = last_plot(),path="output/CrabSurvey/",device = "png",width = 10, height=6, units = "in",dpi = 600, bg = "white")
+
+ggsave(filename = "SnowCrab_MeanSize_Revised.png",plot = last_plot(),path="output/CrabSurvey/",device = "png",width = 10, height=6, units = "in",dpi = 600, bg = "white")
 
 # Create boxplots for fish weights by species
 ggplot(fishmorph4 %>% filter(EST_NUM_CAUGHT>2), aes(x = Year, y = FISH_WEIGHT, fill=location)) +
