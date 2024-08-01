@@ -1,0 +1,33 @@
+name,lat,lon,bathy,bentho,reason,rationale
+Cam1_E,46.04204564,-58.82401403,83.36,Gravel with crinoids,Crinoids,Crinoids
+Cam2_E,46.03623526,-58.83914018,80.71,Gravel with crinoids,Crinoids,Crinoids
+Cam3_E,46.01781512,-58.85558763,88.18,Gravel with crinoids,Crinoids,Crinoids
+Cam4_E,46.00190385,-58.86438791,89.52,Gravel with crinoids,Crinoids,Crinoids
+Cam5_E,45.99370597,-58.88210337,90.83,Gravel with crinoids,Crinoids,Crinoids
+Cam6_E,46.04295678,-58.91139067,109.75,Gravel with crinoids,Crinoids,Crinoids
+Cam7_E,46.03143258,-58.92059937,102.36,Gravel with crinoids,Crinoids,Crinoids
+Cam8_C,45.89190829,-59.61333948,65.27,Till >50% cobbles/gravel,Curdo Bank,Curdo Bank
+Cam9_D,45.89222591,-59.60534434,18.59,Till with coralline algae,Curdo Bank,Curdo Bank
+Cam10_D,45.89255071,-59.59214991,23.04,Till with coralline algae,Curdo Bank,Curdo Bank
+Cam11_D,45.89289938,-59.58650986,37.08,Till with coralline algae,Curdo Bank,Curdo Bank
+Cam12_D,45.89333632,-59.58075086,56.18,Till with coralline algae,Curdo Bank,Curdo Bank
+Cam13_C,45.89449304,-59.56007529,65.72,Till with >50% cobbles/gravel,Curdo to Scatarie profile,Curdo-Scatarie
+Cam14_D,45.89900136,-59.50930281,34.76,Till with coralline algae,Curdo to Scatarie profile,Curdo-Scatarie
+Cam15_C,45.93298737,-59.4311896,43.42,Till with >50% cobbles/gravel,Curdo to Scatarie profile/edge of benthoscapes,Curdo-Scatarie
+Cam16_D,45.93938691,-59.38075142,79.3,Till with coralline algae,Curdo to Scatarie profile/range of benthoscapes,Curdo-Scatarie
+Cam17_E,45.9427412,-59.31532631,91.15,Gravel with crinoids,Crinoids/Curdo to Scatarie profile,Crinoids
+Cam18_B,45.85142633,-59.42721236,89.76,Gravelly sandy/mud,Benthoscape/S part of MPA/Brown,Benthoscape
+Cam19_A,45.84990932,-59.34844312,90.84,Mud,Edge of benthoscapes/S part of MPA,Benthoscape
+Cam20_A,45.8611843,-59.28064008,95.13,Mud,Edge of benthoscape/S part of MPA,Benthoscape
+Cam21_B,45.85475397,-59.23932669,110.56,Gravelly sandy/mud,Benthoscape/ S part of MPA/Brown,Benthoscape
+Cam22_D,45.964358,-59.252045,43.62,Till with coralline algae,Scatarie/Kenchington,Scatarie
+Cam23_D,45.97895067,-59.26089742,59.26,Till with coralline algae,Scatarie/Brown,Scatarie
+Cam24_D,45.98870021,-59.22319325,38.64,Till with coralline algae,Scatarie Bank,Scatarie
+Cam25_D,45.99289889,-59.19966472,28.65,Till with coralline algae,Scatarie Bank,Scatarie
+Cam26_D,45.99160272,-59.17940783,50.11,Till with coralline algae,Scatarie Bank,Scatarie
+Cam27_U,46.11468604,-59.56717116,,Unknown,NW unmapped corner,unmapped
+Cam28_U,46.13085162,-59.50795264,,Unknown,NW unmapped corner,unmapped
+Cam29_U,46.09790933,-59.48905228,,Unknown,NW unmapped corner,unmapped
+Cam30_U,46.09649904,-59.44859591,,Unknown,NW unmapped corner,unmapped
+Cam31_U,46.07949521,-59.3687042,,Unknown,NW unmapped corner,unmapped
+Cam32_U,46.06990506,-59.28773093,,Unknown,NW unmapped corner,unmapped
