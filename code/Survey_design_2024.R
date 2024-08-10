@@ -5,7 +5,6 @@ library(tidyr)
 library(dplyr)
 library(sf)
 library(rnaturalearth)
-library(rnaturalearthhires)
 library(ggplot2)
 library(raster)
 library(stars)
@@ -438,3 +437,54 @@ banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
             
   write.csv(form_b_coords,file = "output/2024_mission/station_coords.csv",row.names=FALSE)
     
+  
+  #### Crew 2 Strategy
+  
+  samples <- read.csv("output/2024_mission/station_coords.csv")%>%
+             st_as_sf(coords=c("Longitude","Latitude"),crs=latlong,remove=FALSE)
+  
+  dayframe <- data.frame(day = c(rep("Day 1 - after Sydney",8),
+                                 rep("Day 2 - Curdo Bank",17),
+                                 rep("Day 3 - Scatarie Bank - eDNA",13),
+                                 rep("Day 4 - Scatarie Bank - CAM",9),
+                                 rep("Day 5 - The bottom",7)),
+                         Station = c(c("SAB_12","SAB_13","SAB_18",
+                                       "SAB_17","SAB_16","SAB_11",
+                                       "Cam32_U","Cam14_D"),
+                                     c("SAB_1",paste0("Curdo_",1:10),
+                                       "Cam8_C","Cam9_D","Cam10_D",
+                                       "Cam11_D","Cam12_D","Cam13_C"),
+                                     c(paste0("Scatarie_",1:10),"SAB_10",
+                                       "Cam15_C","Cam16_D"),
+                                     c("Cam17_E","Cam22_D","Cam23_D",
+                                       "Cam24_D","Cam25_D","Cam26_D",
+                                       "SAB_14","SAB_15","SAB_19"),
+                                     c("SAB_1","SAB_5","SAB_9",
+                                       "Cam18_B","Cam19_A",
+                                       "Cam20_A","Cam21_B")))%>%
+             left_join(samples%>%
+                        data.frame()%>%
+                        dplyr::select(Station,Latitude,Longitude))%>%
+              st_as_sf(coords=c("Longitude","Latitude"),crs=latlong,remove=FALSE)%>%
+              mutate(type=ifelse(grepl("Cam",Station),'Camera','eDNA'))
+  
+
+  crew2_plot <- ggplot()+
+    geom_sf(data=basemap)+
+    geom_sf(data=waypoints_lb%>%filter(name=="louisbourg"),size=3)+
+    geom_sf(data=sab_zones,fill=NA)+
+    geom_sf(data=banks)+
+    geom_sf(data=dayframe,aes(col=type),shape=19,size=1)+
+    theme_bw()+
+    coord_sf(xlim=c(-59.7,-58.7),ylim=c(45.75,46.3),expand=0)+
+    theme(legend.position="inside",
+          legend.position.inside = c(0.8,0.1),
+          legend.title = element_blank())+
+    facet_wrap(~day,ncol=3)
+  
+  ggsave("output/2024_mission/week2_location_groupings.png",crew2_plot,width=8,height=5,units="in",dpi=300)
+  
+  write.csv(dayframe%>%
+              data.frame()%>%
+              dplyr::select(day,Station,type),file="output/week2_station_aggregations.csv",row.names = FALSE)
+  
