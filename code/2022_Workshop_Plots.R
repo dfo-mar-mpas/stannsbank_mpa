@@ -16,7 +16,7 @@ library(fasterize)
 library(stars)
 library(patchwork)
 library(lme4)
-library(foster)
+#library(foster) Foster has been archived on CRAN and is unavailable
 
 sf_use_s2=FALSE
 
@@ -45,7 +45,7 @@ mar_network <- read_sf("c:/Users/stanleyr/Documents/Github/CAN_MCN_Vulnerability
   st_transform(latlong)%>%
   mutate(TYPE = ifelse(TYPE == "TBD","Draft",TYPE))
 
-mar_plotlims <- st_bbox(bioregion)
+
 
 bounding_area <- sab%>%
   st_bbox()%>%
@@ -61,7 +61,7 @@ bounding_area <- sab%>%
 plotlims <- c(-60.2,45.7,-58.25,46.5)
 
 bioregion <- read_sf("data/Shapefiles/MaritimesPlanningArea.shp")%>%st_transform(latlong)
-
+mar_plotlims <- st_bbox(bioregion)
 bioregion_box <- bioregion%>%
   st_transform(utm_mar)%>%
   st_buffer(5)%>%
@@ -99,6 +99,9 @@ sab_benthoscape <- read_sf("data/Shapefiles/benthoscape.shp")%>%
          class = gsub("D - ","",class),
          class = gsub("E - ","",class),
          class = gsub("F - ","",class))
+
+#fix typo on 'cobbles' class
+sab_benthoscape$class <-gsub("cobblles","cobbles",sab_benthoscape$class)
 
 #load bathymetry 
 ras <- raster::raster("data/Bathymetry/sab_dem.tif") %>%
@@ -203,7 +206,7 @@ ggsave("output/sab_ecdf_plot.png",sab_ecdf_plot,height=6,width=6,units="in",dpi=
 sab_benthoscape_plot <- ggplot()+
   geom_sf(data=basemap_atlantic)+
   geom_sf(data=sab_benthoscape,aes(fill=class),lwd=0.25)+
-  geom_sf(data=sab,fill=NA)+
+  geom_sf(data=sab,fill=NA,linewidth=1.25,colour="black")+
   coord_sf(xlim=plotlims[c(1,3)],ylim=plotlims[c(2,4)])+
   theme_bw()+
   theme(legend.position = "bottom",
