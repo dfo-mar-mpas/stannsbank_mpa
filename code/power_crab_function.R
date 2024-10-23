@@ -133,8 +133,8 @@ results <- expand.grid(sp=c("Richness",
                             "GLYPTOCEPHALUS CYNOGLOSSUS",
                             "SEBASTES",
                             "AMBLYRAJA RADIATA",
-                            "GADUS MORHUA"#,
                             "CHIONOECETES OPILIO",
+                            # "GADUS MORHUA",
                             "ANARHICHAS LUPUS"
 ),
 replicate=1:1000,
@@ -145,7 +145,8 @@ sites=c(#5,
         100),
 trend=c("Increase","Decrease"),
 effect_size=seq(0.1,1,0.2),
-p=NA
+p=NA,
+PERIODBefore=NA
 ) %>%
   arrange(sp,replicate,sites,trend,effect_size) %>%
   group_by(batch=(row_number()-1) %/% (n()/batch_n)) %>%
@@ -158,7 +159,7 @@ b_data <- BACI %>% filter(sp %in% results$sp[results$batch==b])
 for(s in unique(b_data$sp)){
   # fit model to species data
   sp_data <- BACI %>% filter(sp==s)
-  realdatamodel <- lme4::glmer.nb(formula= dependent ~ PERIOD+(1|rand1)+(1|rand2),
+  realdatamodel <- lme4::glmer.nb(formula= dependent ~ (1|rand1)+(1|rand2),
                                   data = sp_data)
   
   # get parameters from sp model
@@ -168,7 +169,7 @@ for(s in unique(b_data$sp)){
   spresults <- results[results$batch==b&results$sp==s,]
   
   # simualtion all variables for sp
-  spresults$p <- lapply(1:nrow(spresults),function(row){
+  list_results <- lapply(1:nrow(spresults),function(row){
     # spresults$p <- future_map(1:nrow(spresults),function(row){
     # p <- try(log("a"),silent = TRUE)
     # while(inherits(p,"try-error")){
@@ -236,31 +237,32 @@ for(s in unique(b_data$sp)){
       
       
       
-      
       # Likelihood Ratio Test
       LRT <- anova(simdatawithperiod,simdatawithoutperiod)
-      spresults$p[row] <- LRT$`Pr(>Chisq)`[2]
       p <- LRT$`Pr(>Chisq)`[2]
-      # if(p<0.05&spresults$sites[row]<=10&s=="GADUS MORHUA"){
-      #   browser()
-      #   save.image(file = paste0("env_batch_",b,"_sp_",s,"_row_",row,".RData"))
-      # }
+      PERIODBefore <- as.numeric(fixef(simdatawithperiod)[2])
+                      
       rm(r1,r2,r1index,r2index,PERIOD,simdata,simdatawithperiod,simdatawithoutperiod,LRT)
       gc()
-      p
+      
+      list(p,PERIODBefore)
       
     }, silent = TRUE)
     # if(inherits(p,"try-error")) browser()
     # }
     if(inherits(p,"try-error")){
-      return(0)
+      return(list(0,0))
     } else {
       return(p)
     }
   # }
   # return(p)
   # }
-}) %>% unlist()
+})
+  result_df <- do.call(rbind, lapply(list_results, as.data.frame, col.names = c("p","PERIODBefore")))
+  spresults$p <- result_df$p
+  spresults$PERIODBefore <- result_df$PERIODBefore
+  
   results[results$batch==b&results$sp==s,] <- spresults
   saveRDS(spresults,paste0("power_crab_batch",b,"_sp_",s,".RDS"))
   
