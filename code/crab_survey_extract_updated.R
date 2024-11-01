@@ -103,7 +103,7 @@ sab_benthoscape <- read_sf("data/Shapefiles/benthoscape.shp")%>%
 #load bathymetry 
 ras <- raster::raster("data/Bathymetry/sab_dem.tif") %>%
   raster::projectRaster(.,crs=latlong)
-rasproj <- proj4string(ras)
+rasproj <- sp::proj4string(ras)
 #basemap of Nova Scotia
 novsco <- read_sf("R:/Science/CESD/HES_MPAGroup/Data/Shapefiles/Coastline/NS_coastline_project_Erase1.shp")%>%st_transform(latlong)%>%
   mutate(name="Nova Scotia")%>%

@@ -73,13 +73,37 @@ sab_rich_depth <- ggplot(rich_df%>%filter(nspecies>9),aes(x=depth, y=nspecies, c
 sab_rich_depth
 ggsave("output/CrabSurvey/richness_by_depth.png",sab_rich_depth,height = 8,width=10,units="in",dpi=500)
 
+#Shannon diversity
+tem <- data2%>% select(TRIP_STATION, SPECCD_ID, EST_NUM_CAUGHT) %>%
+  data.frame()
 
+tem2<-tem %>% pivot_wider(names_from = SPECCD_ID, values_from=EST_NUM_CAUGHT) %>% data.frame()
+tem2[tem2=="NULL"]<-0
+
+shan_df2<-diversity(as.numeric(tem2[,-1]),index = "shannon")
+
+  left_join(.,data2%>%
+              data.frame()%>%
+              mutate(id=paste(Year,TRIP_STATION,sep="_"))%>%
+              distinct(id,.keep_all=T)%>%
+              dplyr::select(STATION.x, LONGITUDE,LATITUDE, Year, location, depth))%>%
+  mutate(station=paste("ST",STATION.x,sep="_"),
+         strata=ifelse(depth>150,">150m","<150m"))
+
+
+sab_shan_depth_strata <- ggplot(shan_df,aes(x=location,y=shan,fill=location))+
+  geom_boxplot()+
+  geom_jitter()+
+  facet_grid(~strata)+
+  theme_bw()+
+  labs(x="",y="Shannon Diversity")+
+  theme(legend.position="none")
 rich_count <- rich_df%>%
   group_by(STATION.x)%>%
   summarise(nyears=n(),
             minyear=min(Year),
             maxyear=max(Year))
-
+sab_shan_depth_strata
 rich_mod <- glmer(nspecies ~ location + (1 + location | STATION.x),data=rich_df, family=poisson(link="log"))
 # Linear mixed model fit by REML ['lmerMod']
 # Formula: nspecies ~ Inside + (1 + Inside | STATION.x)
