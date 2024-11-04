@@ -134,7 +134,7 @@ results <- expand.grid(sp=c("Richness",
                             "SEBASTES",
                             "AMBLYRAJA RADIATA",
                             "CHIONOECETES OPILIO",
-                            # "GADUS MORHUA",
+                            "GADUS MORHUA",
                             "ANARHICHAS LUPUS"
 ),
 replicate=1:1000,
@@ -159,7 +159,7 @@ b_data <- BACI %>% filter(sp %in% results$sp[results$batch==b])
 for(s in unique(b_data$sp)){
   # fit model to species data
   sp_data <- BACI %>% filter(sp==s)
-  realdatamodel <- lme4::glmer.nb(formula= dependent ~ (1|rand1)+(1|rand2),
+  realdatamodel <- lme4::glmer.nb(formula= dependent ~ PERIOD+(1|rand1)+(1|rand2),
                                   data = sp_data)
   
   # get parameters from sp model
@@ -199,7 +199,7 @@ for(s in unique(b_data$sp)){
                             rand1=r1,
                             rand2=r2,
                             dependent=(rnegbin(n=spresults$sites[row]*2,
-                                              mu=exp(fixef(realdatamodel)[1]+
+                                              mu=exp(sum(fixef(realdatamodel))+
                                                        rnorm(spresults$sites[row],
                                                              periodeffect$condval[r1index],
                                                              periodeffect$condsd[r1index])+
