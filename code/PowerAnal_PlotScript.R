@@ -32,7 +32,7 @@ library(ggplot2)
   file.remove(list.files(pattern=".RDS"))
  saveRDS(crab_power,"data/crab_power.RDS")
 
-crab_power <- readRDS("data/crab_power.RDS")
+crab_power <- readRDS("data/CrabSurvey/crab_power.RDS")
 head(crab_power)
 
 
@@ -86,7 +86,8 @@ ggplot(resultssummary,aes(x=`Effect Size`,y=Power,color=`Number of Samples`,grou
   scale_color_brewer(palette = "Paired")+
   facet_grid(trend~sp)+
   theme_bw()+
-  theme(strip.background=element_rect(fill="white"))
+  theme(strip.background=element_rect(fill="white"), legend.position = "bottom",
+        text=element_text(size=12))
 
-ggsave("Final_PowerAnalysis_Plot_8species.png",plot=last_plot(),path = "output/CrabSurvey/",width = 12, height = 10, dpi = 320, bg = "white")
+ggsave("Final_PowerAnalysis_Plot_8species.png",plot=last_plot(),path = "output/CrabSurvey/",width = 12, height = 8, dpi = 320, bg = "white")
 
