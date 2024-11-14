@@ -62,7 +62,7 @@ crabstations <- crab %>%
                            if_else(z>=(-150),
                                    "100 to 150 m",
                                    ">150 m"))) %>%
-  st_join(sab %>% select(ZONE_E)) %>%
+  st_join(sab %>% dplyr::select(ZONE_E)) %>%
   mutate(Boundary=if_else(is.na(ZONE_E),
                  "Outside",
                  "Inside"))
@@ -124,10 +124,9 @@ nmdstheme <- theme_bw()+
         panel.grid.minor = element_blank(),
         text=element_text(size=18))
 
-
-# regular ggplot
+# regular ggplot - remove the 'unclassified' polygon hull which masks the other benthoscape polygons
 p <- ggplot() +
-  geom_polygon(data=hull.data,aes(x=NMDS1,y=NMDS2,fill=Class_name),alpha=0.30) + # add the hulls
+  geom_polygon(data=hull.data %>% filter(!Class_name=="Unclassified"),aes(x=NMDS1,y=NMDS2,fill=Class_name),alpha=0.30) + # add the hulls
   # geom_text(data=species.scores,aes(x=NMDS1,y=NMDS2,label=species),alpha=0.5) +  # add the sp.labels
   geom_point(data=data.scores,aes(text=ID,x=NMDS1,y=NMDS2,shape=Class_name,colour=Class_name),size=3) +
   #scale_color_gradient(low="blue", high="black")+
