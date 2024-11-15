@@ -1,6 +1,7 @@
+#load libraries 
+library(tidyverse)
 library(robis)
 library(sf)
-library(ggplot2)
 library(RColorBrewer)
 library(arcpullr)
 library(vegan)
@@ -8,8 +9,7 @@ library(marmap)
 library(stars)
 library(lme4)
 library(MASS)
-library(dplyr)
-library(tidyr)
+library(MarConsNetData)
 
 # get SAB
 url <- "https://gisp.dfo-mpo.gc.ca/arcgis/rest/services/FGP/Oceans_Act_Marine_Protected_Areas/MapServer/0"
@@ -81,6 +81,7 @@ comm_crab_ID <- crab %>%
               names_from = sp_name,
               values_from = CPUE,
               values_fill = 0)
+
 ID <- comm_crab_ID %>%
   dplyr::select(ID,BOARD_DATE,STATION) %>%
   mutate(STATION=as.character(STATION))
@@ -125,19 +126,28 @@ nmdstheme <- theme_bw()+
         text=element_text(size=18))
 
 # regular ggplot - remove the 'unclassified' polygon hull which masks the other benthoscape polygons
-p <- ggplot() +
+# p <- ggplot() +
+#   geom_polygon(data=hull.data %>% filter(!Class_name=="Unclassified"),aes(x=NMDS1,y=NMDS2,fill=Class_name),alpha=0.30) + # add the hulls
+#   geom_point(data=data.scores,aes(text=ID,x=NMDS1,y=NMDS2,shape=Class_name,colour=Class_name),size=3) +
+#   scale_colour_brewer(palette = "Paired") +
+#   coord_equal()+
+#   scale_shape_manual(values=c(15,7,18,16,10,8,17))+
+#   geom_text(aes(x=Inf,y=-Inf,hjust=1.05,vjust=-0.5,label=paste("Stress =",round(ord$stress,3),"k =",ord$ndim)))+
+#   nmdstheme
+
+
+p1 <- ggplot() +
+  geom_point(data=data.scores%>%filter(Class_name=="Unclassified"),aes(x=NMDS1,y=NMDS2),col="black",shape=4) +
   geom_polygon(data=hull.data %>% filter(!Class_name=="Unclassified"),aes(x=NMDS1,y=NMDS2,fill=Class_name),alpha=0.30) + # add the hulls
-  # geom_text(data=species.scores,aes(x=NMDS1,y=NMDS2,label=species),alpha=0.5) +  # add the sp.labels
-  geom_point(data=data.scores,aes(text=ID,x=NMDS1,y=NMDS2,shape=Class_name,colour=Class_name),size=3) +
-  #scale_color_gradient(low="blue", high="black")+
+  geom_point(data=data.scores%>%filter(!Class_name=="Unclassified"),aes(x=NMDS1,y=NMDS2,shape=Class_name,fill=Class_name),col="black",size=3) +
+  scale_shape_manual(values=21:24)+
   scale_colour_brewer(palette = "Paired") +
   coord_equal()+
-  scale_shape_manual(values=c(15,7,18,16,10,8,17))+
   geom_text(aes(x=Inf,y=-Inf,hjust=1.05,vjust=-0.5,label=paste("Stress =",round(ord$stress,3),"k =",ord$ndim)))+
-  nmdstheme
-p
+  nmdstheme+
+  labs(fill="",shape="")
 
-ggsave(filename = "CrabSurvey_NMDS.png",plot = last_plot(), device = "png", path = "output/CrabSurvey/", width = 10, height=8, units="in", dpi=500,bg = "white")
+ggsave(filename = "CrabSurvey_NMDS.png",plot = p1, device = "png", path = "output/CrabSurvey/", width = 10, height=8, units="in", dpi=500,bg = "white")
 
 # plotly interaction
 plotly::ggplotly(p,tooltip = "text")
