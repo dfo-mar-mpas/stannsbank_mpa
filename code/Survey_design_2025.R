@@ -15,18 +15,52 @@ s2_as_sf = FALSE
 
 #Functions ------
 
-convert_to_decimal_degrees <- function(degree_minute) {
-  parts <- strsplit(degree_minute, " ")[[1]]
-  degrees <- as.numeric(parts[1])
-  decimal_minutes <- as.numeric(parts[2])
+ddm_to_dd <- function(ddm_string) {
+  # Clean input string
+  ddm_string <- trimws(ddm_string)
+  
+  # Extract components using regex
+  # Pattern matches: [degrees]° [decimal minutes]' [direction]
+  pattern <- "^\\s*(\\d+)°\\s*(\\d+\\.\\d+)'\\s*([NSEW])\\s*$"
+  
+  # Check if string matches the expected pattern
+  if (!grepl(pattern, ddm_string)) {
+    stop("Input must be in format: DD° MM.MMM' D (e.g., '59° 35.186' W')")
+  }
+  
+  # Extract components
+  degrees <- as.numeric(gsub(pattern, "\\1", ddm_string))
+  decimal_minutes <- as.numeric(gsub(pattern, "\\2", ddm_string))
+  direction <- gsub(pattern, "\\3", ddm_string)
+  
+  # Convert to decimal degrees
   decimal_degrees <- degrees + (decimal_minutes / 60)
+  
+  # Apply sign based on direction
+  if (direction %in% c("W", "S")) {
+    decimal_degrees <- -decimal_degrees
+  }
+  
   return(decimal_degrees)
 }
 
-convert_to_ddm <- function(decimal_degrees) {
-  degrees <- floor(decimal_degrees)  # Extract degrees
-  minutes <- round((decimal_degrees - degrees) * 60,3)  # Calculate decimal minutes
-  return(sprintf("%d° %f'", degrees, minutes))  # Format as "D° M.M'"
+
+convert_to_ddm <- function(decimal_degrees, is_longitude = TRUE) {
+  sign <- ifelse(decimal_degrees < 0, -1, 1)
+  abs_dd <- abs(decimal_degrees)
+  degrees <- floor(abs_dd)
+  minutes <- round((abs_dd - degrees) * 60, 3)
+  if(minutes >= 60) {
+    degrees <- degrees + 1
+    minutes <- 0
+  }
+  # Determine direction based on coordinate type
+  if(is_longitude) {
+    direction <- ifelse(decimal_degrees < 0, "W", "E")
+  } else {
+    direction <- ifelse(decimal_degrees < 0, "S", "N")
+  }
+  return(sprintf("%d° %06.3f' %s", degrees, minutes, direction))
 }
 
 determine_transect_group <- function(lon, threshold) {
@@ -89,7 +123,7 @@ sab  <- sab_zones%>%
         st_as_sf()
 
 #load bathymetric data
-sab_dem <- rast("data/Bathymetry/sab_dem.tif")
+sab_dem <- rast("data/Bathymetry/sab_dem.tif")%>%project(latlong)
 
 contour_sab <- as.contour(sab_dem, levels = 150)%>% # could also use 237 from 'deep' but just round out to 250
   st_as_sf()%>%
@@ -143,14 +177,23 @@ banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
                         mutate(type="Recovery")%>%
                         dplyr::select(name,type)
     
+    rec_coords_recov_depth <- cbind(rec_coords_recov%>%pull(name),
+                                    terra::extract(sab_dem,rec_coords_recov%>%st_transform(st_crs(sab_dem)))*-1)
+    
     array_coords <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
                     st_as_sf(coords=c("long","lat"),crs=latlong)%>%
                     mutate(name=paste("SAB_",Id),
                            type="Existing array")%>%
                     dplyr::select(name,type)
     
-    acoustic_coords <- rbind(rec_coords_new,rec_coords_recov,array_coords)%>%
+    rov_recov_coords <- read.csv("data/Acoustic/2025_rov_stations.csv")%>%
+                        st_as_sf(coords=c("long","lat"),crs=latlong)%>%
+                        dplyr::select(name,type)
+    
+    acoustic_coords <- rbind(rec_coords_new,rec_coords_recov,rov_recov_coords,array_coords)%>%
                        mutate(sample="Acoustic recievers")
+    
+    
     
 #evaluate operational buffer for 2024 season  -------------
     
@@ -296,6 +339,7 @@ banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
                     geom_sf(data=scatarie_coords%>%filter(sample=="AR: New deployments"),aes(fill=sample),shape=24,size=2.5*point_scaler)+
                     geom_sf(data=scatarie_coords%>%filter(sample=="AR: Recovery"),aes(fill=sample),shape=25,size=2.5*point_scaler)+
                     geom_sf(data=scatarie_coords%>%filter(sample=="eDNA"),aes(fill=sample),shape=21,size=2.5*point_scaler)+
+                    geom_sf(data=scatarie_coords%>%filter(sample=="AR: ROV recovery"),aes(fill=sample),shape=21,size=3.25*point_scaler)+              
                     theme_bw()+
                     theme(axis.text=element_blank(),
                           plot.margin = margin(0, 0, 0, 0),
@@ -311,7 +355,8 @@ banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
                     scale_fill_manual(values=c("AR: Recovery" = "aquamarine3",
                                                "AR: Existing array" = "grey80",
                                                "AR: New deployments"="blue2",
-                                               "eDNA" = "white"))
+                                               "eDNA" = "white",
+                                               "AR: ROV recovery" = "red"))
     
     
     sab_points <- scatarie_coords%>%
@@ -327,20 +372,24 @@ banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
               geom_sf(data=scatarie_coords%>%filter(sample=="AR: Existing array"),aes(fill=sample),shape=23,size=1)+
               geom_sf(data=scatarie_coords%>%filter(sample=="AR: New deployments"),aes(fill=sample),shape=24,size=1)+
               geom_sf(data=scatarie_coords%>%filter(sample=="AR: Recovery"),aes(fill=sample),shape=25,size=1)+
+              geom_sf(data=scatarie_coords%>%filter(sample=="AR: ROV recovery"),aes(fill=sample),shape=21,size=1.75)+
               geom_sf(data=sab_points%>%filter(sample=="eDNA"),aes(fill=sample),shape=21,size=1.5)+
               theme_bw()+
               coord_sf(xlim=c(-60.3,-58.3),ylim=c(45.75,46.5),expand=0)+
               theme(plot.margin = margin(0, 0, 0, 0),
                     legend.position="inside",
-                    legend.position.inside = c(0.15,0.84),
+                    legend.position.inside = c(0.25,0.8),
                     legend.background = element_blank(),
-                    legend.title = element_blank())+
+                    legend.title = element_blank(),
+                    legend.key = element_blank(),
+                    legend.text = element_text(size = 6))+
                 annotation_scale()+
                 scale_fill_manual(values=c("AR: Recovery" = "aquamarine3",
                                            "AR: Existing array" = "grey80",
                                            "AR: New deployments"="blue2",
-                                           "eDNA" = "white"))+
-                guides(fill = guide_legend(override.aes = list(size = 2)))
+                                           "eDNA" = "white",
+                                           "AR: ROV recovery" = "red"))+
+                guides(fill = guide_legend(override.aes = list(size = 2.75)))
     
     mosaic_map <- p1 + (p1_scatarie/p1_curdo) + plot_layout(ncol=2,widths=c(4,1))
     
@@ -354,17 +403,20 @@ banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
                     filter(!grepl("Cam",name))%>%
                     dplyr::select(name,sample),
                   acoustic_coords%>%
+                    filter(type!="Existing array")%>%
                     mutate(sample=paste0("AR: ",type))%>%
                     dplyr::select(name,sample)
                    )%>%
                    mutate(Longitude=st_coordinates(.)[,1],
-                          Latitude=st_coordinates(.)[,2],
-                          lon_ddm=paste0("'",convert_to_ddm(Longitude)),
-                          lat_ddm=convert_to_ddm(Latitude))%>%
-                   st_transform(st_crs(dem_sab))%>%
-                   mutate(depth = round(raster::extract(dem_sab,as_Spatial(.)),1))%>%
+                          Latitude=st_coordinates(.)[,2])%>%
+                  rowwise()%>%
+                  mutate(lon_ddm = convert_to_ddm(Longitude, is_longitude = TRUE),
+                          lat_ddm = convert_to_ddm(Latitude, is_longitude = FALSE))%>%
+                  ungroup()%>%
+                  mutate(depth = round(terra::extract(sab_dem,.),1))%>%
                    st_transform(latlong)%>%
                    data.frame()%>%
                    dplyr::select(sample,name,depth,lon_ddm,lat_ddm)
     
     write.csv(form_coords,file="output/2025_mission/station_coords.csv",row.names=FALSE)
+    
