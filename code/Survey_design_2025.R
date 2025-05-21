@@ -44,7 +44,6 @@ ddm_to_dd <- function(ddm_string) {
   return(decimal_degrees)
 }
 
-
 convert_to_ddm <- function(decimal_degrees, is_longitude = TRUE) {
   sign <- ifelse(decimal_degrees < 0, -1, 1)
   abs_dd <- abs(decimal_degrees)
@@ -419,4 +418,60 @@ banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
                    dplyr::select(sample,name,depth,lon_ddm,lat_ddm)
     
     write.csv(form_coords,file="output/2025_mission/station_coords.csv",row.names=FALSE)
+    
+### load the Bras d'Or sample stations
+    bras_df <- read.csv("data/2025 Mission/bras_dor_stations.csv")%>%
+               rowwise()%>%
+               mutate(lon=convert_to_ddm(lon_dd),
+                      lat=convert_to_ddm(lat_dd,is_longitude = FALSE),
+                      depth = abs(depth))%>%
+               data.frame()%>%
+               mutate(Activity = "Water sampling")%>%
+               rename(Depth = depth, 
+                      Longitude = lon,
+                      Latitude = lat,
+                      Name = station)%>%
+               filter(type=="operations",operation != "transit")
+    
+    bras_sf <- bras_df%>%
+               st_as_sf(coords=c("lon_dd","lat_dd"),crs=latlong)
+    
+    bras_out <- bras_df%>%
+                dplyr::select(Activity,Name,Depth,Longitude,Latitude)
+    
+    iona <- read.csv("data/2025 Mission/bras_dor_stations.csv")%>%
+            filter(station == "Iona")%>%
+            st_as_sf(coords=c("lon_dd","lat_dd"),crs=latlong)
+               
+    write.csv(bras_out,"output/2025_mission/bras_dor_stations_formatted.csv",row.names = FALSE)
+    
+    bounding_area_bras <- bras_sf%>%
+      st_transform(utm)%>%
+      st_buffer(dist = 35)%>%
+      st_bbox()%>%
+      st_as_sfc()%>%
+      st_as_sf()%>%
+      st_transform(latlong)%>%
+      st_bbox()%>%
+      st_as_sfc()%>%
+      st_as_sf()%>%
+      suppressWarnings()%>%
+      suppressMessages()
+    
+    basemap_bras <- coast_hr%>%
+      st_intersection(bounding_area_bras%>%st_transform(st_crs(coast_hr)))%>%
+      st_transform(latlong)%>%
+      suppressWarnings()
+    
+    plot_boundaries_bras <- c(c(-61.2,-60.3,45.5,46.35))
+    
+    p1_bras <- ggplot()+
+      geom_sf(data=basemap_bras)+
+      geom_sf(data=bras_sf,shape=21,fill="white")+
+      geom_sf(data=iona,col="black",size=0.75)+
+      coord_sf(xlim=plot_boundaries_bras[c(1,2)],ylim=plot_boundaries_bras[c(3,4)],expand=0)+
+      theme_bw()+
+      annotation_scale(location="br")
+    
+    ggsave("output/2025_mission/bras_map.png",p1_bras,width=5.5,height=7,units="in",dpi=300)
     
