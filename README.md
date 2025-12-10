@@ -24,3 +24,11 @@ __Fig 5.__ Proposed sampling locations for the 2024 Mission to St. Anns Bank (PE
 ![](output/multibeam_bathymap_stannsbank.png)
 
 __Fig 6.__ Multibeam coverage for St Anns Bank. Inset plots of Curdo and Scatarie Bank show 40m isobath. 
+
+![](Acoustic_Predation_event.png)
+
+__Fig 7.__ Location of detection for Atlantic halibut. Relase location within St Anns Bank, later detections after predation likely by a white shark (see Figure 8). 
+
+![](output/Acoustic/Predation_event_logger.png)
+
+__Fig 8.__ Acoustic tag environmental log. Box depicts likely predation event due to increase in temperature and depth. 
