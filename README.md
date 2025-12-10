@@ -20,3 +20,7 @@ __Fig 4.__ Map depicting sample collection locations from the PER-2023-757 missi
 ![](output/2024_mission/mission_map.png)
 
 __Fig 5.__ Proposed sampling locations for the 2024 Mission to St. Anns Bank (PER-2024-885)
+
+![](output/multibeam_bathymap_stannsbank.png)
+
+__Fig 6.__ Multibeam coverage for St Anns Bank. Inset plots of Curdo and Scatarie Bank show 40m isobath. 
