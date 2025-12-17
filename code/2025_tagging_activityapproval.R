@@ -14,7 +14,6 @@ library(cmocean)
 
 s2_as_sf = FALSE
 
-source("r:/Science/CESD/HES_MPAGroup/R/Functions/box_grid.R")
 
 #projections ------
 latlong <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
@@ -84,15 +83,7 @@ curdo_bathy_35 <- curdo_bathy%>%
 scatarie_bathy_35 <- scatarie_bathy%>%
                     terra::mask(.,scatarie_35m_contour)
 
-ggplot()+
-  geom_spatraster(data=curdo_bathy_35)+
-  geom_sf(data=curdo,fill=NA)+
-  scale_fill_viridis()
 
-ggplot()+
-  geom_spatraster(data=scatarie_bathy_35)+
-  geom_sf(data=scatarie,fill=NA)+
-  scale_fill_viridis()
 
 
 #load the reciever locations
@@ -141,7 +132,6 @@ basemap <- coast_hr%>%
 
 #tagging locations -----
 
-
 tag_2022 <- read.csv("data/Acoustic/Halibut tagging sheet Nov 2022 OTN.csv")%>%
                 filter(!is.na(TAG_SERIAL_NUMBER))%>% #tailing blank spaces in the Excel sheet - this will be inclusive of cod and halibut where sets were deployed
                 mutate(lon.deg=as.numeric(substr(RELEASE_LONGITUDE, 1, 2)),
@@ -156,8 +146,9 @@ tag_2022 <- read.csv("data/Acoustic/Halibut tagging sheet Nov 2022 OTN.csv")%>%
                 dplyr::select(lon,lat,year,species,geometry)
 
 tag_2023_25 <- read.csv("data/Acoustic/SABMPA_tagging_basic_metadata_all_QCApril2025.csv")%>%
-                   st_as_sf(coords=c("long","lat"),crs=latlong)%>%
-                  dplyr::select(year,species,geometry)
+                  st_as_sf(coords=c("long","lat"),crs=latlong,remove=FALSE)%>%
+                  rename(lon=long)%>%
+                  dplyr::select(lon,lat,year,species,geometry)
 
 tag_df <- rbind(tag_2022,tag_2023_25)
 
@@ -208,7 +199,7 @@ mod_sets <- tag_2022%>%
             st_intersection(.,sab_zones%>%dplyr::select(Zone,geometry))%>%
             suppressWarnings()
 
-tag_df <- rbind(tag_2022%>%dplyr::select(year,species,geometry),tag_2023_25)%>%
+tag_df <- rbind(tag_2022%>%dplyr::select(year,species,geometry),tag_2023_25%>%dplyr::select(year,species,geometry))%>%
           st_intersection(.,sab)%>%
           mutate(type="Tagging location")
 
@@ -255,8 +246,8 @@ scatarie_plot <- ggplot() +
                 #geom_sf(data=sab_banks,fill=NA)+
                 geom_spatraster(data=scatarie_bathy_35)+
                 geom_sf(data=reciever_locs,fill="white",pch=21,size=2)+
-                #geom_sf(data=tag_df,size=1.25*1.2,col="black")+
-                geom_sf(data=tag_df_summary,col="black")+
+                #geom_sf(data=tag_df,size=0.5,pch=3)+
+                geom_sf(data=tag_df_summary,shape=21,col="coral")+
                 coord_sf(expand=0,xlim=scatarie_bound[c(1,3)],ylim=scatarie_bound[c(2,4)])+
                 scale_fill_cmocean(name = "deep", direction = -1, na.value = NA)+
                 theme_bw()+
