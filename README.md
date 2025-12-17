@@ -5,9 +5,9 @@ St. Anns Bank Marine Protected Area Science Program
 
 __Fig 1.__ St. Anns Bank Marine Protected Area. Fill colours correspond to benthoscape classes [(Lacharite and Brown 2018)](https://onlinelibrary.wiley.com/doi/full/10.1002/aqc.3074). Points correspond to the proposed environmental DNA sampling program (eDNA) and locations for potential deployment of a mid-water camera system in summer 2023. 
 
-![](output/Acoustic/reciever_tag_locations.png)
+![](output/Acoustic/2025_ActivityApproval_taglocations.png)
 
-__Fig 2.__ St. Anns Bank Marine Protected Area. Deployed receiver tag locations (Atlantic cod and Atlantic Halibut) from the 2022 field season. Grey line denotes the 250m isobath.
+__Fig 2.__ St. Anns Bank Acoustic Program [__SABMPA__](https://members.oceantrack.org/project?ccode=SABMPA). Proposed start locations for the 2026-2030 fish tagging locations within the St Anns Bank MPA. White circles denote locations of the Acoustic receivers, with insets showing zoomed in views of focal banks (Scatarie and Curdo) with depths restricted to 35m and shallower. Crosses denote previous sampling locations and grey circles denote centroid of tag location clusters, reported in Table 1. Bathymetry based on available multibeam datasets processed by the Canadian Hydrographic Service [CHS NONNA](https://charts.gc.ca/data-gestion/nonna/index-eng.html). 
 
 ![](output/Temperature/SAB_temp_20152022_monthmean.png)
 
