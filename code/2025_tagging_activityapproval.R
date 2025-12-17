@@ -104,8 +104,8 @@ reciever_locs_old <- read.csv("data/Acoustic/OTN_redesign_coords.csv")%>%
                          type="Acoustic Reciever Locations",)%>%
                   dplyr::select(type,Zone,lon,lat,geometry)
 
-reciever_locs_new <- read.csv("data/Acoustic/SABMPA_NEW_2025_deploys.csv")%>%
-                     st_as_sf(coords=c("Long","Lat"),crs=latlong)%>%
+reciever_locs_new <- read.csv("data/Acoustic/otn-instrument-deployment-SABMPAnew_June2025.csv")%>%
+                     st_as_sf(coords=c("DEPLOY_LONG_DD","DEPLOY_LAT_DD"),crs=latlong)%>%
                       st_intersection(.,sab_zones%>%dplyr::select(Zone,geometry))%>%
                       mutate(lon=round(st_coordinates(.)[,1],3),
                              lat=round(st_coordinates(.)[,2],3),
@@ -177,7 +177,19 @@ tag_df_summary <- tag_df %>%
     geometry = st_centroid(st_union(geometry)),
     .groups = "drop"
   ) %>%
-  st_as_sf()
+  st_as_sf(keep=T)%>%
+  st_intersection(sab_zones)%>%
+  arrange(year,Zone)%>%
+  mutate(Longitude = st_coordinates(.)[,1],
+         Latitude = st_coordinates(.)[,2])%>%
+  rename(Year=year)
+
+write.csv(tag_df_summary%>%
+            data.frame()%>%
+            dplyr::select(Year,Zone,Longitude,Latitude),
+          "output/Acoustic/2025_tag_summary_table.csv")
+
+
 
 #save coordinates for the activity approval applcation - to simplify the included table, the 2022 tag locations will be presented as centriods of the three clusters
 mod_sets <- tag_2022%>%
