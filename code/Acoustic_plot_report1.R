@@ -21,6 +21,8 @@ library(tidyterra)
 
 s2_as_sf = FALSE
 
+source("https://raw.githubusercontent.com/dfo-mar-mpas/MCRG_functions/refs/heads/main/code/trim_img_ws.R")
+
 #projections ------
 latlong <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
 utm <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84=0,0,0"
@@ -282,6 +284,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       
       ggsave("output/Acoustic/primary_plot.png",primary_plot,height=6,width=6,units="in",dpi=300)
       
+      trim_img_ws("output/Acoustic/primary_plot.png")
       
 #inset map
       
@@ -330,6 +333,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                           legend.position = "none")
       
       ggsave("output/Acoustic/inset_plot.png",inset_plot,height=6,width=6,units="in",dpi=300)
+      trim_img_ws("output/Acoustic/inset_plot.png")
       
       #tag map
       plot_list <- NULL
