@@ -38,8 +38,11 @@ sab <- sab_zones%>%
 
 sab_banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
 
+#Canadian EEZ ----
+can_eez <- read_sf("data/Shapefiles/can_eez.shp")%>%st_transform(latlong)
+
 #load bioregion and get plotting limits----
-bioregion <- read_sf("data/Shapefiles/MaritimesPlanningArea.shp")%>%
+bioregion <- data_planning_areas()%>%
              st_transform(latlong)
 
 mar_net <- read_sf("data/Shapefiles/networksites_proposed_OEM_MPA_20220617.shp")%>%
@@ -95,10 +98,16 @@ global_basemap <- ne_states() #this is a very large scale map
     
     #extract bathymetric data
     noaabathy_sab <- getNOAA.bathy(bbsab[1]-1,bbsab[3]+1,bbsab[2]+1,bbsab[4]-1,resolution = 0.25,keep=T)
+    noaabathy_plotregion <- getNOAA.bathy(plot_lim[1]-1,plot_lim[3]+1,plot_lim[2]+1,plot_lim[4]-1,resolution = 0.25,keep=T)
     
     #create xyz dataframes that can be used by geom_contour
     isobath_sab_df <- as.xyz(noaabathy_sab)%>%
                       rename(lon=1,lat=2,depth=3)
+    
+    isobath_df <- as.xyz(noaabathy_plotregion )%>%
+      rename(lon=1,lat=2,depth=3)
+    
+    
     
     
 ## station depth extract ------
@@ -127,7 +136,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
   #code from https://rpubs.com/MaritimesMSP/OTN-DFO-Summary
   
   proj_start <- ymd("20190101")
-  proj_end <- ymd("20230909")
+  proj_end <- ymd("20260101")
   proj_long_upp <- -40.00
   proj_long_low <- -70.00
   proj_lat_upp <- 60.00
@@ -146,19 +155,14 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                            stn_long >= proj_long_low & stn_long <= proj_long_upp)%>%
                   st_as_sf(coords=c("stn_long","stn_lat"),crs=latlong)%>%
                   mutate(year=year(deploy_date),
-                         array = ifelse(year<2021,"2015-2020","2020-2024"))%>%
+                         array = ifelse(year<2021,"2015-2020","2020-2025"))%>%
                   filter(year>2014)#just within the SAB window
                   
   
-  url <- "https://gisp.dfo-mpo.gc.ca/arcgis/rest/services/FGP/Oceans_Act_Marine_Protected_Areas/MapServer/0"
+  can_mcn <- read_sf("data/Shapefiles/All_GoC_MCAs.shp")%>%
+             st_transform(latlong)
   
-  MPAs <- get_spatial_layer(url) %>% 
-    st_make_valid() %>% 
-    st_crop(xmin=proj_long_low,
-            ymin=proj_lat_low,
-            xmax=proj_long_upp,
-            ymax=proj_lat_upp)%>%
-    st_transform(latlong)
+  MPAs <- can_mcn%>%filter(grepl("Marine Protected Area",TYPE_E))
     
 ## OTN tag deployment locations ---------
   tag_url <- 'https://members.oceantrack.org/geoserver/otn/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=otn:animals&outputFormat=csv'
@@ -219,12 +223,24 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
         st_intersection(bounding_area%>%st_transform(st_crs(coast_hr)))%>%
         st_transform(latlong)%>%
         suppressWarnings()
+      
+      #modified MPA network shapefile
+      mar_net_df <- mar_net%>%
+        mutate(NAME = case_when(NAME == "St Anns Bank Marine Protected Area" ~ "St. Anns Bank Marine Protected Area", #to match the FGP pull
+                                NAME == "The Gully Marine Protected Area" ~ "Gully Marine Protected Area",
+                                TRUE ~ NAME),
+               TYPE = case_when(NAME %in% c("Corsair/Georges Canyons Conservation Area","Western Emerald Bank Conservation Area",
+                                            "Emerald Basin Sponge Conservation Area","Sambro Bank Sponge Conservation Area",
+                                            "Jordan Basin Conservation Area","Eastern Canyons Marine Refuge",
+                                            "Northeast Channel Coral Conservation Area")~ "MR",
+                                TRUE ~ TYPE))%>%
+        filter(!NAME %in% MPAs$NAME_E) #these are plotted as part of the GIS pull, which has zones. 
   
       
 #make primary map
       recievers_sf <- otn_stations%>%
                       filter(collectioncode=="SABMPA")%>%
-                      mutate(array = ifelse(year<2021,"2015-2020","2020-2024"),
+                      mutate(array = ifelse(year<2021,"2015-2020","2020-2025"),
                              lon = st_coordinates(.)[,1],
                              lat = st_coordinates(.)[,2])%>%
                       st_transform(proj4string(dem_sab))%>%
@@ -244,18 +260,22 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                   st_centroid()
       
       primary_plot <- ggplot()+
-                      geom_contour(data=isobath_sab_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", size = 0.5)+
+                      geom_contour(data=isobath_sab_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", linewidth  = 0.5)+
                       geom_sf(data=sab_banks,fill="forestgreen")+
                       # ggrepel::geom_label_repel(data=sab_banks,aes(label = name, geometry = geometry),
                       #                           stat = "sf_coordinates",
                       #                           min.segment.length = 0)+
-                      geom_sf(data=otn_stations,size=0.1)+
+                      geom_sf(data=otn_stations,size=1.25,fill = "grey70", colour="black",shape=21,
+                              stroke = 0.1)+
                       geom_sf(data=coast_hr,fill="grey70")+
                       geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
                       geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25,lty=3)+
-                      geom_sf(data=recievers_sf,aes(fill=array),shape=21)+
+                      geom_sf(data=recievers_sf,aes(fill=array),shape=21,size=2)+
                       theme_bw()+
-                      theme(legend.position = "bottom")+
+                      theme(legend.position = "inside",
+                            legend.position.inside = c(0.1,0.92),
+                            legend.background = element_blank(),
+                            legend.title = element_blank())+
                       guides(shape = guide_legend(override.aes = list(size=6)))+
                       labs(fill="",x="",y="")+
                       coord_sf(expand=0,xlim=plot_boundaries[1:2],ylim=plot_boundaries[3:4])
@@ -284,33 +304,30 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                       mutate(lon=st_coordinates(.)[,1],
                              lat=st_coordinates(.)[,2])
       
-      #modified MPA network shapefile
-      mar_net_df <- mar_net%>%
-                    mutate(NAME = case_when(NAME == "St Anns Bank Marine Protected Area" ~ "St. Anns Bank Marine Protected Area", #to match the FGP pull
-                                            NAME == "The Gully Marine Protected Area" ~ "Gully Marine Protected Area",
-                                            TRUE ~ NAME),
-                           TYPE = case_when(NAME %in% c("Corsair/Georges Canyons Conservation Area","Western Emerald Bank Conservation Area",
-                                                        "Emerald Basin Sponge Conservation Area","Sambro Bank Sponge Conservation Area",
-                                                        "Jordan Basin Conservation Area","Eastern Canyons Marine Refuge",
-                                                        "Northeast Channel Coral Conservation Area")~ "MR",
-                                            TRUE ~ TYPE))%>%
-                    filter(!NAME %in% MPAs$NAME_E) #these are plotted as part of the GIS pull, which has zones. 
+      inset_otn_stations <- otn_stations%>%
+                            #filter(station_type %in% c("Acoustic")%>%
+                            st_difference(sab)
+     
       
       inset_plot <- ggplot()+
-                    geom_sf(data=bioregion,fill=NA)+
+                    geom_sf(data=can_eez,fill=NA)+
                     geom_contour(data=isobath_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", size = 0.5)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25,lty=3)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "MR"),fill="grey10",alpha=0.3,lty=3)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "AOI"),fill="salmon2",alpha=0.3,lty=3)+
-                    geom_sf(data=otn_stations,size=0.25,pch=20)+
+                    #geom_sf(data=otn_stations,size=0.25,pch=20)+
                     geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
-                    geom_sf(data=otn_stations%>%filter(collectioncode %in% c("HFX","CBS")),col="red",size=0.7)+
+                    geom_sf(data=recievers_sf,aes(fill=array),shape=21,size=0.75,stroke = 0.1)+
+                    #geom_sf(data=otn_stations%>%filter(collectioncode %in% c("HFX","CBS")),col="red",size=0.7)+
+                    geom_sf(data=inset_otn_stations,size=0.75,fill = "grey70", colour="black",shape=21,
+                            stroke = 0.1)+
                     geom_sf(data=basemap_inset,fill="grey70")+
                     geom_sf(data=inset_box,fill=NA)+ #this is the zoomed out
                     coord_sf(expand=0,xlim=plot_lim[c(1,3)],ylim=plot_lim[c(2,4)])+
                     theme_bw()+
                     labs(x="",y="")+
-                    theme(axis.text=element_blank())
+                    theme(axis.text=element_blank(),
+                          legend.position = "none")
       
       ggsave("output/Acoustic/inset_plot.png",inset_plot,height=6,width=6,units="in",dpi=300)
       
