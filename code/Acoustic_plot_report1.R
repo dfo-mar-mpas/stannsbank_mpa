@@ -23,6 +23,7 @@ library(tidyterra)
 s2_as_sf = FALSE
 
 source("https://raw.githubusercontent.com/dfo-mar-mpas/MCRG_functions/refs/heads/main/code/trim_img_ws.R")
+source("https://raw.githubusercontent.com/dfo-mar-mpas/MCRG_functions/refs/heads/main/code/marmap_to_isobath.R")
 
 #projections ------
 latlong <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
@@ -110,21 +111,10 @@ global_basemap <- ne_states() #this is a very large scale map
     
     # noaabathy_sab <- getNOAA.bathy(bbsab[1]-1,bbsab[3]+1,bbsab[2]-1,bbsab[4]+1,resolution = 0.25,keep=T)
     # noaabathy_plotregion <- getNOAA.bathy(plot_lim[1]-1,plot_lim[3]+1,plot_lim[2]-1,plot_lim[4]+1,resolution = 0.25,keep=T)
+    #  
+    # cont_250_sab <- marmap_to_isobath(noaabathy_sab,-250,latlong)
+    # cont_250_plotregion <- marmap_to_isobath(noaabathy_plotregion,-250,latlong)
     # 
-    # cont_250_sab <- noaabathy_sab%>%
-    #                 marmap::as.raster(.)%>%
-    #                 terra::rast(.)%>%
-    #                 as.contour(.,levels = -250)%>%
-    #                 st_as_sf()%>%
-    #                 st_transform(latlong)
-    # 
-    # cont_250_plotregion<- noaabathy_plotregion%>%
-    #                       marmap::as.raster(.)%>%
-    #                       terra::rast(.)%>%
-    #                       as.contour(.,levels = -250)%>%
-    #                       st_as_sf()%>%
-    #                       st_transform(latlong)
-    
     # write_sf(cont_250_sab,dsn="data/Bathymetry/contour_250_sab.shp")
     # write_sf(cont_250_plotregion,dsn="data/Bathymetry/contour_250_plotregion.shp")
     
@@ -509,26 +499,9 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     # noaabathy_med <- getNOAA.bathy(scale2[1]-1,scale2[3]+1,scale2[2]-1,scale2[4]+1,resolution = 0.5,keep=T)
     # noaabathy_large <- getNOAA.bathy(scale4[1]-1,scale4[3]+1,scale4[2]-1,scale4[4]+1,resolution = 1,keep=T)
     # 
-    # cont_250_fine <- noaabathy_fine%>%
-    #                  marmap::as.raster(.)%>%
-    #                  terra::rast(.)%>%
-    #                  as.contour(.,levels = -250)%>%
-    #                  st_as_sf()%>%
-    #                  st_transform(latlong)
-    # 
-    # cont_250_med <- noaabathy_med%>%
-    #                marmap::as.raster(.)%>%
-    #                terra::rast(.)%>%
-    #                as.contour(.,levels = -250)%>%
-    #                st_as_sf()%>%
-    #                st_transform(latlong)
-    # 
-    # cont_250_large <- noaabathy_large%>%
-    #                   marmap::as.raster(.)%>%
-    #                   terra::rast(.)%>%
-    #                   as.contour(.,levels = -250)%>%
-    #                   st_as_sf()%>%
-    #                   st_transform(latlong)
+    # cont_250_fine <- marmap_to_isobath(noaabathy_fine,-250,latlong)
+    # cont_250_med <- marmap_to_isobath(noaabathy_med,-250,latlong)
+    # cont_250_large <- marmap_to_isobath(noaabathy_large,-250,latlong)
     # 
     # write_sf(cont_250_fine,dsn="data/Bathymetry/contour_250_fine.shp")
     # write_sf(cont_250_med,dsn="data/Bathymetry/contour_250_medium.shp")
