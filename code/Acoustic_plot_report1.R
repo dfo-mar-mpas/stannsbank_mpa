@@ -10,6 +10,7 @@ library(arcpullr)
 library(marmap)
 library(stars)
 library(ggrepel)
+library(ggspatial)
 library(worrms)
 library(patchwork)
 library(raster)
@@ -52,7 +53,7 @@ mar_net <- read_sf("data/Shapefiles/networksites_proposed_OEM_MPA_20220617.shp")
 
 plot_lim <- bioregion%>% #bounding area for the inset (zoom out)
             st_transform(utm)%>%
-            st_buffer(50)%>%
+            st_buffer(10)%>%
             st_transform(latlong)%>%
             st_bbox()
 
@@ -69,11 +70,17 @@ bank_range <- bank_df%>%
               st_transform(latlong)%>%
               st_bbox()
 
-#for inset plot 
-plot_boundaries <- c(c(-60,-58,45.6,46.6)) #for inset plot
-inset_box <- sab%>%st_bbox()
-inset_box[c(1,3,2,4)] <- plot_boundaries     
-inset_box <- inset_box%>%st_as_sfc()%>%st_as_sf()
+#for sab plot 
+# plot_boundaries <- c(c(-60,-58,45.6,46.6)) #for inset plot
+# inset_box <- sab%>%st_bbox()
+# inset_box[c(1,3,2,4)] <- plot_boundaries     
+# inset_box <- inset_box%>%st_as_sfc()%>%st_as_sf()
+
+plot_boundaries <- sab%>%
+                   st_transform(utm)%>%
+                   st_buffer(5)%>%
+                   st_transform(latlong)%>%
+                   st_bbox()
 
 basemap_inset <- rbind(
                   ne_states(country = "Canada",returnclass = "sf")%>%
@@ -109,7 +116,7 @@ global_basemap <- ne_states() #this is a very large scale map
     isobath_df <- as.xyz(noaabathy_plotregion )%>%
       rename(lon=1,lat=2,depth=3)
     
-    
+    load("data/Bathymetry/gebco_plotregion.RData") #this is a trimmed GEBCO for the plot region (+ 100 km buffer)
     
     
 ## station depth extract ------
@@ -262,7 +269,8 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                   st_centroid()
       
       primary_plot <- ggplot()+
-                      geom_contour(data=isobath_sab_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", linewidth  = 0.5)+
+                      geom_spatraster_contour(data = gebco_region,breaks = -250,color = "grey80",linewidth = 0.6)+
+                      #geom_contour(data=isobath_sab_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", linewidth  = 0.5)+
                       geom_sf(data=sab_banks,fill="forestgreen")+
                       # ggrepel::geom_label_repel(data=sab_banks,aes(label = name, geometry = geometry),
                       #                           stat = "sf_coordinates",
@@ -273,17 +281,18 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                       geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
                       geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25,lty=3)+
                       geom_sf(data=recievers_sf,aes(fill=array),shape=21,size=2)+
+                      annotation_scale(location="bl")+
                       theme_bw()+
                       theme(legend.position = "inside",
                             legend.position.inside = c(0.1,0.92),
                             legend.background = element_blank(),
-                            legend.title = element_blank())+
+                            legend.title = element_blank(),
+                            axis.text=element_blank())+
                       guides(shape = guide_legend(override.aes = list(size=6)))+
                       labs(fill="",x="",y="")+
-                      coord_sf(expand=0,xlim=plot_boundaries[1:2],ylim=plot_boundaries[3:4])
+                      coord_sf(expand=0,xlim=plot_boundaries[c(1,3)],ylim=plot_boundaries[c(2,4)])
       
       ggsave("output/Acoustic/primary_plot.png",primary_plot,height=6,width=6,units="in",dpi=300)
-      
       trim_img_ws("output/Acoustic/primary_plot.png")
       
 #inset map
@@ -314,22 +323,23 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       
       inset_plot <- ggplot()+
                     geom_sf(data=can_eez,fill=NA)+
-                    geom_contour(data=isobath_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", size = 0.5)+
+                    geom_spatraster_contour(data = gebco_region,breaks = -250,color = "grey80",linewidth = 0.6)+
+                    #geom_contour(data=isobath_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", size = 0.5)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25,lty=3)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "MR"),fill="grey10",alpha=0.3,lty=3)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "AOI"),fill="salmon2",alpha=0.3,lty=3)+
                     #geom_sf(data=otn_stations,size=0.25,pch=20)+
                     geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
-                    geom_sf(data=recievers_sf,aes(fill=array),shape=21,size=0.75,stroke = 0.1)+
+                    geom_sf(data=recievers_sf,aes(fill=array),shape=21,size=1.1,stroke = 0.1)+
                     #geom_sf(data=otn_stations%>%filter(collectioncode %in% c("HFX","CBS")),col="red",size=0.7)+
-                    geom_sf(data=inset_otn_stations,size=0.75,fill = "grey70", colour="black",shape=21,
+                    geom_sf(data=inset_otn_stations,size=1.1,fill = "grey70", colour="black",shape=21,
                             stroke = 0.1)+
                     geom_sf(data=basemap_inset,fill="grey70")+
                     geom_sf(data=inset_box,fill=NA)+ #this is the zoomed out
                     coord_sf(expand=0,xlim=plot_lim[c(1,3)],ylim=plot_lim[c(2,4)])+
                     theme_bw()+
                     labs(x="",y="")+
-                    theme(axis.text=element_blank(),
+                    theme(
                           legend.position = "none")
       
       ggsave("output/Acoustic/inset_plot.png",inset_plot,height=6,width=6,units="in",dpi=300)
