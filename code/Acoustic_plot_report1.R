@@ -43,6 +43,7 @@ sab_banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
 
 #Canadian EEZ ----
 can_eez <- read_sf("data/Shapefiles/can_eez.shp")%>%st_transform(latlong)
+us_eez <- read_sf("data/Shapefiles/US EEZ/eez.shp")%>%st_transform(latlong)
 
 #load bioregion and get plotting limits----
 bioregion <- data_planning_areas()%>%
@@ -106,8 +107,29 @@ global_basemap <- ne_states() #this is a very large scale map
     bbsab <- st_bbox(sab)
     
     #extract bathymetric data
-    noaabathy_sab <- getNOAA.bathy(bbsab[1]-1,bbsab[3]+1,bbsab[2]+1,bbsab[4]-1,resolution = 0.25,keep=T)
-    noaabathy_plotregion <- getNOAA.bathy(plot_lim[1]-1,plot_lim[3]+1,plot_lim[2]+1,plot_lim[4]-1,resolution = 0.25,keep=T)
+    
+    # noaabathy_sab <- getNOAA.bathy(bbsab[1]-1,bbsab[3]+1,bbsab[2]-1,bbsab[4]+1,resolution = 0.25,keep=T)
+    # noaabathy_plotregion <- getNOAA.bathy(plot_lim[1]-1,plot_lim[3]+1,plot_lim[2]-1,plot_lim[4]+1,resolution = 0.25,keep=T)
+    # 
+    # cont_250_sab <- noaabathy_sab%>%
+    #                 marmap::as.raster(.)%>%
+    #                 terra::rast(.)%>%
+    #                 as.contour(.,levels = -250)%>%
+    #                 st_as_sf()%>%
+    #                 st_transform(latlong)
+    # 
+    # cont_250_plotregion<- noaabathy_plotregion%>%
+    #                       marmap::as.raster(.)%>%
+    #                       terra::rast(.)%>%
+    #                       as.contour(.,levels = -250)%>%
+    #                       st_as_sf()%>%
+    #                       st_transform(latlong)
+    
+    # write_sf(cont_250_sab,dsn="data/Bathymetry/contour_250_sab.shp")
+    # write_sf(cont_250_plotregion,dsn="data/Bathymetry/contour_250_plotregion.shp")
+    
+    cont_250_sab <- read_sf("data/Bathymetry/contour_250_sab.shp")
+    cont_250_plotregion <- read_sf("data/Bathymetry/contour_250_plotregion.shp")
     
     #create xyz dataframes that can be used by geom_contour
     isobath_sab_df <- as.xyz(noaabathy_sab)%>%
@@ -269,7 +291,8 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                   st_centroid()
       
       primary_plot <- ggplot()+
-                      geom_spatraster_contour(data = gebco_region,breaks = -250,color = "grey80",linewidth = 0.6)+
+                      geom_sf(data=cont_250_sab,color = "grey80",linewidth = 0.6)+
+                      #geom_spatraster_contour(data = gebco_region,breaks = -250,color = "grey80",linewidth = 0.6)+
                       #geom_contour(data=isobath_sab_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", linewidth  = 0.5)+
                       geom_sf(data=sab_banks,fill="forestgreen")+
                       # ggrepel::geom_label_repel(data=sab_banks,aes(label = name, geometry = geometry),
@@ -323,7 +346,8 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       
       inset_plot <- ggplot()+
                     geom_sf(data=can_eez,fill=NA)+
-                    geom_spatraster_contour(data = gebco_region,breaks = -250,color = "grey80",linewidth = 0.6)+
+                    geom_sf(data=cont_250_plotregion,color = "grey80",linewidth = 0.6)+
+                    #geom_spatraster_contour(data = gebco_region,breaks = -250,color = "grey80",linewidth = 0.6)+
                     #geom_contour(data=isobath_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", size = 0.5)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25,lty=3)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "MR"),fill="grey10",alpha=0.3,lty=3)+
@@ -424,13 +448,15 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                                          TRUE ~sp))%>%
                  rowwise()%>%
                  mutate(uid = get_uuid(search),
-                        sp = ifelse(sp == "Blue shark/Mako/Bluefin tuna",gsub("/","-",sp),sp))%>%
+                        sp = gsub("/","-",sp))%>%
                  data.frame()
     
     
     
-    # five scales
     
+    #Set up the scales -----
+    
+    #scale 0
     scale0 <- sab%>%
               st_transform(utm)%>%
               st_buffer(7)%>%
@@ -438,11 +464,88 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
               st_bbox()
     
     scale0_box <- scale0%>%st_as_sfc()%>%st_as_sf()
+    #scale 1
+    scale1 <- sab%>%
+      st_transform(utm)%>%
+      st_buffer(300)%>%
+      st_transform(latlong)%>%
+      st_bbox()
     
+    scale1[2] <- 44
+    
+    scale1_box <- scale1%>%st_as_sfc()%>%st_as_sf()
+    
+    #scale 2
+    scale2 <- sab%>%
+      st_transform(utm)%>%
+      st_buffer(650)%>%
+      st_transform(latlong)%>%
+      st_bbox()
+    
+    scale2_box <- scale2%>%st_as_sfc()%>%st_as_sf()
+    
+    #scale 3
+    scale3 <- sab%>%
+      st_bbox()
+    
+    scale3[c(3,4)] <- scale2[c(3,4)]
+    scale3[3] <- -51
+    scale3[2] <- 38.5
+    scale3[1] <- -78
+    
+    scale3_box <- scale3%>%st_as_sfc()%>%st_as_sf()
+    
+    #scale 4 
+    scale4 <- sab%>%
+      st_bbox()
+    
+    scale4[c(3,4)] <- scale3[c(3,4)]
+    scale4[3] <- -47
+    scale4[2] <- 4
+    scale4[1] <- -85
+    
+    #download the bathymetry data
+    # noaabathy_fine <- getNOAA.bathy(scale1[1]-1,scale1[3]+1,scale1[2]-1,scale1[4]+1,resolution = 0.25,keep=T)
+    # noaabathy_med <- getNOAA.bathy(scale2[1]-1,scale2[3]+1,scale2[2]-1,scale2[4]+1,resolution = 0.5,keep=T)
+    # noaabathy_large <- getNOAA.bathy(scale4[1]-1,scale4[3]+1,scale4[2]-1,scale4[4]+1,resolution = 1,keep=T)
+    # 
+    # cont_250_fine <- noaabathy_fine%>%
+    #                  marmap::as.raster(.)%>%
+    #                  terra::rast(.)%>%
+    #                  as.contour(.,levels = -250)%>%
+    #                  st_as_sf()%>%
+    #                  st_transform(latlong)
+    # 
+    # cont_250_med <- noaabathy_med%>%
+    #                marmap::as.raster(.)%>%
+    #                terra::rast(.)%>%
+    #                as.contour(.,levels = -250)%>%
+    #                st_as_sf()%>%
+    #                st_transform(latlong)
+    # 
+    # cont_250_large <- noaabathy_large%>%
+    #                   marmap::as.raster(.)%>%
+    #                   terra::rast(.)%>%
+    #                   as.contour(.,levels = -250)%>%
+    #                   st_as_sf()%>%
+    #                   st_transform(latlong)
+    # 
+    # write_sf(cont_250_fine,dsn="data/Bathymetry/contour_250_fine.shp")
+    # write_sf(cont_250_med,dsn="data/Bathymetry/contour_250_medium.shp")
+    # write_sf(cont_250_large,dsn="data/Bathymetry/contour_250_large.shp")
+    
+    cont_250_fine <- read_sf("data/Bathymetry/contour_250_fine.shp")
+    cont_250_med <- read_sf("data/Bathymetry/contour_250_medium.shp")
+    cont_250_large <- read_sf("data/Bathymetry/contour_250_large.shp")
+      
+    
+    #make plots  
+    
+    #full scale - 
     scale0_pts <- tag_df%>%st_intersection(scale0_box)
     
     scale0_plot <- ggplot()+
-                    geom_sf(data=shelfbreak,col="grey20",lty=2,fill=NA)+
+                    geom_sf(data=cont_250_sab,col="grey20",lty=2,fill=NA)+
                     geom_sf(data=basemap_inset)+
                     geom_sf(data=sab_zones,fill="cornflowerblue",alpha=0.3)+
                     geom_sf(data=tag_df,aes(fill=Common.Name),size=3,pch=21)+
@@ -454,15 +557,6 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     
     
     #scale 1 (fine scale)
-    scale1 <- sab%>%
-              st_transform(utm)%>%
-              st_buffer(300)%>%
-              st_transform(latlong)%>%
-              st_bbox()
-    
-    scale1[2] <- 44
-    
-    scale1_box <- scale1%>%st_as_sfc()%>%st_as_sf()
     
     scale1_pts <- tag_df%>%
                   st_intersection(scale1_box)%>%
@@ -470,6 +564,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     
     scale1_plot <- ggplot()+
                     geom_sf(data=basemap_inset)+
+                    geom_sf(data=cont_250_fine,col="grey60",linewidth=0.6)+
                     geom_sf(data=sab_zones,fill="cornflowerblue",alpha=0.3)+
                     geom_sf(data=tag_df,aes(fill=Common.Name),size=1,pch=21)+
                     geom_sf(data=tag_df%>%filter(animal_id %in% scale1_pts$animal_id),aes(fill=Common.Name),size=4,pch=21)+
@@ -480,13 +575,6 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                           axis.text=element_blank())
     
     #scale 2 fine-medium scale 
-    scale2 <- sab%>%
-              st_transform(utm)%>%
-              st_buffer(650)%>%
-              st_transform(latlong)%>%
-              st_bbox()
-    
-    scale2_box <- scale2%>%st_as_sfc()%>%st_as_sf()
     
     scale2_pts <- tag_df%>%
                   st_intersection(.,scale2_box)%>%
@@ -504,15 +592,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                           axis.text=element_blank())
     
     #scale 3 medium-large scale
-    scale3 <- sab%>%
-              st_bbox()
-    
-    scale3[c(3,4)] <- scale2[c(3,4)]
-    scale3[3] <- -51
-    scale3[2] <- 38.5
-    scale3[1] <- -78
-    
-    scale3_box <- scale3%>%st_as_sfc()%>%st_as_sf()
+   
     
     scale3_pts <- tag_df%>%
                   st_intersection(.,scale3_box)
