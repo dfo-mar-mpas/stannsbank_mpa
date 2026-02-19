@@ -101,7 +101,23 @@ basemap_inset <- rbind(
                     mutate(country="US")
                   )
 
-global_basemap <- ne_states() #this is a very large scale map
+global_basemap <- ne_states(returnclass = "sf")%>%
+                  st_transform(latlong)
+
+bbox_vals <- c( #these are the values of scale4
+                xmin = -85- 2,
+                ymin = 4- 2,
+                xmax = -47+ 2,
+                ymax = 52.3+ 2)%>%
+              st_bbox(crs=latlong)%>%
+              st_as_sfc()
+
+focal_countries <- global_basemap%>%
+                   st_make_valid()%>%
+                   st_intersection(bbox_vals)%>%
+                   group_by(admin) %>% 
+                   st_make_valid()%>%
+                   summarise(geometry = st_union(geometry), .groups = "drop")
 
 
 #bathymetry 
@@ -555,6 +571,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     
     scale2_plot <- ggplot()+
                     geom_sf(data=basemap_inset)+
+                    geom_sf(data=cont_250_med,col="grey60",linewidth=0.6)+
                     geom_sf(data=sab_zones,fill="cornflowerblue",alpha=0.3)+
                     geom_sf(data=tag_df,aes(fill=Common.Name),size=1,pch=21)+
                     geom_sf(data=tag_df%>%filter(animal_id %in% scale2_pts$animal_id),aes(fill=Common.Name),size=3,pch=21)+
@@ -571,15 +588,78 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                   st_intersection(.,scale3_box)
                 
     scale3_plot <- ggplot()+
-                   geom_sf(data=global_basemap)+
+                   geom_sf(data=can_eez,fill=NA,colour="black")+
+                   geom_sf(data=basemap_inset%>%filter(country!="Canada"))+
+                   geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey70")+
+                   geom_sf(data=cont_250_large,col="grey65",linewidth=0.4)+
                    geom_sf(data=sab,fill="cornflowerblue",alpha=0.3)+
-                   geom_sf(data=tag_df,aes(fill=Common.Name),size=2,pch=21)+
+                   #geom_sf(data=tag_df,aes(fill=Common.Name),size=2,pch=21)+
                    geom_sf(data=tag_df%>%filter(animal_id %in% scale3_pts$animal_id),aes(fill=Common.Name),size=4,pch=21)+
                    coord_sf(expand=0,xlim=scale3[c(1,3)],ylim=scale3[c(2,4)])+
+                   scale_fill_viridis(discrete = TRUE)+
                    theme_bw()+
                    annotation_scale(location="br")+
                    theme(legend.position = "none",
                          axis.text=element_blank())
+    
+    #scale 3 with labels ----
+    
+    tag_proj <- st_transform(tag_df, 3347)
+    
+    near_list <- st_is_within_distance(tag_proj, dist = 20000)
+    
+    # Convert neighbour list to cluster IDs
+    cluster_id <- rep(NA_integer_, length(near_list))
+    current_id <- 1
+    
+    for (i in seq_along(near_list)) {
+      if (is.na(cluster_id[i])) {
+        members <- unlist(near_list[i])
+        cluster_id[members] <- current_id
+        current_id <- current_id + 1
+      }
+    }
+    
+    tag_clustered <- tag_proj %>%
+      mutate(cluster = cluster_id) %>%
+      group_by(cluster) %>%
+      slice(1) %>%
+      ungroup()%>%
+      st_transform(latlong)%>%
+      st_intersection(scale3_box)%>%
+      mutate(Project = gsub("ACT.","",Project),
+             Project = gsub("FACT.","",Project))
+    
+    
+    scale3_plot_labs <- ggplot()+
+                        geom_sf(data=basemap_inset %>% filter(country!="Canada"))+
+                        geom_sf(data=basemap_inset %>% filter(country=="Canada"),fill="grey70")+
+                        geom_sf(data=sab,fill="cornflowerblue",alpha=0.3)+
+                        geom_sf(data=tag_df %>% 
+                                  filter(animal_id %in% scale3_pts$animal_id),
+                                aes(fill=Common.Name),
+                                                  size=4,pch=21)+
+                        geom_label_repel(
+                          data = tag_clustered,
+                          aes(label = Project, geometry = geometry),
+                          stat = "sf_coordinates",
+                          size = 3,
+                          max.overlaps = Inf,
+                          box.padding = 0.4,
+                          point.padding = 0.3,
+                          fill = "white",        # box fill
+                          color = "black",       # text colour
+                          label.size = 0.2       # border thickness
+                        )+
+      
+                          coord_sf(expand=0,
+                                 xlim=scale3[c(1,3)],
+                                 ylim=scale3[c(2,4)])+
+                        scale_fill_viridis(discrete = TRUE)+
+                        theme_bw()+
+                        annotation_scale(location="br")+
+                        theme(legend.position = "none")+
+                        labs(x="",y="")
     
     #scale 4 largest
     scale4 <- sab%>%
@@ -608,15 +688,21 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                   filter(!animal_id %in% c(scale0_pts$animal_id,scale1_pts$animal_id,scale2_pts$animal_id,scale3_pts$animal_id))
     
     scale4_plot <- ggplot()+
-                  geom_sf(data=global_basemap)+
-                  geom_sf(data=sab,fill="cornflowerblue",alpha=0.3)+
+                  geom_sf(data=can_eez,fill=NA,colour="black")+
+                  geom_sf(data=focal_countries)+
+                  geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey70")+
+                  geom_sf(data=cont_250_large,col="grey65",linewidth=0.4)+
+                  geom_sf(data=sab,fill="cornflowerblue",alpha=0.3,colour="black")+
                   geom_sf(data=tag_df,aes(fill=Common.Name),size=3,pch=21)+
                   geom_sf(data=tag_df%>%filter(animal_id %in% scale4_pts$animal_id),aes(fill=Common.Name),size=3,pch=21)+
                   geom_sf(data=rings,lty=2,lwd=0.5,fill=NA)+
+                  scale_fill_viridis(discrete = TRUE)+
                   coord_sf(expand=0,xlim=scale4[c(1,3)],ylim=scale4[c(2,4)],label_axes = "-NE")+
                   theme_bw()+
                   annotation_scale(location = "br")+
-                  annotation_north_arrow(location = "tr")+
+                  annotation_north_arrow(location = "tl",
+                                         height = unit(0.7, "cm"),
+                                         width  = unit(0.7, "cm"))+
                   theme(legend.position = "none")
     
     #make a legend plot
@@ -627,12 +713,17 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                     coord_sf(expand=0,label_axes = "-NE")
     
     #save plot - note used Scale 3 and 4 in the end plot to make it simple
-    ggsave("output/Acoustic/tagmap_scale0.png",scale0_plot+scale_fill_viridis(discrete=T),height=5,width=5,units="in",dpi=300)
-    ggsave("output/Acoustic/tagmap_scale1.png",scale1_plot+scale_fill_viridis(discrete=T),height=5,width=6,units="in",dpi=300)
-    ggsave("output/Acoustic/tagmap_scale2.png",scale2_plot+scale_fill_viridis(discrete=T),height=6,width=8,units="in",dpi=300)
-    ggsave("output/Acoustic/tagmap_scale3.png",scale3_plot+scale_fill_viridis(discrete=T),height=6,width=10,units="in",dpi=300)
-    ggsave("output/Acoustic/tagmap_scale4.png",scale4_plot+scale_fill_viridis(discrete=T),height=10,width=6,units="in",dpi=300) 
-    ggsave("output/Acoustic/tagmap_legend.png",legend_dummy+scale_fill_viridis(discrete=T),height=5,width=5,units="in",dpi=300)
+    # ggsave("output/Acoustic/tagmap_scale0.png",scale0_plot+scale_fill_viridis(discrete=T),height=5,width=5,units="in",dpi=300)
+    # ggsave("output/Acoustic/tagmap_scale1.png",scale1_plot+scale_fill_viridis(discrete=T),height=5,width=6,units="in",dpi=300)
+    #ggsave("output/Acoustic/tagmap_scale2.png",scale2_plot+scale_fill_viridis(discrete=T),height=6,width=8,units="in",dpi=300)
+    ggsave("output/Acoustic/tagmap_scale3.png",scale3_plot,height=6,width=10,units="in",dpi=300)
+    ggsave("output/Acoustic/tagmap_scale3_labs.png",scale3_plot_labs,height=6,width=10,units="in",dpi=300)
+    ggsave("output/Acoustic/tagmap_scale4.png",scale4_plot,height=10,width=6,units="in",dpi=300) 
+    ggsave("output/Acoustic/tagmap_legend.png",legend_dummy,height=5,width=5,units="in",dpi=300)
+    
+    trim_img_ws("output/Acoustic/tagmap_scale3.png")
+    trim_img_ws("output/Acoustic/tagmap_scale3_labs.png")
+    trim_img_ws("output/Acoustic/tagmap_scale4.png")
 
 #### Interpolated species track plot -----------
     
