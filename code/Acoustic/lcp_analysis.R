@@ -18,6 +18,7 @@ library(nngeo)
 library(sfnetworks)
 library(fasterize)
 library(gdistance)
+library(ggridges)
 
 s2_as_sf = FALSE
 
@@ -62,8 +63,6 @@ basemap <- rbind(
     st_as_sf()%>%
     mutate(country="US")
 )
-
-
 
 
 #load the reciever array ---- 
@@ -198,9 +197,88 @@ tag_df_bbox <- lcp_dataframe%>%
                            transition_name = "tag_df",
                            rad=20,
                            lines=TRUE,
-                           dirs=8, # just a lower resolution for the distance seeking at the large scale
+                           dirs=16, # just a lower resolution for the distance seeking at the large scale
                            recalculate=FALSE,
                            midpoint=FALSE)
 
+#save interim outputs
+save(med_scale_lcp,large_scale_lcp,file="output/Acoustic/lcp_outputs.RData")
+
+#bring the data together
+
+lcp_distances <- lcp_dataframe%>%
+                 left_join(.,rbind(med_scale_lcp[[1]],large_scale_lcp[[1]])%>%
+                 rename(lcp_dist = dist))
+
+lcp_paths <- rbind(med_scale_lcp[[2]],large_scale_lcp[[2]])%>%st_transform(latlong)
 
 
+p1 <- ggplot()+
+  geom_sf(data=global_basemap)+
+  geom_sf(data=sab,fill="cornflowerblue")+
+  geom_sf(data=reciever_df)+
+  geom_sf(data=sab_array_centre,size=3)+
+  geom_sf(data=lcp_paths,col="grey20",linetype=2)+
+  geom_sf(data=lcp_dataframe,aes(fill=Common.Name),size=1.5,pch=21)+
+  theme_bw()+
+  coord_sf(expand=0,xlim=tag_bound[c(1,3)],ylim=tag_bound[c(2,4)])+
+  labs(fill="")+
+  annotation_scale()+
+  theme(
+        # legend.position="inside",
+        # legend.position.inside = c(0.85,0.5),
+        legend.background = element_blank(),
+        legend.title = element_blank(),
+        legend.text = element_text(size=6),
+        legend.spacing.x = unit(0.05, "cm"));p1
+
+ggsave("output/Acoustic/distance_analysis_qdet_lines.png",p1,height=7,width=5,units="in")
+trim_img_ws("output/Acoustic/distance_analysis_qdet_lines.png")  
+                 
+#plot the distances
+
+breaks = c(10, 30, 100, 300, 1000, 3000)
+
+p2 <- ggplot(lcp_distances,
+       aes(x = lcp_dist,
+           y = Common.Name)) +
+  
+  geom_density_ridges_gradient(
+    aes(fill = after_stat(x)),   # ← raw distance
+    scale = 1.2,
+    rel_min_height = 0.01,
+    alpha = 0.8
+  ) +
+  
+  geom_point(
+    position = position_jitter(height = 0.05),
+    size = 1.1,
+    alpha = 0.5,
+    shape = 21,
+    fill = "grey30",
+    colour = "black"
+  ) +
+  
+  scale_fill_viridis_c(
+    trans = "log10",   # ← log transform here instead
+    breaks = breaks,
+    labels = scales::label_number()
+  ) +
+  
+  scale_x_log10(
+    breaks = breaks,
+    labels = scales::label_number()
+  ) +
+  
+  annotation_logticks(sides = "b",
+                      short = unit(0.1, "cm"),
+                      mid   = unit(0.15, "cm"),
+                      long  = unit(0.2, "cm")) +
+  theme_bw()+
+  labs(x="Marine distance (km)",
+       y="")+
+  theme(legend.position="none")
+
+ggsave("output/Acoustic/distance_ridgelines_qdet.png",p2,height=6,width=6,dpi=300,units="in")
+
+## with our tags --- 
