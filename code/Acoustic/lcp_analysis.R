@@ -281,4 +281,9 @@ p2 <- ggplot(lcp_distances,
 
 ggsave("output/Acoustic/distance_ridgelines_qdet.png",p2,height=6,width=6,dpi=300,units="in")
 
+#save the csv output
+
+write.csv(lcp_distances%>%data.frame()%>%dplyr::select(-c(dist_sab,id,site_id,geometry)),"output/Acoustic/lcp_distances.csv",row.names=FALSE)
+
+
 ## with our tags --- 
