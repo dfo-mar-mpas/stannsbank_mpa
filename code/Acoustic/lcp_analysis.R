@@ -19,6 +19,7 @@ library(sfnetworks)
 library(fasterize)
 library(gdistance)
 library(ggridges)
+library(readxl)
 
 s2_as_sf = FALSE
 
@@ -174,8 +175,7 @@ tag_df_bbox <- lcp_dataframe%>%
                st_as_sfc()%>%
                st_as_sf()
 
-#will break this up by discance
-
+#will break this up by distance
 
  med_scale_lcp <- lcp_site(x=lcp_dataframe%>%filter(dist_sab<=750),#high resolution distance finding for those within 750 km
                            target = sab_array_centre,
@@ -287,3 +287,122 @@ write.csv(lcp_distances%>%data.frame()%>%dplyr::select(-c(dist_sab,id,site_id,ge
 
 
 ## with our tags --- 
+
+#read in the animal tag metadata from OTN
+otn_meta <- read.csv("data/Acoustic/SABMPAtagging_release_locs_5March2024.csv")%>% #note this gives the same outputs as the 'animals.csv' from OTN
+  rename(lon_dep=deploy_long,lat_dep=deploy_lat,date_dep=datelastmodified)%>%
+  dplyr::select(animal_id,date_dep,lon_dep,lat_dep)%>%
+  distinct(animal_id,.keep_all=TRUE)
+
+#read in where the tags have been detected
+det_sheets <- excel_sheets("data/Acoustic/det_evts_match_bind_old.xlsm")
+
+det_df <- NULL
+for(i in det_sheets){det_df <- rbind(det_df,read_excel("data/Acoustic/det_evts_match_bind_old.xlsm",sheet=i))}
+
+#merge in the deployment information
+det_df <- det_df%>%
+          left_join(otn_meta)%>%
+          rename(lon=mean_longitude,
+                 lat=mean_latitude)%>%
+          mutate(event_id = 1:n())%>%
+          filter(res_time_sec>0,
+                 num_detections>2)
+
+det_boundbox <- det_df%>%
+                dplyr::select(lon,lat)%>%
+                st_as_sf(coords=c("lon","lat"),crs=latlong)%>%
+                rbind(.,det_df%>%
+                        dplyr::select(lon_dep,lat_dep)%>%
+                        st_as_sf(coords=c("lon_dep","lat_dep"),crs=latlong))%>%
+                st_transform(utm)%>%
+                st_buffer(50)%>% # buffer around the points
+                st_transform(latlong)%>%
+                st_bbox()
+
+#generate a fine(r) scale transition object for the tag detections around St. Anns Bank
+tag_trans <- trans_gen(basemap = basemap,
+                       bound_box = det_boundbox,
+                       resolution = 2, #2 km resolution. For this smaller map, transition object takes a while to be created but it will give more accurate assessments
+                       transition_name = "tag_df_sab",
+                       dirs=16,
+                       recalculate = TRUE)
+
+
+
+#check for errors - this was an issue pre-screening for res_time_sec and num_detections
+# det_issues <- det_df%>%
+#               mutate(diff_lat = lat-lat_dep, #this means the tag deployment location matches also where it was detected
+#                      diff_lon=lon-lon_dep)%>%
+#               filter(diff_lat == 0 | diff_lon == 0)
+# 
+# det_df <- det_df%>%
+#           filter(!event_id %in% det_issues$event_id)
+
+#load the transition object. Note that this is made during another analysis for the qualified detections using lcp_site.R function. These can be
+#manually made if needed.
+
+load("data/transition objects/tag_df_16_10km.RData") #large scale 10km resolution
+load('data/transition objects/')
+
+basemap_d <- basemap%>%st_intersection(det_boundbox%>%st_as_sfc()) #used for the straight line check in lcp_otn_pair
+
+lcp_tags <- lcp_otn_pair(x=det_df,trans_d=tag_trans,lines=TRUE,basemap_d = basemap_d,sld_check=TRUE) #takes a while to get through the tags
+
+#unpack the outputs
+
+#lines
+spec_ord <- c("Atlantic Halibut","Atlantic Cod","Atlantic Striped Wolffish")
+
+lcp_tags_lines_df <- lcp_tags[[2]]%>%
+                     st_set_crs(latlong)%>%
+                     left_join(det_df%>%distinct(animal_id,.keep_all=TRUE)%>%dplyr::select(animal_id,species))%>%
+                     mutate(species = factor(species,levels = spec_ord))
+
+tag_lims <- lcp_tags_lines_df%>%
+            st_transform(utm)%>%
+            st_bbox()%>%
+            st_as_sfc()%>%
+            st_buffer(20)%>%
+            st_transform(latlong)%>%
+            st_bbox()
+
+spec_ord <- c("Atlantic Halibut","Atlantic Cod","Atlantic Striped Wolffish")
+
+release_locs <- det_df%>%
+                st_as_sf(coords=c("lon_dep","lat_dep"),crs=latlong)%>%
+                mutate(species = factor(species,levels = spec_ord))
+
+detection_locs <- det_df%>%
+                  st_as_sf(coords=c("lon","lat"),crs=latlong)%>%
+                  mutate(species = factor(species,levels = spec_ord))
+
+
+lcp_plot <- ggplot()+
+  geom_sf(data=basemap)+
+  geom_sf(data=sab,fill="cornflowerblue")+
+  geom_sf(data=lcp_tags_lines_df,linewidth=1,alpha=0.3,col="grey")+
+  geom_sf(data=release_locs,aes(fill=species),size=2,shape=21)+
+  geom_sf(data=detection_locs,aes(fill=species),size=2,shape=21)+
+  facet_wrap(~species)+
+  theme_bw()+
+  coord_sf(xlim=tag_lims[c(1,3)],ylim=tag_lims[c(2,4)],expand=0)+
+  theme(legend.position="none",
+        strip.background = element_rect(fill="white"))+
+  scale_fill_viridis(discrete=T)+
+  annotation_scale(
+    data=data.frame(species="Atlantic Halibut"),
+    location="br"
+  )
+
+ggsave("output/Acoustic/lcp_analysis_species.png",lcp_plot,width=10,height=7,units="in",dpi=300)
+trim_img_ws("output/Acoustic/lcp_analysis_species.png")
+
+
+#save the distances
+sab_tags_dists <- lcp_tags[[1]]
+
+write.csv(lcp_tags[[1]],"output/Acoustic/lcp_sab_tags_distances.csv",row.names=FALSE)
+
+
+
