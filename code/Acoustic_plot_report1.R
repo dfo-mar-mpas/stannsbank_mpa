@@ -11,6 +11,7 @@ library(marmap)
 library(stars)
 library(ggrepel)
 library(ggspatial)
+library(ggnewscale)
 library(worrms)
 library(patchwork)
 library(raster)
@@ -19,6 +20,7 @@ library(ggspatial)
 library(viridis)
 library(terra)
 library(tidyterra)
+library(MarConsNetData)
 
 s2_as_sf = FALSE
 
@@ -138,11 +140,11 @@ focal_countries <- global_basemap%>%
     cont_250_plotregion <- read_sf("data/Bathymetry/contour_250_plotregion.shp")
     
     #create xyz dataframes that can be used by geom_contour
-    isobath_sab_df <- as.xyz(noaabathy_sab)%>%
-                      rename(lon=1,lat=2,depth=3)
-    
-    isobath_df <- as.xyz(noaabathy_plotregion )%>%
-      rename(lon=1,lat=2,depth=3)
+    # isobath_sab_df <- as.xyz(noaabathy_sab)%>%
+    #                   rename(lon=1,lat=2,depth=3)
+    # 
+    # isobath_df <- as.xyz(noaabathy_plotregion )%>%
+    #   rename(lon=1,lat=2,depth=3)
     
     load("data/Bathymetry/gebco_plotregion.RData") #this is a trimmed GEBCO for the plot region (+ 100 km buffer)
     
@@ -296,32 +298,38 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       banks_df <- sab_banks%>%
                   st_centroid()
       
+      #high res extraction of bathymetry (combo of multibeam and GEBCO)
+      
+      sab_dem_hr <- terra::rast("data/Bathymetry/TotalSABbathy/wholeBathy.tif")
+      
+      rast_proj <- st_crs(sab_dem_hr)
+      
+      sab_dem_hr_trimmed <- sab_dem_hr%>%mask(.,sab%>%st_transform(rast_proj))
+      
       primary_plot <- ggplot()+
-                      geom_sf(data=cont_250_sab,color = "grey80",linewidth = 0.6)+
-                      #geom_spatraster_contour(data = gebco_region,breaks = -250,color = "grey80",linewidth = 0.6)+
-                      #geom_contour(data=isobath_sab_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", linewidth  = 0.5)+
-                      geom_sf(data=sab_banks,fill="forestgreen")+
-                      # ggrepel::geom_label_repel(data=sab_banks,aes(label = name, geometry = geometry),
-                      #                           stat = "sf_coordinates",
-                      #                           min.segment.length = 0)+
-                      geom_sf(data=otn_stations,size=1.25,fill = "grey70", colour="black",shape=21,
+                      geom_spatraster(data = sab_dem_hr_trimmed)+
+                      geom_sf(data=cont_250_sab,col="grey35",linewidth=0.5)+
+                      geom_sf(data=MPAs%>%filter(NAME_E == "St. Anns Bank Marine Protected Area"),fill=NA,linewidth=1.1,col="black")+
+                      geom_sf(data=sab_banks%>%st_transform(rast_proj),fill=NA,col="black")+
+                      geom_sf(data=otn_stations%>%filter(!grepl("_SB",station_name)),size=1.5,fill = "grey70", colour="black",shape=21,
                               stroke = 0.1)+
+                      scale_fill_viridis(na.value = "transparent")+
                       geom_sf(data=coast_hr,fill="grey70")+
-                      geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
-                      geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25,lty=3)+
-                      geom_sf(data=recievers_sf,aes(fill=array),shape=21,size=2)+
+                      labs(fill="Depth (m)")+
+                      new_scale_fill()+
+                      geom_sf(data=recievers_sf%>%filter(!grepl("_SB",station_name)),aes(fill=array),col="black",shape=21,size=2,show.legend = FALSE)+
+                      scale_fill_manual(values=c("2015-2020" = "#D73027","2020-2025"="white"))+
                       annotation_scale(location="bl")+
                       theme_bw()+
                       theme(legend.position = "inside",
-                            legend.position.inside = c(0.1,0.92),
+                            legend.position.inside = c(0.07,0.85),
                             legend.background = element_blank(),
-                            legend.title = element_blank(),
                             axis.text=element_blank())+
                       guides(shape = guide_legend(override.aes = list(size=6)))+
-                      labs(fill="",x="",y="")+
+                      labs(x="",y="")+
                       coord_sf(expand=0,xlim=plot_boundaries[c(1,3)],ylim=plot_boundaries[c(2,4)])
       
-      ggsave("output/Acoustic/primary_plot.png",primary_plot,height=6,width=6,units="in",dpi=300)
+      ggsave("output/Acoustic/primary_plot.png",primary_plot,height=7.5,width=7.5,units="in",dpi=300)
       trim_img_ws("output/Acoustic/primary_plot.png")
       
 #inset map
@@ -360,12 +368,13 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                     geom_sf(data=mar_net_df%>%filter(TYPE == "AOI"),fill="salmon2",alpha=0.3,lty=3)+
                     #geom_sf(data=otn_stations,size=0.25,pch=20)+
                     geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
-                    geom_sf(data=recievers_sf,aes(fill=array),shape=21,size=1.1,stroke = 0.1)+
+                    geom_sf(data=recievers_sf%>%filter(!grepl("_SB",station_name)),aes(fill=array),shape=21,size=1.1,stroke = 0.1)+
+                    scale_fill_manual(values=c("2015-2020" = "#D73027","2020-2025"="white"))+
                     #geom_sf(data=otn_stations%>%filter(collectioncode %in% c("HFX","CBS")),col="red",size=0.7)+
-                    geom_sf(data=inset_otn_stations,size=1.1,fill = "grey70", colour="black",shape=21,
+                    geom_sf(data=inset_otn_stations%>%filter(!grepl("_SB",station_name)),size=1.1,fill = "grey70", colour="black",shape=21,
                             stroke = 0.1)+
                     geom_sf(data=basemap_inset,fill="grey70")+
-                    geom_sf(data=inset_box,fill=NA)+ #this is the zoomed out
+                    geom_sf(data=plot_boundaries%>%st_as_sfc(),fill=NA)+ 
                     coord_sf(expand=0,xlim=plot_lim[c(1,3)],ylim=plot_lim[c(2,4)])+
                     theme_bw()+
                     labs(x="",y="")+
