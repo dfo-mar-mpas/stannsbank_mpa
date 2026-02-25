@@ -103,8 +103,6 @@ basemap_inset <- rbind(
                     mutate(country="US")
                   )
 
-global_basemap <- ne_states(returnclass = "sf")%>%
-                  st_transform(latlong)
 
 bbox_vals <- c( #these are the values of scale4
                 xmin = -85- 2,
@@ -113,6 +111,9 @@ bbox_vals <- c( #these are the values of scale4
                 ymax = 52.3+ 2)%>%
               st_bbox(crs=latlong)%>%
               st_as_sfc()
+
+global_basemap <- ne_states(returnclass = "sf")%>%
+  st_transform(latlong)
 
 focal_countries <- global_basemap%>%
                    st_make_valid()%>%
@@ -322,7 +323,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                       annotation_scale(location="bl")+
                       theme_bw()+
                       theme(legend.position = "inside",
-                            legend.position.inside = c(0.07,0.85),
+                            legend.position.inside = c(0.12,0.85),
                             legend.background = element_blank(),
                             axis.text=element_blank())+
                       guides(shape = guide_legend(override.aes = list(size=6)))+
@@ -384,7 +385,133 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       ggsave("output/Acoustic/inset_plot.png",inset_plot,height=6,width=6,units="in",dpi=300)
       trim_img_ws("output/Acoustic/inset_plot.png")
       
-      #tag map
+      #global inset ... inset --
+      
+      global_scale <- st_bbox(
+        c(
+          xmin = -85.00000,
+          ymin =  4.00000,
+          xmax = -47.00000,
+          ymax = 52.25748
+        ),
+        crs = latlong)
+      
+      global_inset <- ggplot()+
+        geom_sf(data=can_eez,fill=NA,colour="black")+
+        geom_sf(data=focal_countries)+
+        geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey70")+
+        geom_sf(data=cont_250_plotregion,color = "grey80",linewidth = 0.6)+
+        geom_sf(data=plot_lim%>%st_as_sfc(),fill=NA)+
+        geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25)+
+        geom_sf(data=mar_net_df%>%filter(TYPE == "MR"),fill="grey10",alpha=0.3)+
+        geom_sf(data=mar_net_df%>%filter(TYPE == "AOI"),fill="salmon2",alpha=0.3)+
+        geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
+        theme_bw()+
+        coord_sf(xlim=global_scale[c(1,3)],ylim=global_scale[c(2,4)],expand=0)+
+        annotation_north_arrow(location = "tl",
+                               height = unit(0.7, "cm"),
+                               width  = unit(0.7, "cm"))
+        
+        
+        ggsave("output/Acoustic/global_inset.png",global_inset,height=6,width=5,units="in",dpi=300)
+        trim_img_ws("output/Acoustic/global_inset.png")
+      
+      #globe version of the map
+        
+        #download the world globe basemap
+        world_globe <- ne_countries(
+          scale = "medium",
+          returnclass = "sf"
+        ) %>%
+          st_wrap_dateline(options = c("WRAPDATELINE=YES")) %>%
+          st_transform(globe_crs)
+        
+        #Define a global region that is centered on the study area
+        
+        center_pt <- plot_lim%>%
+                     st_as_sfc()%>%
+                     st_centroid()
+        
+        lon0 <- st_coordinates(center_pt)[1]
+        lat0 <- st_coordinates(center_pt)[2]
+        
+        globe_crs <- sprintf("+proj=ortho +lat_0=%s +lon_0=%s",lat0, lon0)
+        
+        #define the box denoting the study region you want to highlight
+        global_box <- plot_lim%>%
+                      st_as_sfc() %>%
+                      st_transform(globe_crs)
+        
+        #make a circle to wrap the globe plot
+        
+        globe_circle <- st_sfc(
+          st_buffer(
+            st_point(c(0, 0)),   # center of orthographic projection
+            dist =  6378137  # meters
+          ),
+          crs = globe_crs
+        )
+        
+        #crudgy way to make it so that the oceans are white in the plot
+        globe_disc <- st_sfc(
+          st_point(c(0, 0)),  # center in projected coords
+          crs = globe_crs
+        ) %>%
+          st_buffer(dist = 6378137) %>%   # Earth radius in meters
+          st_as_sf()
+       
+        
+        global_inset2 <- ggplot() +
+          
+          #global background
+          geom_sf(data = globe_disc, fill = "white", colour = "black", linewidth = 0.4)+
+          
+          # Land
+          geom_sf(
+            data = world_globe,
+            colour = "grey20",
+            linewidth = 0.2
+          ) +
+          
+          geom_sf(
+            data = world_globe%>%filter(formal_en == "Canada"),
+            fill = "grey70",
+            colour = "grey20",
+            linewidth = 0.2
+          ) +
+          
+          # Study region box
+          geom_sf(
+            data = global_box,
+            fill = NA,
+            colour = "black",
+            linewidth = 0.9
+          ) +
+          
+          geom_sf(data = globe_circle,
+                  fill = NA,
+                  colour = "grey30",
+                  linewidth = 0.4)+
+          
+          coord_sf(crs = globe_crs) +
+          
+          theme_void() +
+          
+          theme(
+            panel.background = element_rect(fill = NA, colour = NA),
+            plot.background  = element_rect(fill = NA, colour = NA)
+          )
+        
+        ggsave(
+          "output/Acoustic/global_inset2.png",
+          plot = global_inset2,
+          width = 4,
+          height = 4,
+          dpi = 600,
+          bg = "transparent"
+        )
+      
+#tag maps ---------------
       plot_list <- NULL
       
       for(i in unique(tag_df$common)){
