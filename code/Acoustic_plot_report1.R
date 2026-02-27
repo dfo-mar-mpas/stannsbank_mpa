@@ -1,9 +1,8 @@
 #Figure 1 for the Acoustic Report
 
 #load libraries ----
-library(dplyr)
+library(tidyverse)
 library(sf)
-library(ggplot2)
 library(rnaturalearth)
 library(lubridate)
 library(arcpullr)
@@ -24,12 +23,16 @@ library(MarConsNetData)
 
 s2_as_sf = FALSE
 
+#source functions
 source("https://raw.githubusercontent.com/dfo-mar-mpas/MCRG_functions/refs/heads/main/code/trim_img_ws.R")
 source("https://raw.githubusercontent.com/dfo-mar-mpas/MCRG_functions/refs/heads/main/code/marmap_to_isobath.R")
+source("code/Acoustic/create_gate_raster.R")
 
 #projections ------
 latlong <- "+proj=longlat +datum=NAD83 +no_defs +ellps=GRS80 +towgs84=0,0,0"
 utm <- "+proj=utm +zone=20 +datum=NAD83 +units=km +no_defs +ellps=GRS80 +towgs84=0,0,0"
+
+#load shapefiles -----
 
 #load St Anns Bank MPA shapefile 
 sab_zones <- read_sf("data/Shapefiles/SAB_boundary_zones_2017.shp")%>%
@@ -44,11 +47,11 @@ sab <- sab_zones%>%
 
 sab_banks <- read_sf("data/Shapefiles/sab_banks.shp")%>%st_transform(latlong)
 
-#Canadian EEZ ----
+#Canadian EEZ 
 can_eez <- read_sf("data/Shapefiles/can_eez.shp")%>%st_transform(latlong)
 us_eez <- read_sf("data/Shapefiles/US EEZ/eez.shp")%>%st_transform(latlong)
 
-#load bioregion and get plotting limits----
+#load bioregion and get plotting limits 
 bioregion <- data_planning_areas()%>%
              st_transform(latlong)
 
@@ -74,11 +77,11 @@ bank_range <- bank_df%>%
               st_transform(latlong)%>%
               st_bbox()
 
-#for sab plot 
-# plot_boundaries <- c(c(-60,-58,45.6,46.6)) #for inset plot
-# inset_box <- sab%>%st_bbox()
-# inset_box[c(1,3,2,4)] <- plot_boundaries     
-# inset_box <- inset_box%>%st_as_sfc()%>%st_as_sf()
+      #for sab plot 
+      # plot_boundaries <- c(c(-60,-58,45.6,46.6)) #for inset plot
+      # inset_box <- sab%>%st_bbox()
+      # inset_box[c(1,3,2,4)] <- plot_boundaries     
+      # inset_box <- inset_box%>%st_as_sfc()%>%st_as_sf()
 
 plot_boundaries <- sab%>%
                    st_transform(utm)%>%
@@ -123,7 +126,7 @@ focal_countries <- global_basemap%>%
                    summarise(geometry = st_union(geometry), .groups = "drop")
 
 
-#bathymetry 
+#bathymetry ----
     bbsab <- st_bbox(sab)
     
     #extract bathymetric data
@@ -306,7 +309,8 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       rast_proj <- st_crs(sab_dem_hr)
       
       sab_dem_hr_trimmed <- sab_dem_hr%>%mask(.,sab%>%st_transform(rast_proj))
-      
+
+## Figure 1 -----------    
       primary_plot <- ggplot()+
                       geom_spatraster(data = sab_dem_hr_trimmed)+
                       geom_sf(data=cont_250_sab,col="grey35",linewidth=0.5)+
@@ -864,74 +868,221 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
 #### Interpolated species track plot -----------
     
     qdets <- read.csv("data/Acoustic/qdets_pos.csv")
-    pos_cod <- read.csv("data/Acoustic/pos_acod.csv")%>%mutate(sp="Atlantic cod")
-    pos_halibut <- read.csv("data/Acoustic/pos_halibut.csv")%>%mutate(sp="Atlantic halibut")
-    pos_wolffish <- read.csv("data/Acoustic/pos_wolffish.csv")%>%mutate(sp="Atlantic wolffish")
+    # pos_cod1 <- read.csv("data/Acoustic/pos_acod.csv")%>%mutate(sp="Atlantic cod")
+    # pos_halibut1 <- read.csv("data/Acoustic/pos_halibut.csv")%>%mutate(sp="Atlantic halibut")
+    # pos_wolffish1 <- read.csv("data/Acoustic/pos_wolffish.csv")%>%mutate(sp="Atlantic wolffish")
     
-    pos_df <- rbind(pos_cod,pos_halibut,pos_wolffish)%>%
-              mutate(timestamp=as.POSIXct(bin_timestamp),
+    pos_cod <- read.csv("data/Acoustic/CJFAS paper/cod_final_M25.csv")%>%mutate(sp="Atlantic cod")
+    pos_halibut <- read.csv("data/Acoustic/CJFAS paper/hal_final_M25.csv")%>%mutate(sp="Atlantic halibut")
+    pos_wolffish <- read.csv("data/Acoustic/CJFAS paper/wolf_final_M25.csv")%>%mutate(sp="Atlantic wolffish")
+    
+    pos_df1 <- rbind(pos_cod,pos_halibut,pos_wolffish)%>%
+              mutate(timestamp=as.POSIXct(detection_timestamp_utc),
                      julian=yday(timestamp),
                      year=year(timestamp),
                      id=gsub("SABMPA-","",animal_id), #individual fish id
                      id=gsub("MPA-SAB-","",id),
                      id=sub("-.*", "", id),
                      id=as.numeric(id),
-                     array=ifelse(year>2020,"2020-2024","2015-2020"))%>%
-              st_as_sf(coords=c("longitude","latitude"),crs=latlong,remove=FALSE)
+                     array=ifelse(year>2020,"2020-2025","2015-2020"),
+                     stn_id=paste(receiver_sn,year,sep="-"))%>%
+              st_as_sf(coords=c("deploy_long","deploy_lat"),crs=latlong,remove=FALSE)
     
-    pos_filter <- pos_df%>%
-                  mutate(position_tag = paste(longitude,latitude,sep="-"))%>% #some points have multiple days but one coordinate
-                  group_by(id,year)%>%
-                  summarise(cnt=length(unique(julian)),
-                            cnt2=length(unique(position_tag)))%>%
-                  ungroup()%>%
-                  arrange(cnt)%>%
-                  filter(cnt>1 & cnt2>1)%>%
-                  mutate(id2 = paste(id,year,sep="_"))%>%
-                  pull(id2)
-                  
+    #Load in the receiver efficiency index data
+    rei_df <- read.csv("data/Acoustic/CJFAS paper/SABMPA_rei_all.csv")%>%
+              st_as_sf(coords=c("longitude","latitude"),crs=latlong)%>%
+              dplyr::select(station,rei,rei_percent)
     
-    pos_df_line <-  pos_df%>%
-                    mutate(id2 = paste(id,year,sep="_"))%>%
-                    filter(id2 %in% pos_filter)%>%
-                    arrange(sp,year,id,timestamp)%>%
-                    group_by(id,year)%>%
-                    mutate(geometry=st_union(geometry))%>%
-                    st_cast("LINESTRING")
+    #sum of total daily unique detections over the deployment period
+    pos_df_daily <- pos_df1%>%
+                    filter(glatos_array == "OTN.SABMPA")%>%
+                    data.frame()%>%
+                    group_by(sp,year,receiver_sn,julian)%>%
+                    summarise(total_count = n_distinct(animal_id),
+                              .groups = "drop")%>%
+                    mutate(array=ifelse(year>2020,"2020-2025","2015-2020"),
+                           gate=ifelse(array=="2015-2020","Double","Single"),
+                           stn_id=paste(receiver_sn,year,sep="-"))%>%
+                    left_join(pos_df1%>%
+                                data.frame()%>%
+                                distinct(stn_id,.keep_all=TRUE)%>%
+                                dplyr::select(stn_id,deploy_long,deploy_lat))%>%
+                    st_as_sf(coords=c("deploy_long","deploy_lat"),crs=latlong,remove=FALSE)
     
-    plot_line_lim <- pos_df%>%
-                     st_bbox()%>%
-                     st_as_sfc()%>%
-                     st_transform(utm)%>%
-                     st_buffer(10)%>%
-                     st_transform(latlong)%>%
-                     st_bbox()
-       
+    #number of unique fish detections summed over the deployment period
+    pos_df_unique <- pos_df1%>%
+                     filter(glatos_array == "OTN.SABMPA")%>%
+                     data.frame()%>%
+                     group_by(sp,array,stn_id)%>%
+                     summarise(total_unique = n_distinct(animal_id),
+                               .groups = "drop")%>%
+                    left_join(pos_df1%>%
+                                data.frame()%>%
+                                distinct(stn_id,.keep_all=TRUE)%>%
+                                dplyr::select(stn_id,deploy_long,deploy_lat))%>%
+                    st_as_sf(coords=c("deploy_long","deploy_lat"),crs=latlong,remove=FALSE)
     
-    p1 <- ggplot()+
-      geom_sf(data=sab)+
-      geom_sf(data=basemap_inset,fill="grey60")+
-      geom_sf(data=sab_banks,fill="forestgreen",alpha=0.5)+
-      geom_sf(data=recievers_sf%>%filter(year %in% c(2019,2021)))+
-      geom_sf(data=pos_df_line)+
-      coord_sf(expand=0,xlim=plot_line_lim[c(1,3)],ylim=plot_line_lim[c(2,4)])+
-      theme_bw()+
-      facet_grid(sp~array)
-    
-    ggsave("test.png",height=6,width=6,dpi=)
+                     
     
     #count raster
-    points_extent <- pos_df%>%
-                     st_intersection(.,sab)%>%
+    points_extent <- pos_df1%>%
+                     filter(glatos_array == "OTN.SABMPA")%>%
+                     st_drop_geometry() %>%     #makes the distinct operation faster
+                     distinct(receiver_sn,.keep_all = TRUE)%>%
+                     st_as_sf(coords=c("deploy_long","deploy_lat"),crs=latlong,remove=FALSE)%>%
                      st_transform(utm)%>%
-                     st_buffer(10)%>%
+                     st_buffer(2)%>% # 2 km buffer
                      st_bbox()%>%
                      st_as_sfc()%>%
                      st_as_sf()
     
-    raster_empty <-  raster(extent(points_extent),res=2,crs=utm) # 1 km resolution 
+    #identify the between receiver spacing 
+    
+    receiver_spacing <- recievers_sf%>%
+                        mutate(datetime=as.POSIXct(deploy_date),
+                               year=year(datetime))%>%
+                        filter(year %in% c(2018,2023))%>%
+                        mutate(gate=ifelse(year==2018,"Double","Single"),
+                               gate2=case_when(lat>46.15~"Double_top",
+                                               lat<46.15 & gate == "Double" ~ "Double_bottom",
+                                               TRUE ~ "Single"))%>%
+                        arrange(gate,gate2,-lon)%>%
+                        group_by(gate2)%>%
+                        mutate(station_id = paste(gate2,1:n(),sep="-"),
+                               .groups = "drop")%>%
+                        group_by(gate2) %>%   
+                        mutate(
+                          station_id = paste(gate2, row_number(), sep = "-"),
+                          spacing_m = as.numeric(st_distance(geometry, lag(geometry), by_element = TRUE))
+                        ) %>%
+                        ungroup()%>%
+                        st_transform(utm)
+    
+    round(median(receiver_spacing$spacing_m,na.rm=T)/1000,2) #roughly 1 km spacing
+    
+
+    #now create rasters for the cells and plotting. this will be done by creating a linestring converted from the points, 
+    #sampling along that lines string at even intervals (~ 1 km nominal spacing) and then converting to cells and a raster
+    
+    gate_cells <- NULL
+    gate_rasters <- list()
+    
+    for(i in unique(receiver_spacing$gate2)){
+      
+      input <- receiver_spacing%>%filter(gate2==i)
+      
+      gate_single_r <- create_gate_raster(input, spacing_m = 1000, cell_width = 1000)
+      
+      gate_cells <- rbind(gate_cells,gate_single_r[[2]]%>%mutate(gate2=i))
+      gate_rasters[[i]] <- gate_single_r[[1]]
+      
+    }
+    
+    
+    gate_cells2 <- gate_cells%>%
+                   left_join(receiver_spacing%>%
+                              st_drop_geometry() %>%  
+                              distinct(gate2,.keep_all=TRUE) %>%
+                              dplyr::select(gate,gate2))%>%
+                   st_transform(latlong)%>%
+                   mutate(cell_id = 1:n(),
+                          array=ifelse(gate=="Double","2015-2020","2020-2025"))
+    
+    #Spatial join - assign each detection to a gate cell
+    detections_in_cells <- pos_df_daily%>% #*** can repeat this code but use the pos_df_unique()
+                           st_join(gate_cells2%>%dplyr::select(cell_id),join=st_within)
+    
+    #Group and sum by species, cell, and array (if needed by array)
+    detection_summary <- detections_in_cells %>%
+                        rename(species=sp) %>%
+                        st_drop_geometry() %>%
+                        group_by(species, array, cell_id ) %>%  
+                        summarise(total_detections = sum(total_count, na.rm = TRUE),
+                                  .groups = 'drop')
+    
+    
+    #make species specific cell data.frames
+    cell_df <- list()
+    
+    for(i in unique(detection_summary$species)){
+      for(j in unique(detection_summary$array)){
+        
+        temp <- detection_summary%>%
+                filter(species == i,array==j)%>%
+                right_join(.,gate_cells2%>%
+                             filter(array==j)%>%
+                             dplyr::select(cell_id))%>%
+                st_as_sf()%>%
+                st_transform(latlong)%>%
+                mutate(species=i,
+                       array=j)
+        
+        cell_df[[paste(i,j,sep="_")]] <- temp
+        
+      }# end j loop
+    }# end i loop
+    
+    cell_df <- do.call("rbind",cell_df)
+    
+    grid_lims <- cell_df%>%
+                 st_bbox()%>%
+                 st_as_sfc()%>%
+                 st_transform(utm)%>%
+                 st_buffer(1.5)%>%
+                 st_transform(latlong)%>%
+                 st_bbox()
+    
+    ggplot(cell_df)+
+      geom_sf(data=sab_zones,fill=NA)+
+      geom_sf(data=sab_banks%>%filter(name=="Scatarie Bank"),fill="grey90")+
+      geom_sf(aes(fill=total_detections))+
+      scale_fill_viridis(trans = "log10",
+                         breaks = c(1, 3, 10, 30, 100, 300),
+                         labels = c("1", "3", "10", "30", "100", "300"),
+                         na.value = NA)+
+      facet_grid(species~array)+
+      theme_bw()+
+      theme(strip.background = element_rect(fill="white"),
+            legend.position = "bottom")+
+      labs(fill="Sum of unqiue daily detections")+
+      coord_sf(expand=0,xlim=grid_lims[c(1,3)],ylim=grid_lims[c(2,4)])
+    
+    
+
+    #Vizualize one per cell
+    ggplot()+
+      geom_sf(data=gate_cells2)+
+      geom_sf(data=receiver_spacing)+
+      facet_grid(~gate)+
+      theme_bw()
+    
+    #more detail for the single gate, where points do have some isues
+    input <- receiver_spacing%>%filter(gate2=="Single")
+    
+    gate_single_r <- create_gate_raster(input, spacing_m = 1000, cell_width = 1000)
+    
+    out_cells <- gate_cells%>%
+                 filter(gate2=="Single")
+    
+    cell_counts <- out_cells %>%
+      st_join(input%>%st_transform(st_crs(out_cells)), join = st_contains) %>%  # attach points inside each cell
+      group_by(geometry) %>%                        # group by each cell
+      summarise(n_points = n(), .groups = "drop")
+    
+    ggplot()+
+      geom_sf(data=cell_counts,aes(fill=n_points))+
+      geom_sf(data=input%>%st_transform(st_crs(out_cells)),col='white')+
+      theme_bw()
+    
+    
+                        
+                        
+    
+    raster_empty <-  raster(extent(points_extent),res=1,crs=utm) # 1 km resolution 
     
     raster_list <- list()
+    
+    pos_df <- pos_df1
     
     for(i in unique(pos_df$sp)){
       for(j in unique(pos_df$array)){
@@ -1021,10 +1172,24 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       geom_sf(data=sab)+
       geom_raster(aes(x = x, y = y, fill = layer),data=rast_df_list%>%filter(sp=="Atlantic cod")) +
       geom_sf(data=recievers_sf_simple%>%filter(array=="2015-2020"),size=0.5,pch=19)+
+      geom_sf(data=sab_banks,fill=NA)+
       facet_wrap(~ Raster) +
       coord_sf(crs = st_crs(sab))+
       scale_fill_viridis_c(na.value = "transparent") +  # Example color scale
       theme_bw()
+    
+    #lines for tracks
+    animal_tracks <- qdets%>%
+      dplyr::select(year,animal_id,bin_timestamp,geometry)%>%
+      rbind(.,pos_df%>%dplyr::select(year,animal_id,bin_timestamp,geometry))%>%
+      arrange(animal_id,bin_timestamp)%>%
+      group_by(year,animal_id)%>%
+      arrange(animal_id,bin_timestamp)%>%
+      summarise(do_union=FALSE)%>%
+      st_cast("LINESTRING")%>%
+      left_join(.,rbind(qdets%>%data.frame()%>%distinct(animal_id,.keep_all=TRUE)%>%dplyr::select(animal_id,sp),
+                        pos_df%>%data.frame()%>%distinct(animal_id,.keep_all=TRUE)%>%dplyr::select(animal_id,sp)))%>%
+      mutate(array = ifelse(year<2021,"2015-2020","2020-2024"))
     
     
     plot_rast_df <- data.frame(sp=c("Atlantic cod","Snow crab", "Atlantic eel","Atlantic salmon","Atlantic sturgeon","Atlantic halibut",
@@ -1118,18 +1283,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     ggsave("output/Acoustic/detectionraster_lg_plegics.png",long_plot2,height=8,width=6,units="in",dpi=300)
    
     
-    #lines for tracks
-    animal_tracks <- qdets%>%
-                     dplyr::select(year,animal_id,bin_timestamp,geometry)%>%
-                     rbind(.,pos_df%>%dplyr::select(year,animal_id,bin_timestamp,geometry))%>%
-                     arrange(animal_id,bin_timestamp)%>%
-                     group_by(year,animal_id)%>%
-                     arrange(animal_id,bin_timestamp)%>%
-                     summarise(do_union=FALSE)%>%
-                     st_cast("LINESTRING")%>%
-                     left_join(.,rbind(qdets%>%data.frame()%>%distinct(animal_id,.keep_all=TRUE)%>%dplyr::select(animal_id,sp),
-                                       pos_df%>%data.frame()%>%distinct(animal_id,.keep_all=TRUE)%>%dplyr::select(animal_id,sp)))%>%
-                     mutate(array = ifelse(year<2021,"2015-2020","2020-2024"))
+    
     
     
 
