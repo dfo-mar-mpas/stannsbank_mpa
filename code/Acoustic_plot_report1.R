@@ -1257,7 +1257,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       summarize(
         min = min(total_count, na.rm = TRUE),
         max = max(total_count, na.rm = TRUE),
-        range = paste(min, max, sep = "-"),
+        range = paste0("n=",max), #just the total number
         .groups = "drop"
       )
     
