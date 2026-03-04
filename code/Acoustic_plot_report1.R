@@ -230,23 +230,24 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
   geoserver_tag_releases <- geoserver_tag_releases%>%left_join(.,tag_tax)
   
   #some of the geoserver extracts are missing information. Use this csv instead
-  tag_df <- read.csv("data/Acoustic/SABMPA_tagrelease_Dec2023.csv")%>%
-            rename(common=COMMON_NAME_E)%>%
-            mutate(id = paste(abs(RELEASE_LONGITUDE),RELEASE_LATITUDE,common,sep="_"),
-                   year=year(as.POSIXct(UTC_RELEASE_DATE_TIME)),
-                   common=case_when(common == "ATLANTIC COD" ~ "Atlantic cod",
-                                    common == "ATLANTIC HALIBUT" ~ "Atlantic halibut",
-                                    common == "Atlantic Striped wolffish" ~ "Atlantic wolffish",
-                                    TRUE ~ common),
-                   array = ifelse(year<2021,"2015-2020","2020-2024"))%>% #only need unique locations
-            distinct(id,.keep_all=TRUE)%>%
-            st_as_sf(coords=c("RELEASE_LONGITUDE","RELEASE_LATITUDE"),crs=latlong)%>%
-            dplyr::select(common,year,array,geometry)%>%
-            rbind(.,geoserver_tag_releases%>% #add the snow crab data
-                    filter(common == "Snow crab")%>%
-                    rename(year=yearcollected)%>%
-                    mutate(array = ifelse(year<2021,"2015-2020","2020-2024"))%>%
-                    dplyr::select(common,year,array,geometry))
+  # tag_df <- read.csv("data/Acoustic/SABMPA_tagrelease_Dec2023.csv")%>%
+  #           rename(common=COMMON_NAME_E)%>%
+  #           mutate(id = paste(abs(RELEASE_LONGITUDE),RELEASE_LATITUDE,common,sep="_"),
+  #                  year=year(as.POSIXct(UTC_RELEASE_DATE_TIME)),
+  #                  common=case_when(common == "ATLANTIC COD" ~ "Atlantic cod",
+  #                                   common == "ATLANTIC HALIBUT" ~ "Atlantic halibut",
+  #                                   common == "Atlantic Striped wolffish" ~ "Atlantic wolffish",
+  #                                   TRUE ~ common),
+  #                  array = ifelse(year<2021,"2015-2020","2020-2024"))%>% #only need unique locations
+  #           distinct(id,.keep_all=TRUE)%>%
+  #           st_as_sf(coords=c("RELEASE_LONGITUDE","RELEASE_LATITUDE"),crs=latlong)%>%
+  #           dplyr::select(common,year,array,geometry)%>%
+  #           rbind(.,geoserver_tag_releases%>% #add the snow crab data
+  #                   filter(common == "Snow crab")%>%
+  #                   rename(year=yearcollected)%>%
+  #                   mutate(array = ifelse(year<2021,"2015-2020","2020-2024"))%>%
+  #                   dplyr::select(common,year,array,geometry))
+  
   
  #bounding area for the primary plot----------
       bounding_area <- sab%>%
@@ -562,43 +563,40 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       
 ### Tagging plot ----- 
       
-    tag_df <- read.csv("data/Acoustic/qdet_releaselocs.csv")%>%
-              rename(lon=RELEASE_LONGITUDE,lat=RELEASE_LATITUDE)%>%
-              filter(!is.na(lon))%>%
-              st_as_sf(coords=c("lon","lat"),crs=latlong,remove=FALSE)%>%
-              mutate(group=case_when(Common.Name %in% c("White shark","Shortfin mako","Blue shark","Blue shark/Mako/Bluefin tuna","Porbeagle shark") ~ "Sharks",
-                                     Common.Name %in% c("Atlantic sturgeon","Bluefin tuna")~"Pelagics",
-                                     Common.Name %in% c("Atlantic cod","Snow crab","Atlantic halibut") ~ "Atlantic fisheries",
-                                     Common.Name %in% c("Atlantic salmon","American eel") ~ "Diadramous",
-                                     Common.Name %in% c("Grey seal","Leatherback turtle") ~ "Large pelagics",
-                                     TRUE ~ NA),
-                     Common.Name = factor(Common.Name,levels=c("American eel","Atlantic cod","Atlantic halibut","Atlantic salmon","Atlantic sturgeon",
-                                                               "Blue shark","Blue shark/Mako/Bluefin tuna","Bluefin tuna","Grey seal","Leatherback turtle",           
-                                                               "Porbeagle shark","Shortfin mako","Snow crab","White shark")))
-              
+      tag_df <- read.csv("data/Acoustic/CJFAS paper/SAB_filt_Q25_releaselocs1.csv")%>%
+                rename(Common.Name=common_name)%>%
+                filter(!is.na(mean_lon))%>%
+                st_as_sf(coords=c("mean_lon","mean_lat"),crs=latlong)
       
-    
+      #Colour scale to match other plots
+      tag_colours <- read.csv("data/Acoustic/CJFAS paper/tag_palette.csv")%>%
+                     mutate(Common.Name = tag_df%>%arrange(Common.Name)%>%distinct(Common.Name)%>%pull(Common.Name))%>%
+                     rename(colour=2)%>%
+                     dplyr::select(Common.Name,colour)
+      
+      fill_vals <- setNames(tag_colours$colour,
+                            tag_colours$Common.Name)
+      
+    # tag_df <- read.csv("data/Acoustic/qdet_releaselocs.csv")%>%
+    #           rename(lon=RELEASE_LONGITUDE,lat=RELEASE_LATITUDE)%>%
+    #           filter(!is.na(lon))%>%
+    #           st_as_sf(coords=c("lon","lat"),crs=latlong,remove=FALSE)%>%
+    #           mutate(group=case_when(Common.Name %in% c("White shark","Shortfin mako","Blue shark","Blue shark/Mako/Bluefin tuna","Porbeagle shark") ~ "Sharks",
+    #                                  Common.Name %in% c("Atlantic sturgeon","Bluefin tuna")~"Pelagics",
+    #                                  Common.Name %in% c("Atlantic cod","Snow crab","Atlantic halibut") ~ "Atlantic fisheries",
+    #                                  Common.Name %in% c("Atlantic salmon","American eel") ~ "Diadramous",
+    #                                  Common.Name %in% c("Grey seal","Leatherback turtle") ~ "Large pelagics",
+    #                                  TRUE ~ NA),
+    #                  Common.Name = factor(Common.Name,levels=c("American eel","Atlantic cod","Atlantic halibut","Atlantic salmon","Atlantic sturgeon",
+    #                                                            "Blue shark","Blue shark/Mako/Bluefin tuna","Bluefin tuna","Grey seal","Leatherback turtle",           
+    #                                                            "Porbeagle shark","Shortfin mako","Snow crab","White shark")))
+    #           
+      
     tag_bound <- tag_df%>%
                  st_bbox()%>%
                  st_as_sfc()%>%
                  st_buffer(0.5)%>% #0.5 degree buffer
                  st_bbox()
-    
-    tag_df_sp <- data.frame(sp = unique(tag_df$Common.Name))%>%
-                 mutate(search=case_when(sp == "Atlantic salmon"~"Salmo trutta", #closest match in phylopic
-                                         sp == "Atlantic halibut" ~"Hippoglossoides platessoides", #closest match in phylopic
-                                         sp == "Leatherback turtle"~"Dermochelys coriacea",
-                                         sp == "Porbeagle shark"~"Lamna nasus",
-                                         sp == "Snow crab"~"Pugettia quadridens", #closest I could find on phylopic
-                                         sp == "Blue shark/Mako/Bluefin tuna" ~ "Isurus oxyrinchus", #general shark pic for this species group
-                                         TRUE ~sp))%>%
-                 rowwise()%>%
-                 mutate(uid = get_uuid(search),
-                        sp = gsub("/","-",sp))%>%
-                 data.frame()
-    
-    
-    
     
     #Set up the scales -----
     
@@ -680,6 +678,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                     geom_sf(data=tag_df,aes(fill=Common.Name),size=3,pch=21)+
                     coord_sf(expand=0,xlim=scale0[c(1,3)],ylim=scale0[c(2,4)])+
                     theme_bw()+
+                    scale_fill_manual(values=tag_colours$colour)
                     annotation_scale(location="br")+
                     theme(legend.position = "none",
                           axis.text=element_blank())
@@ -733,10 +732,10 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                    geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey70")+
                    geom_sf(data=cont_250_large,col="grey65",linewidth=0.4)+
                    geom_sf(data=sab,fill="cornflowerblue",alpha=0.3)+
-                   #geom_sf(data=tag_df,aes(fill=Common.Name),size=2,pch=21)+
-                   geom_sf(data=tag_df%>%filter(animal_id %in% scale3_pts$animal_id),aes(fill=Common.Name),size=4,pch=21)+
+                   geom_sf(data=tag_df,aes(fill=Common.Name),size=4,pch=21)+
+                   #geom_sf(data=tag_df%>%filter(animal_id %in% scale3_pts$animal_id),aes(fill=Common.Name),size=4,pch=21)+
                    coord_sf(expand=0,xlim=scale3[c(1,3)],ylim=scale3[c(2,4)])+
-                   scale_fill_viridis(discrete = TRUE)+
+                   scale_fill_manual(values=fill_vals)+
                    theme_bw()+
                    annotation_scale(location="br")+
                    theme(legend.position = "none",
@@ -767,17 +766,16 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       ungroup()%>%
       st_transform(latlong)%>%
       st_intersection(scale3_box)%>%
-      mutate(Project = gsub("ACT.","",Project),
-             Project = gsub("FACT.","",Project))
+      mutate(Project = gsub("ACT.","",Project_full),
+             Project = gsub("FACT.","",Project_full),
+             Project = sub(" -.*", "",Project))
     
     
     scale3_plot_labs <- ggplot()+
                         geom_sf(data=basemap_inset %>% filter(country!="Canada"))+
                         geom_sf(data=basemap_inset %>% filter(country=="Canada"),fill="grey70")+
                         geom_sf(data=sab,fill="cornflowerblue",alpha=0.3)+
-                        geom_sf(data=tag_df %>% 
-                                  filter(animal_id %in% scale3_pts$animal_id),
-                                aes(fill=Common.Name),
+                        geom_sf(data=tag_df,aes(fill=Common.Name),
                                                   size=4,pch=21)+
                         geom_label_repel(
                           data = tag_clustered,
@@ -795,10 +793,10 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                           coord_sf(expand=0,
                                  xlim=scale3[c(1,3)],
                                  ylim=scale3[c(2,4)])+
-                        scale_fill_viridis(discrete = TRUE)+
+                        scale_fill_manual(values=fill_vals)+
                         theme_bw()+
                         annotation_scale(location="br")+
-                        theme(legend.position = "none")+
+                        theme(legend.position = "bottom")+
                         labs(x="",y="")
     
     #scale 4 largest
@@ -823,10 +821,10 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     
     scale4_box <- scale4%>%st_as_sfc()%>%st_as_sf()
     
-    scale4_pts <- tag_df%>%
-                  st_intersection(.,scale4_box)%>%
-                  filter(!animal_id %in% c(scale0_pts$animal_id,scale1_pts$animal_id,scale2_pts$animal_id,scale3_pts$animal_id))
-    
+    # scale4_pts <- tag_df%>%
+    #               st_intersection(.,scale4_box)%>%
+    #               filter(!animal_id %in% c(scale0_pts$animal_id,scale1_pts$animal_id,scale2_pts$animal_id,scale3_pts$animal_id))
+    # 
     scale4_plot <- ggplot()+
                   geom_sf(data=can_eez,fill=NA,colour="black")+
                   geom_sf(data=focal_countries)+
@@ -834,9 +832,9 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                   geom_sf(data=cont_250_large,col="grey65",linewidth=0.4)+
                   geom_sf(data=sab,fill="cornflowerblue",alpha=0.3,colour="black")+
                   geom_sf(data=tag_df,aes(fill=Common.Name),size=3,pch=21)+
-                  geom_sf(data=tag_df%>%filter(animal_id %in% scale4_pts$animal_id),aes(fill=Common.Name),size=3,pch=21)+
+                  #geom_sf(data=tag_df%>%filter(animal_id %in% scale4_pts$animal_id),aes(fill=Common.Name),size=3,pch=21)+
                   geom_sf(data=rings,lty=2,lwd=0.5,fill=NA)+
-                  scale_fill_viridis(discrete = TRUE)+
+                  scale_fill_manual(values=fill_vals)+
                   coord_sf(expand=0,xlim=scale4[c(1,3)],ylim=scale4[c(2,4)],label_axes = "-NE")+
                   theme_bw()+
                   annotation_scale(location = "br")+
@@ -859,8 +857,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     ggsave("output/Acoustic/tagmap_scale3.png",scale3_plot,height=6,width=10,units="in",dpi=300)
     ggsave("output/Acoustic/tagmap_scale3_labs.png",scale3_plot_labs,height=6,width=10,units="in",dpi=300)
     ggsave("output/Acoustic/tagmap_scale4.png",scale4_plot,height=10,width=6,units="in",dpi=300) 
-    ggsave("output/Acoustic/tagmap_legend.png",legend_dummy,height=5,width=5,units="in",dpi=300)
-    
+     
     trim_img_ws("output/Acoustic/tagmap_scale3.png")
     trim_img_ws("output/Acoustic/tagmap_scale3_labs.png")
     trim_img_ws("output/Acoustic/tagmap_scale4.png")

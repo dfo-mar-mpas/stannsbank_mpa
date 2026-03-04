@@ -1,0 +1,63 @@
+,common_name,Project_full,RELEASE_LOCATION,General_release_area,Detections,Individuals,mean_lat,mean_lon,min_lat,max_lat,min_lon,max_lon
+1,American eel,BDLSPG - Apoqnmatulti'k - Bras D'Or Lake,"Amaguadee's Pond, Bras d'Or Lake, Cape Breton",Bras d'or Lake,7,1,45.916931,-60.653694,-,-,-,-
+2,American eel,BDLSPG - Apoqnmatulti'k - Bras D'Or Lake,"Bras d'Or Lake, Cape Breton",Bras d'or Lake,31,1,45.933283,-60.62895,-,-,-,-
+3,American eel,BDLSPG - Apoqnmatulti'k - Bras D'Or Lake,"Outside John Pauls Pond, Bras d'Or Lake, Cape Breton",Bras d'or Lake,16,1,45.933283,-60.62895,-,-,-,-
+4,American eel,BQEEL - Bay of Quinte Eel Tracking,"Bay of Quinte, Lake Ontario",Lake Ontario,113,2,44.150834,-77.265379,-,-,-,-
+5,Atlantic cod,SBICOD - Cod Movements in the Northern Gulf,"Strait of Belle Ils., Gulf of  St. Lawrence",Strait of Belle Ils,24,1,51.194118,-57.233651,-,-,-,-
+6,Atlantic cod,SGS - OTN Canada Sable Island Grey Seal Bioprobes,St. Anns Bank MPA,St. Anns Bank,14671,45,45.17,-60.51,-,-,-,-
+7,Atlantic cod,"SPI - Shippagan, NB: Cod tagging",Southern Gulf of St. Lawrence,Southern Gulf of St. Lawrence,48,2,48.006447,-63.975384,-,-,-,-
+8,Atlantic halibut,HALIBT - Acoustic Array and Halibut Tagging,Scotian Shelf,Scotian Shelf,417,2,44.38092,-59.12464,-,-,-,-
+9,Atlantic halibut,MEHAL - Maine Atlantic Halibut Tagging,"Gulf of Maine, USA","Gulf of Maine, USA",94,3,44.437627,-67.39565,-,-,-,-
+10,Atlantic mackerel,V2LNASTI - Mackerel tracking in the Northwest Arm,"Halifax, NS","Halifax, NS",9,1,44.536689,-63.460551,-,-,-,-
+11,Atlantic salmon,ASF - Atlantic Salmon Federation Tagging Projects,Gulf of St. Lawrence,Gulf of St. Lawrence,81,2,NA,NA,-,-,-,-
+12,Atlantic salmon,BDK - Overwinter Bras d’Or Atlantic salmon populations,"Bras d'Or Lakes, Cape Breton",Bras d'or Lake,378,2,46.079643,-60.908239,-,-,-,-
+13,Atlantic salmon,ESRF - Atlantic Salmon Offshore Tracking Project,Cascapedia River,Western Gulf of St. Lawrence,10,1,48.306,-65.9422,-,-,-,-
+14,Atlantic salmon,ESRF - Atlantic Salmon Offshore Tracking Project,LaHave River,"South shore, NS",12,1,44.534224,-64.712359,-,-,-,-
+15,Atlantic salmon,ESRF - Atlantic Salmon Offshore Tracking Project,"LeHave, NS","South shore, NS",41,7,44.534401,-64.712414,-,-,-,-
+16,Atlantic salmon,ESRF - Atlantic Salmon Offshore Tracking Project,Morell River,Prince Edward Island,89,2,46.362398,-62.704283,-,-,-,-
+17,Atlantic salmon,ESRF - Atlantic Salmon Offshore Tracking Project,"St. Mary's, NS","Eastern Shore, NS",215,10,45.25585251,-62.06367065,45.2559,45.256,-62.0736,-62.0635
+18,Atlantic salmon,ESRF - Atlantic Salmon Offshore Tracking Project,"West branch, St Marys river, NS","Eastern Shore, NS",124,3,45.255804,-62.063908,-,-,-,-
+19,Atlantic salmon,ESRF - Atlantic Salmon Offshore Tracking Project,Western Atlantic Canada,Western Atlantic Canada,497,17,44.534401,-64.712414,-,-,-,-
+20,Atlantic salmon,KNE - NOAA Kennebec Salmon Tracking,"Kennebec River, Maine, USA",Maine USA,15,1,44.531632,-69.642214,-,-,-,-
+21,Atlantic salmon,MARSS - Maritimes Region Atlantic salmon marine survival and migration,"East branch, St Marys river, NS","Eastern Shore, NS",89,8,45.255757,-62.073002,-,-,-,-
+22,Atlantic salmon,"NARR - Characterizing the behavior and survival of age 1 hatchery stocked smolts in the Narraguagus River, Maine U.S.A.","Milbridge, Narraguagus River, Maine USA",Maine USA,11,2,44.536181,-67.867763,-,-,-,-
+23,Atlantic salmon,PBN - NOAA Penobscot Salmon Tracking,"Penobscot River, Maine, USA",Maine USA,156,6,44.81988,-68.718798,-,-,-,-
+24,Atlantic salmon,PBSM_QRPT - Quoddy Region Salmon Tracking,"Magaguadavic Basin, St. George, NB",Bay of Fundy,36,3,45.12778889,-66.82511222,45.1265,45.1358,-66.8252,-66.8243
+25,Atlantic salmon,PBU - USGS: Salmon tagging,"Bucksport, Maine, USA",Maine USA,290,22,44.570523,-68.793599,-,-,-,-
+26,Atlantic salmon,QSLR - St. Lawrence River Fish Monitoring,Gulf of St. Lawrence,Gulf of St. Lawrence,38,4,48.580941,-64.203323,-,-,-,-
+27,Atlantic salmon,TNGS - Tobique Narrows Generation Station efficiency,"Tobique River, NB",Bay of Fundy,6,2,45.983415,-66.718058,-,-,-,-
+28,Atlantic salmon,UNBMIR - UNB Miramichi River,"Miramichi River, NB",Western Gulf of St. Lawrence,34,1,46.95677,-65.58655,-,-,-,-
+29,Atlantic salmon,V2LCBHNP - Cape Breton Highlands National Park salmon tracking,Cape Breton Highlands,"Cape Breton, NS",447,7,46.65998,-60.39962,-,-,-,-
+30,Atlantic salmon,"V2LNSSA - Nova Scotia Salmon Association, Sheet Harbour","West River, Sheet Harbour,NS","Eastern Shore, NS",37,6,44.958544,-62.617825,-,-,-,-
+31,Atlantis sturgeon,QSLR - St. Lawrence River Fish Monitoring,Gulf of St. Lawrence,Gulf of St. Lawrence,9,1,48.580941,-64.203323,-,-,-,-
+32,Blue shark,MFSAR - Shark Spatial Ecology and life history in NL waters,"Conception Bay 1, NL","Conception Bay, NL",128,1,47.45967,-53.121317,-,-,-,-
+33,Blue shark,MFSAR - Shark Spatial Ecology and life history in NL waters,"Conception Bay 2, NL","Conception Bay, NL",12,1,47.49826667,-53.1481,-,-,-,-
+34,Blue shark,MFSAR - Shark Spatial Ecology and life history in NL waters,"St. Johns, NL","St. Johns, NL",13,1,47.589795,-52.624955,-,-,-,-
+35,Blue shark,MFSAR - Shark Spatial Ecology and life history in NL waters,"St. Mary's Bay, NL","St. Mary's Bay, NL",32,1,46.9065,-53.76555,-,-,-,-
+36,Blue shark,NSBS - OTN NS Blue Shark Tracking,"Halifax, NS","Halifax, NS",424,13,44.23497,-63.24841,-,-,-,-
+37,Bluefin tuna,BFTTAG - Bluefin tuna high res multi-beam sonar and tagging,"PEI, Gulf of St. Lawrence",Prince Edward Island,77,12,46.612852,-62.157012,-,-,-,-
+38,Bluefin tuna,DFOBFT - Long-term monitoring of Atlantic Bluefin tuna and Swordfish,"Port Hood, NS",Eastern Gulf of St. Lawrence,219,12,45.92569,-61.64994,-,-,-,-
+39,Bluefin tuna,TAG - Tag-A-Giant Foundation: Bluefin Tuna Tracking,North Carolina shelf by Hatteras,"North Carolina, USA",168,2,35.460449,-75.084143,-,-,-,-
+40,Bluefin tuna,TAG - Tag-A-Giant Foundation: Bluefin Tuna Tracking,Northumberland Straight,Northumberland Straight,74,4,46.053076,-61.907533,-,-,-,-
+41,Bluefin tuna,TAG - Tag-A-Giant Foundation: Bluefin Tuna Tracking,Northumberland Straight,Northumberland Straight,645,56,46.053076,-61.907533,-,-,-,-
+42,Grey seal,GSFP - Grey seal foraging pressure,Gulf of St. Lawrence,Gulf of St. Lawrence,6,2,47.780097,-61.483532,-,-,-,-
+43,Grey seal,GSFP - Grey seal foraging pressure,Scotian Shelf,Scotian Shelf,38,2,43.9308333,-59.9177777,-,-,-,-
+44,Grey seal,RISME - Pinniped Movement in Rhode Island Waters,"Rhode Island, USA","Cape cod, USA",10,1,41.149202,-71.225023,-,-,-,-
+45,Leatherback turtle,JBLB - Juno Beach Leatherback Tagging,"Juno beach, Florida, USA","Florida, USA",69,1,26.85761,-79.897383,-,-,-,-
+46,Leatherback turtle,"MIGRAMAR.LBTPCR - Leatherback Turtle Tracking in Pacuare Wildlife Reserve, CR","Pacuare Wildlife Reserve, Costa Rica",Costa Rica,41,1,10.18333,-83.243641,-,-,-,-
+47,Porbeagle shark,JPBS - DFO: Porbeagle and Blue Sharks,Emerald Basin,"Emerald Basin, Scotian Shelf",16,1,44.402158,-62.801851,-,-,-,-
+48,Porbeagle shark,JPBS - DFO: Porbeagle and Blue Sharks,Georges Bank,"Georges Bank, Scotian Shelf",56,3,41.21,-67.38108,-,-,-,-
+49,Shortfin mako,RICSS - RIDEM DMF Coastal Shark Tagging Study,"Block Island, New England, USA","Cape cod, USA",29,1,41.081236,-71.576333,-,-,-,-
+50,Snow crab,ZSC - Scotian Shelf Snow Crab Tagging,Scotian Shelf,Scotian Shelf,371,2,46.655883,-61.26395,-,-,-,-
+51,White shark,CCOCE - Shelf-associated movements and migration of sharks in the Western North Atlantic Ocean,"Hilton Head, South Carolina, USA","South Carolina, USA",9,1,32.00025,-80.59483333,-,-,-,-
+52,White shark,CCOCE - Shelf-associated movements and migration of sharks in the Western North Atlantic Ocean,"Lunenburg, NS","South Shore, NS",25,2,44.22783333,-64.28468333,-,-,-,-
+53,White shark,CCOCE - Shelf-associated movements and migration of sharks in the Western North Atlantic Ocean,NE Atlantic,NE Atlantic,123,10,44.22537617,-64.2826131,44.2249,44.2257,-64.2863,-64.2774
+54,White shark,CCOCE - Shelf-associated movements and migration of sharks in the Western North Atlantic Ocean,"Scatarie Island, Cape Breton, NS","Cape Breton, NS",37,1,46.03645,-59.69378333,-,-,-,-
+55,White shark,CCOCE - Shelf-associated movements and migration of sharks in the Western North Atlantic Ocean,"W. Ironbound I., NS","Southshore, NS",64,4,44.22818411,-64.28176901,44.2257,44.2366,-64.2863,-64.2714
+56,White shark,HMSWEA - Offshore Wind Telemetry,"Nantucket, USA","Cape cod, USA",51,3,39.543908,-73.857779,-,-,-,-
+57,White shark,HMSWEA - Offshore Wind Telemetry,"Southern New England, USA","Southern New England, USA",3,1,39.5439,-73.85777,-,-,-,-
+58,White shark,MSRPWS - Massachusetts White Shark Research Program,"Cape cod, MA","Cape cod, USA",940,47,41.34566,-69.618619,-,-,-,-
+59,White shark,NYSHARKS - New York Juvenile White Shark Study,"Long Island, USA","Cape cod, USA",39,5,40.09488,-73.2486,-,-,-,-
+60,White shark,SBUSOMAS01 - SBU Coastal New York Bight Acoustic Network,"Long Island, USA","Cape cod, USA",3,1,40.090717,-73.308458,-,-,-,-
+61,White shark,V2LWSAMP - White Shark Acoustic Monitoring Program,"Kejimkujik Park, NS","South Shore, NS",6,1,43.798987,-64.772998,-,-,-,-
+62,White shark,VMLPPWS - Grey seals and white sharks in Atlantic Canadian waters,"Magdalen Islands, Gulf of St. Lawrence",Gulf of St. Lawrence,4,1,47.88175,-61.380374,-,-,-,-
