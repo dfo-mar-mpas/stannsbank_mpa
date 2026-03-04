@@ -54,8 +54,11 @@ us_eez <- read_sf("data/Shapefiles/US EEZ/eez.shp")%>%st_transform(latlong)
 #load bioregion and get plotting limits 
 bioregion <- data_planning_areas()%>%
              st_transform(latlong)
+# 
+# mar_net <- read_sf("data/Shapefiles/networksites_proposed_OEM_MPA_20220617.shp")%>%
+#             st_transform(latlong)
 
-mar_net <- read_sf("data/Shapefiles/networksites_proposed_OEM_MPA_20220617.shp")%>%
+mar_net <- data_draft_areas()%>%
             st_transform(latlong)
 
 plot_lim <- bioregion%>% #bounding area for the inset (zoom out)
@@ -269,15 +272,16 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
         suppressWarnings()
       
       #modified MPA network shapefile
+     
       mar_net_df <- mar_net%>%
-        mutate(NAME = case_when(NAME == "St Anns Bank Marine Protected Area" ~ "St. Anns Bank Marine Protected Area", #to match the FGP pull
-                                NAME == "The Gully Marine Protected Area" ~ "Gully Marine Protected Area",
-                                TRUE ~ NAME),
-               TYPE = case_when(NAME %in% c("Corsair/Georges Canyons Conservation Area","Western Emerald Bank Conservation Area",
-                                            "Emerald Basin Sponge Conservation Area","Sambro Bank Sponge Conservation Area",
-                                            "Jordan Basin Conservation Area","Eastern Canyons Marine Refuge",
-                                            "Northeast Channel Coral Conservation Area")~ "MR",
-                                TRUE ~ TYPE))%>%
+        mutate(NAME = case_when(grepl("anns",tolower(SiteName_E)) ~ "St. Anns Bank Marine Protected Area", #to match the FGP pull
+                                SiteName_E == "The Gully Marine Protected Area" ~ "Gully Marine Protected Area",
+                                TRUE ~ SiteName_E),
+               TYPE = case_when(grepl("refuge",tolower(SiteName_E))~ "MR",
+                                grepl("Tier",Classification_E)~ "Draft",
+                                grepl("Interest",Classification_E) ~ "AOI",
+                                Classification_E == "Existing site" & LeadAgency_E != "Fisheries and Oceans Canada" ~ "OECM",
+                                TRUE ~ "MPA"))%>%
         filter(!NAME %in% MPAs$NAME_E) #these are plotted as part of the GIS pull, which has zones. 
   
       
@@ -367,19 +371,12 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       inset_plot <- ggplot()+
                     geom_sf(data=can_eez,fill=NA)+
                     geom_sf(data=cont_250_plotregion,color = "grey80",linewidth = 0.6)+
-                    #geom_spatraster_contour(data = gebco_region,breaks = -250,color = "grey80",linewidth = 0.6)+
-                    #geom_contour(data=isobath_df,aes(x=lon,y=lat,z=depth),breaks=-250,color = "grey80", size = 0.5)+
-                    geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25,lty=3)+
+                    geom_sf(data=mar_net_df%>%filter(TYPE == "Draft"),fill="grey70",alpha=0.25,lty=3)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "MR"),fill="grey10",alpha=0.3,lty=3)+
                     geom_sf(data=mar_net_df%>%filter(TYPE == "AOI"),fill="salmon2",alpha=0.3,lty=3)+
-                    #geom_sf(data=otn_stations,size=0.25,pch=20)+
                     geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
                     geom_sf(data=inset_otn_stations%>%filter(!grepl("_SB",station_name)),size=0.5,colour="black")+
                     geom_sf(data=recievers_sf%>%filter(!grepl("_SB",station_name)),aes(fill=array),size=0.5,colour="black")+
-                    # scale_fill_manual(values=c("2015-2020" = "#D73027","2020-2025"="white"))+
-                    #geom_sf(data=otn_stations%>%filter(collectioncode %in% c("HFX","CBS")),col="red",size=0.7)+
-                    #geom_sf(data=inset_otn_stations%>%filter(!grepl("_SB",station_name)),size=1.1,fill = "grey70", colour="black",shape=21,
-                    #        stroke = 0.1)+
                     geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
                     geom_sf(data=basemap_inset%>%filter(country!="Canada"),fill="#A8D5A3")+
                     geom_sf(data=plot_boundaries%>%st_as_sfc(),fill=NA)+ 
