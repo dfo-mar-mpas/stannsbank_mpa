@@ -320,7 +320,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                       geom_sf(data=otn_stations%>%filter(!grepl("_SB",station_name)),size=1.5,fill = "grey70", colour="black",shape=21,
                               stroke = 0.1)+
                       scale_fill_viridis(na.value = "transparent")+
-                      geom_sf(data=coast_hr,fill="grey70")+
+                      geom_sf(data=coast_hr,fill="#8AB58A")+
                       labs(fill="Depth (m)")+
                       new_scale_fill()+
                       geom_sf(data=recievers_sf%>%filter(!grepl("_SB",station_name)),aes(fill=array),col="black",shape=21,size=2,show.legend = FALSE)+
@@ -374,12 +374,14 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                     geom_sf(data=mar_net_df%>%filter(TYPE == "AOI"),fill="salmon2",alpha=0.3,lty=3)+
                     #geom_sf(data=otn_stations,size=0.25,pch=20)+
                     geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
-                    geom_sf(data=recievers_sf%>%filter(!grepl("_SB",station_name)),aes(fill=array),shape=21,size=1.1,stroke = 0.1)+
-                    scale_fill_manual(values=c("2015-2020" = "#D73027","2020-2025"="white"))+
+                    geom_sf(data=inset_otn_stations%>%filter(!grepl("_SB",station_name)),size=0.5,colour="black")+
+                    geom_sf(data=recievers_sf%>%filter(!grepl("_SB",station_name)),aes(fill=array),size=0.5,colour="black")+
+                    # scale_fill_manual(values=c("2015-2020" = "#D73027","2020-2025"="white"))+
                     #geom_sf(data=otn_stations%>%filter(collectioncode %in% c("HFX","CBS")),col="red",size=0.7)+
-                    geom_sf(data=inset_otn_stations%>%filter(!grepl("_SB",station_name)),size=1.1,fill = "grey70", colour="black",shape=21,
-                            stroke = 0.1)+
-                    geom_sf(data=basemap_inset,fill="grey70")+
+                    #geom_sf(data=inset_otn_stations%>%filter(!grepl("_SB",station_name)),size=1.1,fill = "grey70", colour="black",shape=21,
+                    #        stroke = 0.1)+
+                    geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
+                    geom_sf(data=basemap_inset%>%filter(country!="Canada"),fill="#A8D5A3")+
                     geom_sf(data=plot_boundaries%>%st_as_sfc(),fill=NA)+ 
                     coord_sf(expand=0,xlim=plot_lim[c(1,3)],ylim=plot_lim[c(2,4)])+
                     theme_bw()+
@@ -403,8 +405,8 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       
       global_inset <- ggplot()+
         geom_sf(data=can_eez,fill=NA,colour="black")+
-        geom_sf(data=focal_countries)+
-        geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey70")+
+        geom_sf(data=focal_countries,fill="#A8D5A3")+
+        geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
         geom_sf(data=cont_250_plotregion,color = "grey80",linewidth = 0.6)+
         geom_sf(data=plot_lim%>%st_as_sfc(),fill=NA)+
         geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25)+
@@ -423,6 +425,18 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       
       #globe version of the map
         
+        #Define a global region that is centered on the study area
+        
+        center_pt <- plot_lim%>%
+          st_as_sfc()%>%
+          st_centroid()
+        
+        lon0 <- st_coordinates(center_pt)[1]
+        lat0 <- st_coordinates(center_pt)[2]
+        
+        globe_crs <- sprintf("+proj=ortho +lat_0=%s +lon_0=%s",lat0, lon0)
+        
+        
         #download the world globe basemap
         world_globe <- ne_countries(
           scale = "medium",
@@ -431,16 +445,7 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
           st_wrap_dateline(options = c("WRAPDATELINE=YES")) %>%
           st_transform(globe_crs)
         
-        #Define a global region that is centered on the study area
         
-        center_pt <- plot_lim%>%
-                     st_as_sfc()%>%
-                     st_centroid()
-        
-        lon0 <- st_coordinates(center_pt)[1]
-        lat0 <- st_coordinates(center_pt)[2]
-        
-        globe_crs <- sprintf("+proj=ortho +lat_0=%s +lon_0=%s",lat0, lon0)
         
         #define the box denoting the study region you want to highlight
         global_box <- plot_lim%>%
@@ -475,12 +480,13 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
           geom_sf(
             data = world_globe,
             colour = "grey20",
+            fill = "#A8D5A3",
             linewidth = 0.2
           ) +
           
           geom_sf(
             data = world_globe%>%filter(formal_en == "Canada"),
-            fill = "grey70",
+            fill = "#8AB58A",
             colour = "grey20",
             linewidth = 0.2
           ) +
@@ -728,10 +734,10 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                 
     scale3_plot <- ggplot()+
                    geom_sf(data=can_eez,fill=NA,colour="black")+
-                   geom_sf(data=basemap_inset%>%filter(country!="Canada"))+
-                   geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey70")+
+                   geom_sf(data=basemap_inset%>%filter(country!="Canada"),fill="#A8D5A3")+
+                   geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
                    geom_sf(data=cont_250_large,col="grey65",linewidth=0.4)+
-                   geom_sf(data=sab,fill="cornflowerblue",alpha=0.3)+
+                   geom_sf(data=sab,fill="cornflowerblue",alpha=0.6,colour="black",linewidth=0.6)+
                    geom_sf(data=tag_df,aes(fill=Common.Name),size=4,pch=21)+
                    #geom_sf(data=tag_df%>%filter(animal_id %in% scale3_pts$animal_id),aes(fill=Common.Name),size=4,pch=21)+
                    coord_sf(expand=0,xlim=scale3[c(1,3)],ylim=scale3[c(2,4)])+
@@ -827,10 +833,10 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     # 
     scale4_plot <- ggplot()+
                   geom_sf(data=can_eez,fill=NA,colour="black")+
-                  geom_sf(data=focal_countries)+
-                  geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey70")+
+                  geom_sf(data=focal_countries,fill="#A8D5A3")+
+                  geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
                   geom_sf(data=cont_250_large,col="grey65",linewidth=0.4)+
-                  geom_sf(data=sab,fill="cornflowerblue",alpha=0.3,colour="black")+
+                  geom_sf(data=sab,fill="cornflowerblue",alpha=0.6,colour="black",linewidth=0.6)+
                   geom_sf(data=tag_df,aes(fill=Common.Name),size=3,pch=21)+
                   #geom_sf(data=tag_df%>%filter(animal_id %in% scale4_pts$animal_id),aes(fill=Common.Name),size=3,pch=21)+
                   geom_sf(data=rings,lty=2,lwd=0.5,fill=NA)+
