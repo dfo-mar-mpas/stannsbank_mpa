@@ -74,6 +74,15 @@ can_eez <- read_sf("data/Shapefiles/can_eez.shp")%>%st_transform(latlong)
 #bathymetry for the St. Anns bank MPA
 sab_dem_hr_trimmed <- terra::rast("data/Bathymetry/TotalSABbathy/sab_dem_hr_trimmed.tif")%>%terra::project(latlong)
 
+#load bioregion and get plotting limits 
+bioregion <- data_planning_areas()%>%
+  st_transform(latlong)
+
+plot_lim <- bioregion%>% #bounding area for the inset (zoom out)
+  st_transform(utm)%>%
+  st_buffer(10)%>%
+  st_transform(latlong)%>%
+  st_bbox()
 
 #make a map of the regional network
 mar_net_df <- mar_net%>%
