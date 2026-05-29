@@ -324,7 +324,8 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                       geom_sf(data=otn_stations%>%filter(!grepl("_SB",station_name)),size=1.5,fill = "grey70", colour="black",shape=21,
                               stroke = 0.1)+
                       scale_fill_viridis(na.value = "transparent")+
-                      geom_sf(data=coast_hr,fill="#8AB58A")+
+                      #geom_sf(data=coast_hr,fill="#8AB58A")+
+                      geom_sf(data=coast_hr,fill="grey40")+
                       labs(fill="Depth (m)")+
                       new_scale_fill()+
                       geom_sf(data=recievers_sf%>%filter(!grepl("_SB",station_name)),aes(fill=array),col="black",shape=21,size=2,show.legend = FALSE)+
@@ -377,8 +378,10 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                     geom_sf(data=MPAs,fill="cornflowerblue",alpha=0.5)+
                     geom_sf(data=inset_otn_stations%>%filter(!grepl("_SB",station_name)),size=0.5,colour="black")+
                     geom_sf(data=recievers_sf%>%filter(!grepl("_SB",station_name)),aes(fill=array),size=0.5,colour="black")+
-                    geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
-                    geom_sf(data=basemap_inset%>%filter(country!="Canada"),fill="#A8D5A3")+
+                    #geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
+                    #geom_sf(data=basemap_inset%>%filter(country!="Canada"),fill="#A8D5A3")+
+                    geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey40")+
+                    geom_sf(data=basemap_inset%>%filter(country!="Canada"))+
                     geom_sf(data=plot_boundaries%>%st_as_sfc(),fill=NA)+ 
                     coord_sf(expand=0,xlim=plot_lim[c(1,3)],ylim=plot_lim[c(2,4)])+
                     theme_bw()+
@@ -402,8 +405,10 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
       
       global_inset <- ggplot()+
         geom_sf(data=can_eez,fill=NA,colour="black")+
-        geom_sf(data=focal_countries,fill="#A8D5A3")+
-        geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
+        #geom_sf(data=focal_countries,fill="#A8D5A3")+
+        #geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
+        geom_sf(data=focal_countries)+
+        geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey40")+
         geom_sf(data=cont_250_plotregion,color = "grey80",linewidth = 0.6)+
         geom_sf(data=plot_lim%>%st_as_sfc(),fill=NA)+
         geom_sf(data=mar_net_df%>%filter(TYPE == "TBD"),fill="grey70",alpha=0.25)+
@@ -477,13 +482,12 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
           geom_sf(
             data = world_globe,
             colour = "grey20",
-            fill = "#A8D5A3",
             linewidth = 0.2
           ) +
           
           geom_sf(
             data = world_globe%>%filter(formal_en == "Canada"),
-            fill = "#8AB58A",
+            fill = "grey40",
             colour = "grey20",
             linewidth = 0.2
           ) +
@@ -731,8 +735,10 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
                 
     scale3_plot <- ggplot()+
                    geom_sf(data=can_eez,fill=NA,colour="black")+
-                   geom_sf(data=basemap_inset%>%filter(country!="Canada"),fill="#A8D5A3")+
-                   geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
+                   # geom_sf(data=basemap_inset%>%filter(country!="Canada"),fill="#A8D5A3")+
+                   # geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
+                   geom_sf(data=basemap_inset%>%filter(country!="Canada"))+
+                   geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey40")+
                    geom_sf(data=cont_250_large,col="grey65",linewidth=0.4)+
                    geom_sf(data=sab,fill="cornflowerblue",alpha=0.6,colour="black",linewidth=0.6)+
                    geom_sf(data=tag_df,aes(fill=Common.Name),size=4,pch=21)+
@@ -830,8 +836,10 @@ coast_hr <- read_sf("data/shapefiles/NS_coastline_project_Erase1.shp")
     # 
     scale4_plot <- ggplot()+
                   geom_sf(data=can_eez,fill=NA,colour="black")+
-                  geom_sf(data=focal_countries,fill="#A8D5A3")+
-                  geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
+                  # geom_sf(data=focal_countries,fill="#A8D5A3")+
+                  # geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="#8AB58A")+
+                  geom_sf(data=focal_countries)+
+                  geom_sf(data=basemap_inset%>%filter(country=="Canada"),fill="grey40")+
                   geom_sf(data=cont_250_large,col="grey65",linewidth=0.4)+
                   geom_sf(data=sab,fill="cornflowerblue",alpha=0.6,colour="black",linewidth=0.6)+
                   geom_sf(data=tag_df,aes(fill=Common.Name),size=3,pch=21)+
